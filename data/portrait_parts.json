@@ -1,0 +1,164 @@
+{
+	"root": "res://character_assets",
+	"folders": {
+		"body": "body",
+		"eye": "eyes",
+		"brow": "brows",
+		"mouth": "mouth",
+		"hair": "hair",
+		"clothes": "clothes",
+		"accessory": "accessories",
+		"wrinkles": "wrinkles",
+		"facial_hair": "facial_hair"
+	},
+	"body": "body_base",
+	"skin_tones": [
+		{ "skin": "#f0c8a0", "brow": "#54392a" },
+		{ "skin": "#d9a878", "brow": "#432c1f" },
+		{ "skin": "#b98455", "brow": "#2f1e14" },
+		{ "skin": "#8a5a3a", "brow": "#1d120c" }
+	],
+	"hair_colors": ["#1c1a1a", "#2e211b", "#4a3226", "#6e4a2f", "#d9b56e"],
+	"hair_color_weights": [5, 4, 3, 2, 1],
+	"male_only_hair": ["hair_curly_fade", "hair_fade", "hair_messy_spiky", "hair_slick_back", "hair_wavy_textured"],
+	"retired_hair": ["hair_curly"],
+	"female_only_hair": [
+		"hair_bob_straight",
+		"hair_long_straight",
+		"hair_long_straight_bangs",
+		"hair_long_wavy",
+		"hair_messy_buns",
+		"hair_ponytail",
+		"hair_short_straight_bangs",
+		"hair_short_wavy"
+	],
+	"uniforms": {
+		"male": "clothes_uniform_male",
+		"female": "clothes_uniform_female"
+	},
+	"civilian_clothes": "clothes_tshirt",
+	"civilian_chance": 0.3,
+	"shirt_colors": ["#3b6ea5", "#a33b3b", "#3f7d5a", "#e0b23a", "#6b5b95", "#e8e4d8"],
+	"eye_shapes": ["round", "slanted"],
+	"pretty_eye_chance": {
+		"male": 0.0,
+		"female": 0.7
+	},
+	"lanyard_colors": {
+		"1": "#2f8f5b",
+		"2": "#e0b23a",
+		"3": "#2f6db5",
+		"4": "#b23a3a"
+	},
+	"accessories": [
+		{ "name": "accessory_lanyard", "chance": 0.5 },
+		{ "name": "accessory_sunglasses", "chance": 0.08, "hides_eyes": true },
+		{ "name": "accessory_sweat_drop", "chance": 0.0 }
+	],
+	"expressions": {
+		"neutral": { "eye": "open", "brow": "brow_normal", "mouth": "mouth_neutral" },
+		"happy": { "eye": "open", "brow": "brow_raised", "mouth": "mouth_smile" },
+		"delighted": { "eye": "open", "brow": "brow_raised", "mouth": "mouth_grin" },
+		"surprised": { "eye": "wide", "brow": "brow_raised", "mouth": "mouth_surprised" },
+		"nervous": { "eye": "wide", "brow": "brow_raised", "mouth": "mouth_nervous" },
+		"annoyed": { "eye": "side_eye", "brow": "brow_lowered", "mouth": "mouth_smirk" },
+		"angry": { "eye": "squint", "brow": "brow_lowered", "mouth": "mouth_downturned" },
+		"furious": { "eye": "squint", "brow": "brow_lowered", "mouth": "mouth_shout" }
+	},
+	"parents": [
+		{
+			"hair": "hair_short_wavy",
+			"hair_color": "#3a3533",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#7a4f6d",
+			"eye_style": "round_pretty",
+			"wrinkles": "wrinkles_light",
+			"accessories": [],
+			"expression": "annoyed"
+		},
+		{
+			"hair": "hair_bob_straight",
+			"hair_color": "#8d8783",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#5f7a5a",
+			"eye_style": "slanted_pretty",
+			"wrinkles": "wrinkles_heavy",
+			"accessories": [],
+			"expression": "annoyed"
+		},
+		{
+			"hair": "hair_slick_back",
+			"hair_color": "#6f6a66",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#4f6b7a",
+			"eye_style": "slanted",
+			"wrinkles": "wrinkles_light",
+			"facial_hair": "facial_hair_mustache",
+			"accessories": [],
+			"expression": "annoyed"
+		},
+		{
+			"hair": "hair_curly_fade",
+			"hair_color": "#9a9591",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#7d6a4a",
+			"eye_style": "round",
+			"wrinkles": "wrinkles_heavy",
+			"facial_hair": "facial_hair_beard",
+			"accessories": [],
+			"expression": "annoyed"
+		},
+		{
+			"hair": "hair_fade",
+			"hair_color": "#55504d",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#5a5f7d",
+			"eye_style": "round",
+			"wrinkles": "wrinkles_light",
+			"facial_hair": "facial_hair_goatee",
+			"accessories": [],
+			"expression": "annoyed"
+		}
+	],
+	"team": [
+		{
+			"name": "Razel",
+			"hair": "hair_long_straight_bangs",
+			"hair_color": "#0b0a0b",
+			"skin": "#c8a374",
+			"brow_color": "#2f2418",
+			"eye_style": "round_pretty",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#fbfaf4",
+			"accessories": ["accessory_lanyard"],
+			"accessory_colors": { "accessory_lanyard": "#1f5a3d" },
+			"expression": "happy"
+		},
+		{
+			"name": "Zsof",
+			"hair": "hair_long_wavy",
+			"hair_color": "#24160f",
+			"skin": "#f3d2b3",
+			"brow_color": "#3d2a1e",
+			"eye_style": "round_pretty",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#fbfaf4",
+			"accessories": ["accessory_lanyard"],
+			"accessory_colors": { "accessory_lanyard": "#1f5a3d" },
+			"expression": "happy"
+		},
+		{
+			"name": "Torcy",
+			"hair": "hair_wavy_textured",
+			"hair_color": "#151313",
+			"skin": "#bd9766",
+			"brow_color": "#2a1c12",
+			"eye_style": "round",
+			"clothes": "clothes_tshirt",
+			"clothes_color": "#fbfaf4",
+			"accessories": ["accessory_lanyard"],
+			"accessory_colors": { "accessory_lanyard": "#1f5a3d" },
+			"expression": "happy"
+		}
+	]
+}
