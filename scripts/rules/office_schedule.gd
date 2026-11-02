@@ -47,6 +47,36 @@ static func return_minutes(day_number: int, office: String, minute: float) -> fl
 	return wait
 
 
+## Game minutes as a clock, like "10:30" (0 is 8:00).
+static func clock(minute: float, with_suffix: bool = false) -> String:
+	var total := 8 * 60 + int(minute)
+	var hour := floori(total / 60.0)
+	var shown := hour if hour <= 12 else hour - 12
+	var text := "%d:%02d" % [shown, total % 60]
+	if with_suffix:
+		text += " AM" if hour < 12 else " PM"
+	return text
+
+
+## One line for the memo, like "Advisers on break 10:30–11:00".
+static func describe(day_number: int, office: String) -> String:
+	var plan := _plan(day_number, office)
+	var parts: Array = []
+	parts.append("Open all morning" if OPEN_STATUSES.has(plan["default"]) else "Closed today")
+	for window: Dictionary in plan["windows"]:
+		var span := "%s–%s" % [clock(window["from"]), clock(window["to"])]
+		match window["status"]:
+			"break":
+				parts.append("on break %s" % span)
+			"long_line":
+				parts.append("long line after %s" % clock(window["from"]))
+			"closed":
+				parts.append("closes at %s" % clock(window["from"]))
+			"open":
+				parts.append("open %s" % span)
+	return ", ".join(parts)
+
+
 static func _plan(day_number: int, office: String) -> Dictionary:
 	var override: Dictionary = GameData.day(day_number).get("offices", {}).get(office, {})
 	return {

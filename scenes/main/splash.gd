@@ -159,3 +159,4 @@ func _finish() -> void:
 	if not _done:
 		_done = true
 		finished.emit()
+		GameState.start_new_game()

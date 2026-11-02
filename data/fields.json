@@ -1,0 +1,19 @@
+{
+	"labels": {
+		"id_number": "ID number",
+		"name": "Name",
+		"program": "Program",
+		"year": "Year level",
+		"department": "Department",
+		"balance": "Balance",
+		"account": "ISMIS account",
+		"units_enrolled": "Units enrolled",
+		"max_units": "Max load",
+		"course": "Subject",
+		"section": "Section",
+		"units_after": "Units after",
+		"adviser": "Adviser",
+		"signature": "Signature"
+	},
+	"record_order": ["id_number", "name", "program", "year", "department", "balance", "account", "units_enrolled", "max_units"]
+}

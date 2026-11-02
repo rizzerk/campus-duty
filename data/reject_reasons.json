@@ -1,0 +1,6 @@
+{
+	"missing_requirement": { "label": "Missing requirement (return with list)", "stamp": "RETURNED" },
+	"failed_prereq": { "label": "Failed prerequisite (5.0)", "stamp": "REJECTED" },
+	"fake_signature": { "label": "Fake signature", "stamp": "REJECTED" },
+	"office_closed": { "label": "Office closed today, come back tomorrow", "stamp": "RETURNED" }
+}

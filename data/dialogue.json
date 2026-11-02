@@ -22,6 +22,10 @@
 			{ "ceb": "I-add lang ang {course}, palihug.", "en": "Just add {course}, please." }
 		]
 	},
+	"no_id": [
+		{ "ceb": "Nawala akong ID. Ang akong number kay {id}.", "en": "I lost my ID. My number is {id}." },
+		{ "ceb": "Nabilin nako akong ID sa boarding house. {id} akong ID number.", "en": "I left my ID at the boarding house. My ID number is {id}." }
+	],
 	"problems": {
 		"ismis_login": [
 			{ "ceb": "Dili ko maka-login sa ISMIS. Unsaon man ni?", "en": "I can't log in to ISMIS. What do I do?" },
@@ -57,6 +61,31 @@
 		],
 		"returned": [
 			{ "ceb": "Ok na, nahuman na nako didto.", "en": "Okay, I'm done over there." }
+		]
+	},
+	"ask": {
+		"requirement": [
+			{ "ceb": "Ay, nakalimtan nako ang {item}. Sorry kaayo.", "en": "Oh, I forgot the {item}. I'm so sorry." },
+			{ "ceb": "Wala pa diay ko kakuha sa {item}...", "en": "I haven't gotten the {item} yet..." }
+		],
+		"signature_blank": [
+			{ "ceb": "Wala pa diay napirmahan ni Sir. Akong balikan.", "en": "Sir hasn't signed it yet. I'll go back to him." }
+		],
+		"signature_fake": [
+			{ "ceb": "Ako ra ang nagpirma, wala man gud si Sir...", "en": "I signed it myself, Sir wasn't around..." }
+		],
+		"balance": [
+			{ "ceb": "Ay, wala pa diay nako nabayran ang tanan.", "en": "Oh, I haven't paid all of it yet." }
+		],
+		"harmless_name": [
+			{ "ceb": "Gipamubo ra na nako akong pangalan. Ako ra gyud na.", "en": "I just shortened my name. That's really me." }
+		],
+		"harmless_program": [
+			{ "ceb": "Pareho ra man na nga course, gisulat lang lahi.", "en": "That's the same course, just written differently." }
+		],
+		"same": [
+			{ "ceb": "Pareho ra man na, di ba?", "en": "That's the same, isn't it?" },
+			{ "ceb": "Unsa may problema ana?", "en": "What's wrong with that?" }
 		]
 	}
 }

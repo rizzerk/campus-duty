@@ -13,6 +13,8 @@ func _init() -> void:
 	_test_wrong_call_comes_back_then_walks_out()
 	_test_idle_player_runs_out()
 	_test_same_seed_same_line()
+	_test_stars()
+	_test_flags_and_asking()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -34,7 +36,12 @@ func _play(shift: ShiftState, policy: Callable) -> void:
 		if not shift.current.is_empty():
 			var choice: Array = policy.call(shift)
 			if not choice.is_empty():
-				shift.act(choice[0], choice[1])
+				shift.act(choice[0], {
+					"section": choice[1],
+					"flags": choice[2] if choice.size() > 2 else [],
+					"reason": choice[3] if choice.size() > 3 else "",
+					"items": choice[4] if choice.size() > 4 else [],
+				})
 
 
 func _perfect(shift: ShiftState) -> Array:
@@ -44,7 +51,7 @@ func _perfect(shift: ShiftState) -> Array:
 	var section := ""
 	if want["problem"] == "closed_section":
 		section = Timetable.fitting_sections(shift.current)[0]
-	return [want["action"], section]
+	return [want["action"], section, [], want["reason_id"], want["items"]]
 
 
 func _test_perfect_player_never_fails() -> void:
@@ -119,3 +126,46 @@ func _test_same_seed_same_line() -> void:
 	var a := ShiftState.new(4, 9)
 	var b := ShiftState.new(4, 9)
 	_check(a.line.size() == b.line.size() and a.line[0]["name"] == b.line[0]["name"], "same seed gives the same line")
+
+
+func _test_stars() -> void:
+	var game_state: GDScript = load("res://scripts/autoload/game_state.gd")
+	var idle := ShiftState.new(2, 42)
+	_play(idle, func(_s: ShiftState) -> Array: return [])
+	_check(game_state.stars_for(idle.summary()) == 0, "waiting out the clock earns no stars (%s)" % idle.end_reason)
+	var perfect := ShiftState.new(2, 42)
+	_play(perfect, _perfect)
+	_check(game_state.stars_for(perfect.summary()) == 3, "perfect day 2 earns 3 stars")
+	var walkout := perfect.summary()
+	walkout["walked_out"] = 1
+	_check(game_state.stars_for(walkout) == 2, "a walkout caps stars at 2")
+	var failed := perfect.summary()
+	failed["reason"] = "patience"
+	_check(game_state.stars_for(failed) == 0, "a failed shift earns no stars")
+	var half := perfect.summary()
+	half["served_ratio"] = 0.6
+	_check(game_state.stars_for(half) == 1, "serving only 60% of the line caps stars at 1")
+
+
+func _test_flags_and_asking() -> void:
+	var shift := ShiftState.new(2, 5)
+	var student := {}
+	for seed_value in 5000:
+		student = StudentGen.make(seed_value, 2)
+		if student["problems"] == ["missing_requirement"]:
+			break
+	student["number"] = 997
+	var real: Array = Mismatch.real_differences(student)[0]
+	shift.patience = 50.0
+	shift.current = student
+	var flags := [{ "form": real[0], "key": real[1], "context": "" }, { "form": 0, "key": "id_number", "context": "" }]
+	shift.act("reject", { "flags": flags, "reason": "missing_requirement", "items": RulesCheck.missing_items(student) })
+	_check(shift.caught == 1 and shift.false_alarms == 1, "one catch and one false alarm counted")
+	var expected := 50.0 + GameData.balance("patience_correct_bonus") + GameData.balance("patience_flag_bonus") - GameData.balance("patience_false_flag_penalty")
+	_check(is_equal_approx(shift.patience, expected), "flag bonus and penalty applied (%.1f vs %.1f)" % [shift.patience, expected])
+	_check(shift.summary()["caught"] == 1 and shift.summary()["false_alarms"] == 1, "summary counts flags")
+	var before_minute := shift.minute
+	var before_patience := shift.patience
+	shift.ask()
+	_check(is_equal_approx(shift.minute - before_minute, GameData.balance("ask_minutes")), "asking takes game time")
+	_check(shift.patience < before_patience, "asking costs patience")

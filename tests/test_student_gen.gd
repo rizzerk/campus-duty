@@ -47,11 +47,16 @@ func _check_student(s: Dictionary, day: int) -> void:
 		for other: String in GameData.problem(id)["excludes"]:
 			_check(not problems.has(other), "%s %s with %s" % [tag, id, other])
 	_check(s["visit"] == "first_year" or info["years"].has(float(s["year"])), "%s year %d" % [tag, s["year"]])
-	_check(_paper(s, "id_card")["fields"]["id_number"] == record["id_number"], "%s id card matches" % tag)
+	if s["no_id"]:
+		_check(day >= 3, "%s no ID card only from day 3" % tag)
+		_check(_paper(s, "id_card").is_empty(), "%s no-ID student has no card" % tag)
+		_check(s["line"]["en"].contains(record["id_number"]), "%s no-ID student says their number" % tag)
+	else:
+		_check(_paper(s, "id_card")["fields"]["id_number"] == record["id_number"], "%s id card matches" % tag)
 	_check(s["line"]["ceb"] != "" and s["line"]["en"] != "" and not s["line"]["en"].contains("{"), "%s line filled in" % tag)
 	_check(problems.has("missing_requirement") == _paper(s, "grad_checklist").get("fields", {}).values().has("Missing"), "%s missing requirement shown" % tag)
 	_check(problems.has("ismis_login") == (record["account"] == "Locked"), "%s locked account" % tag)
-	_check(problems.has("unpaid_balance") == (record["balance"] != "₱0.00"), "%s balance" % tag)
+	_check(problems.has("unpaid_balance") == (record["balance"] != "PHP 0.00"), "%s balance" % tag)
 	if problems.has("unpaid_balance") and not _paper(s, "assessment").is_empty():
 		_check(Mismatch.differs(s, _paper(s, "assessment"), "balance"), "%s balance mismatch flaggable" % tag)
 	var slip := _paper(s, "consultation_slip")
@@ -70,4 +75,8 @@ func _check_student(s: Dictionary, day: int) -> void:
 			_check(problems.has("failed_prereq") == (record["grades"][prereq] == "5.0"), "%s failed prereq grade" % tag)
 			_check(problems.has("inc_prereq") == (record["grades"][prereq] == "INC"), "%s INC grade" % tag)
 	if problems.is_empty():
-		_check(Mismatch.all_differences(s).is_empty(), "%s clean student has no mismatches" % tag)
+		_check(Mismatch.real_differences(s).is_empty(), "%s clean student has no real mismatches" % tag)
+	_check(day >= 3 or s["harmless"].is_empty(), "%s harmless quirks only from day 3" % tag)
+	for key: String in s["harmless"]:
+		_check(Mismatch.differs(s, _paper(s, "id_card"), key), "%s harmless %s shows on the ID" % [tag, key])
+		_check(not Mismatch.real_differs(s, _paper(s, "id_card"), key), "%s harmless %s isn't real" % [tag, key])

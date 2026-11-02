@@ -3,11 +3,16 @@
 	"shift_minutes": 240,
 	"patience_start": 100,
 	"patience_drain_base": 0.05,
-	"patience_drain_per_waiting": 0.012,
+	"patience_drain_per_waiting": 0.025,
 	"patience_correct_bonus": 3,
 	"patience_mistake_penalty": 12,
 	"patience_walkout_penalty": 8,
 	"wrong_return_minutes": 30,
 	"max_returns": 1,
-	"first_queue_number": 100
+	"first_queue_number": 100,
+	"star_thresholds": [0.5, 0.75, 0.9],
+	"patience_flag_bonus": 2,
+	"patience_false_flag_penalty": 5,
+	"ask_minutes": 3,
+	"ask_patience": 2
 }

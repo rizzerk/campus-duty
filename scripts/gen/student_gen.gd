@@ -26,6 +26,8 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 		"portrait": portrait,
 		"request": {},
 		"problems": [],
+		"harmless": [],
+		"no_id": false,
 		"returns": 0,
 		"mood": "calm",
 	}
@@ -34,6 +36,11 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 		_add_course_request(rng, student, program)
 	student["papers"] = _make_papers(rng, student, program)
 	_roll_problems(rng, student, day)
+	# Some students come without their ID card; the player searches ISMIS by number instead.
+	if rng.randf() < float(day.get("no_id_chance", 0.0)):
+		student["papers"].remove_at(0)
+		student["no_id"] = true
+	_roll_harmless(rng, student, program, day)
 	student["line"] = _make_line(rng, student)
 	return student
 
@@ -65,7 +72,7 @@ static func _make_record(rng: RandomNumberGenerator, student: Dictionary, progra
 		"program": program["code"],
 		"year": str(student["year"]),
 		"department": program["department"],
-		"balance": "₱0.00",
+		"balance": "PHP 0.00",
 		"account": "Active",
 		"max_units": 24,
 		"units_enrolled": int(_pick(rng, data["unit_loads"])),
@@ -143,7 +150,7 @@ static func _make_papers(rng: RandomNumberGenerator, student: Dictionary, progra
 				fields[requirement["key"]] = "Attached"
 			papers.append({ "form": "grad_checklist", "title": "Graduation clearance", "fields": fields })
 		"enrollment_payment", "first_year":
-			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "balance": "₱0.00" } })
+			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "balance": "PHP 0.00" } })
 		"enroll_subject", "add_subject":
 			var request: Dictionary = student["request"]
 			papers.append({
@@ -175,6 +182,24 @@ static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day:
 			continue
 		if rng.randf() < float(day["problems"][id]) and _apply_problem(rng, student, id):
 			student["problems"].append(id)
+
+
+## A difference that doesn't matter: a shortened first name or another way of writing the
+## program on the ID card. The record keeps the official spelling.
+static func _roll_harmless(rng: RandomNumberGenerator, student: Dictionary, program: Dictionary, day: Dictionary) -> void:
+	if rng.randf() >= float(day.get("harmless_chance", 0.0)):
+		return
+	var card := _paper(student, "id_card")
+	if card.is_empty():
+		return
+	if rng.randf() < 0.5:
+		var first: String = student["name"].get_slice(" ", 0)
+		var short := "Ma." if first == "Maria" else first.left(1) + "."
+		card["fields"]["name"] = student["name"].replace(first, short)
+		student["harmless"].append("name")
+	else:
+		card["fields"]["program"] = _pick(rng, program["aliases"])
+		student["harmless"].append("program")
 
 
 ## Changes the papers or record so the problem is really there to find. False if it can't apply.
@@ -230,11 +255,13 @@ static func _make_line(rng: RandomNumberGenerator, student: Dictionary) -> Dicti
 	for id: String in student["problems"]:
 		if dialogue["problems"].has(id):
 			options = dialogue["problems"][id]
+	if student["no_id"]:
+		options = dialogue["no_id"]
 	var line: Dictionary = _pick(rng, options).duplicate()
 	var request: Dictionary = student["request"]
 	var section: String = request.get("section", "")
 	for lang: String in ["ceb", "en"]:
-		line[lang] = line[lang].format({ "course": request.get("course", ""), "section": section.get_slice("-", 1) })
+		line[lang] = line[lang].format({ "course": request.get("course", ""), "section": section.get_slice("-", 1), "id": student["record"]["id_number"] })
 	return line
 
 

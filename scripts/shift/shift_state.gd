@@ -20,6 +20,9 @@ var bench: Array = []
 var served: int = 0
 var mistakes: int = 0
 var walked_out: int = 0
+var caught: int = 0
+var false_alarms: int = 0
+var total_students: int = 0
 var history: Array = []
 var ended: bool = false
 var end_reason: String = ""
@@ -46,6 +49,7 @@ func _init(day_number: int, base_seed: int) -> void:
 		for i in int(rush["count"]):
 			times.append(float(rush["at"]))
 	times.sort()
+	total_students = times.size()
 	for i in times.size():
 		var student := StudentGen.make(base_seed * 100000 + day * 1000 + i, day)
 		student["number"] = number + i
@@ -60,11 +64,7 @@ func offices() -> Dictionary:
 
 ## Game time as a clock string, like "10:45 AM".
 func clock_text() -> String:
-	var total := 8 * 60 + int(minute)
-	var hour := total / 60
-	var suffix := "AM" if hour < 12 else "PM"
-	var shown := hour if hour <= 12 else hour - 12
-	return "%d:%02d %s" % [shown, total % 60, suffix]
+	return OfficeSchedule.clock(minute, true)
 
 
 func tick(delta_seconds: float) -> void:
@@ -110,22 +110,38 @@ func bench_full() -> bool:
 	return bench.size() >= BENCH_SEATS
 
 
-## The player's decision on the student at the window. Returns the rules result plus an outcome:
-## served, stays, routed, held, let_through, sent_back_wrong or walked_out.
-func act(action: String, picked_section: String = "") -> Dictionary:
+## Asking the student about a flag takes a few minutes and tries the line's patience.
+func ask() -> void:
+	if ended:
+		return
+	minute += GameData.balance("ask_minutes")
+	patience -= GameData.balance("ask_patience")
+	tick(0.0)
+
+
+## The player's decision on the student at the window. details holds "section" (section picker)
+## and "flags" (the player's flagged mismatches, judged now). Returns the rules result plus an
+## outcome: served, stays, routed, held, let_through, sent_back_wrong or walked_out.
+func act(action: String, details: Dictionary = {}) -> Dictionary:
 	if ended or current.is_empty():
 		return {}
 	if action == "hold" and bench_full():
 		return { "error": "bench_full" }
 	var student := current
-	var result := RulesCheck.judge(student, action, offices(), picked_section)
+	var result := RulesCheck.judge(student, action, offices(), details)
+	var flag_score := Mismatch.score_flags(student, details.get("flags", []))
+	caught += flag_score["caught"]
+	false_alarms += flag_score["false_alarms"]
+	patience += flag_score["caught"] * GameData.balance("patience_flag_bonus")
+	patience -= flag_score["false_alarms"] * GameData.balance("patience_false_flag_penalty")
+	patience = minf(patience, GameData.balance("patience_start"))
 	var outcome := ""
 	if result["correct"]:
 		patience = minf(patience + GameData.balance("patience_correct_bonus"), GameData.balance("patience_start"))
 		if action == "fix":
 			student["problems"].erase(result["problem"])
 			if result["problem"] == "closed_section":
-				student["request"]["section"] = picked_section
+				student["request"]["section"] = details.get("section", "")
 			outcome = "stays" if not student["problems"].is_empty() else _finish("served")
 		elif action.begins_with("route:"):
 			var office := action.trim_prefix("route:")
@@ -160,6 +176,8 @@ func act(action: String, picked_section: String = "") -> Dictionary:
 		"problem": result["problem"],
 		"reason": result["reason"],
 		"outcome": outcome,
+		"caught": flag_score["caught"],
+		"false_alarms": flag_score["false_alarms"],
 		"clock": clock_text(),
 	})
 	if outcome != "stays":
@@ -181,7 +199,13 @@ func summary() -> Dictionary:
 		"correct": correct,
 		"mistakes": mistakes,
 		"walked_out": walked_out,
-		"accuracy": float(correct) / history.size() if not history.is_empty() else 1.0,
+		"caught": caught,
+		"false_alarms": false_alarms,
+		"total": total_students,
+		"served_ratio": float(served) / maxi(1, total_students),
+		"clock": OfficeSchedule.clock(minute, true),
+		# No decisions at all counts as 0%, so waiting out the clock earns nothing.
+		"accuracy": float(correct) / history.size() if not history.is_empty() else 0.0,
 	}
 
 

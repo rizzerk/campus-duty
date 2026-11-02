@@ -3,6 +3,8 @@
 	"last_day": 8,
 	"days": {
 		"2": {
+			"reject_reasons": ["missing_requirement"],
+			"actions": ["approve", "reject"],
 			"phase": "4th-year enrollment",
 			"intro": "Good morning! Graduating students are filing their clearances today. Expect about 16 before noon.",
 			"rules": [
@@ -18,10 +20,14 @@
 			"max_problems": 1
 		},
 		"3": {
+			"no_id_chance": 0.12,
+			"harmless_chance": 0.25,
+			"actions": ["fix"],
 			"phase": "3rd-year enrollment",
 			"intro": "Third years enroll today. Some sections will fill up fast.",
 			"rules": [
-				{ "text": "Full section? Open the section picker and find an open one with no schedule clash.", "new": true }
+				{ "text": "Full section? Open the section picker and find an open one with no schedule clash.", "new": true },
+				{ "text": "Short forms are fine: Ma. for Maria, J. for Juan, BS IT for BSIT. Don't flag them.", "new": true }
 			],
 			"students": 18,
 			"start_line": 6,
@@ -31,6 +37,9 @@
 			"max_problems": 1
 		},
 		"4": {
+			"no_id_chance": 0.12,
+			"harmless_chance": 0.25,
+			"actions": ["route"],
 			"phase": "2nd-year enrollment",
 			"intro": "Second years today. The Cashier gets busy after 10:00.",
 			"rules": [
@@ -47,6 +56,8 @@
 			}
 		},
 		"5": {
+			"no_id_chance": 0.12,
+			"harmless_chance": 0.25,
 			"phase": "1st-year enrollment",
 			"intro": "Freshmen day. Many of them have never logged in to ISMIS before.",
 			"rules": [
@@ -60,6 +71,9 @@
 			"max_problems": 2
 		},
 		"6": {
+			"no_id_chance": 0.12,
+			"reject_reasons": ["failed_prereq"],
+			"harmless_chance": 0.25,
 			"phase": "Open market",
 			"intro": "Open market! Every year level at once, and slots drain live. Stay sharp.",
 			"rules": [
@@ -74,6 +88,10 @@
 			"rush": [{ "at": 60, "count": 5 }, { "at": 150, "count": 5 }]
 		},
 		"7": {
+			"no_id_chance": 0.12,
+			"reject_reasons": ["fake_signature"],
+			"harmless_chance": 0.25,
+			"actions": ["hold"],
 			"phase": "Adjustment, day 1",
 			"intro": "Add/drop starts today. Expect a busy line, about 24 students before noon.",
 			"rules": [
@@ -92,6 +110,9 @@
 			}
 		},
 		"8": {
+			"no_id_chance": 0.12,
+			"reject_reasons": ["office_closed"],
+			"harmless_chance": 0.25,
 			"phase": "Adjustment, day 2",
 			"intro": "Overload requests start today. The Dean's office takes them until 11:30.",
 			"rules": [

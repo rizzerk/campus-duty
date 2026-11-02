@@ -12,10 +12,11 @@
 	],
 	"passing_grades": ["1.0", "1.2", "1.5", "1.7", "2.0", "2.2", "2.5", "2.7", "3.0"],
 	"unit_loads": [15, 18, 21],
-	"balances": ["₱1,250.00", "₱2,480.00", "₱3,450.00", "₱5,900.00", "₱8,125.00"],
+	"balances": ["PHP 1,250.00", "PHP 2,480.00", "PHP 3,450.00", "PHP 5,900.00", "PHP 8,125.00"],
 	"programs": [
 		{
 			"code": "BSIT",
+			"aliases": ["BS IT", "BS Info Tech"],
 			"department": "Dept. of Computer, Information Sciences and Mathematics",
 			"advisers": [
 				{ "name": "Mr. R. Tan", "specimen": "RTan" },
@@ -52,6 +53,7 @@
 		},
 		{
 			"code": "BSA",
+			"aliases": ["BS Accountancy", "BS Acctg."],
 			"department": "Dept. of Accountancy",
 			"advisers": [
 				{ "name": "Ms. L. Bacalso", "specimen": "LBacalso" },
@@ -88,6 +90,7 @@
 		},
 		{
 			"code": "BSCE",
+			"aliases": ["BS CE", "BS Civil Eng."],
 			"department": "Dept. of Civil Engineering",
 			"advisers": [
 				{ "name": "Engr. D. Navarro", "specimen": "DNavarro" },
