@@ -42,8 +42,14 @@ static func _good_key(entry: Dictionary) -> String:
 static func _bad_key(entry: Dictionary) -> String:
 	var action: String = entry["action"]
 	var expected: String = entry["expected"]
+	if entry.get("bent", false):
+		return "bent_caught" if entry.get("spotted", false) else "bent"
 	if entry["outcome"] == "walked_out":
 		return "walked_out"
+	if entry.get("reason", "").begins_with("Right idea, wrong order"):
+		return "wrong_order"
+	if entry["outcome"] == "wrong_fix":
+		return "wrong_fix"
 	if action.begins_with("route:") and not entry.get("office_open", true):
 		return "closed_office"
 	if action.begins_with("route:") and expected.begins_with("route:"):

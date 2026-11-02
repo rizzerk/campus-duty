@@ -18,6 +18,9 @@ func _init() -> void:
 				seen[id] = true
 	for id: String in GameData.json("problems"):
 		_check(seen.has(id), "problem %s shows up somewhere in days 2-8" % id)
+	_test_traits()
+	_test_traits_dont_change_problems()
+	_test_favors()
 	print("student_gen: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -86,3 +89,83 @@ func _check_student(s: Dictionary, day: int) -> void:
 	for key: String in s["harmless"]:
 		_check(Mismatch.differs(s, _paper(s, "id_card"), key), "%s harmless %s shows on the ID" % [tag, key])
 		_check(not Mismatch.real_differs(s, _paper(s, "id_card"), key), "%s harmless %s isn't real" % [tag, key])
+
+
+func _test_traits() -> void:
+	var traits: Dictionary = GameData.json("traits")
+	var seen := {}
+	for day in range(2, 9):
+		var allowed: Dictionary = GameData.day(day).get("traits", {})
+		for id: String in allowed:
+			_check(traits.has(id), "day %d trait %s exists" % [day, id])
+		for seed_value in SEEDS:
+			var student := StudentGen.make(seed_value, day)
+			var id: String = student["trait"]
+			var accessories: Array = student["portrait"]["accessories"]
+			_check(accessories.has("accessory_sweat_drop") == (id == "impatient"), "sweat drop only on impatient students")
+			_check(accessories.has("accessory_sunglasses") == (id == "kapit"), "sunglasses only on kapit students")
+			_check(student["portrait"].has("parent") == (id == "with_parent"), "parent only with the trait")
+			if id == "":
+				continue
+			seen[id] = true
+			_check(allowed.has(id), "day %d only rolls its own traits (%s)" % [day, id])
+			var visits: Array = traits[id].get("visits", [])
+			_check(visits.is_empty() or visits.has(student["visit"]), "%s only on %s" % [id, visits])
+			var tell: Dictionary = traits[id]["tell"]
+			if tell.has("expression"):
+				_check(student["portrait"]["expression"] == tell["expression"], "%s rests with its face" % id)
+			if id == "kapit":
+				_check(student["favor"] == "connections", "kapit always pushes for a favor")
+	for id: String in traits:
+		_check(seen.has(id), "trait %s shows up somewhere" % id)
+		var info: Dictionary = traits[id]
+		_check(info.has("lines") or info.has("favor"), "trait %s has something to say" % id)
+
+
+## Traits use their own random numbers, so turning them off leaves every problem and paper as is.
+func _test_traits_dont_change_problems() -> void:
+	var days: Dictionary = GameData.json("days")["days"]
+	var with_traits := {}
+	for seed_value in 200:
+		with_traits[seed_value] = StudentGen.make(seed_value, 7)
+	var saved: Dictionary = days["7"]["traits"]
+	var saved_favors: float = days["7"]["favor_chance"]
+	days["7"]["traits"] = {}
+	days["7"]["favor_chance"] = 0.0
+	for seed_value in 200:
+		var plain := StudentGen.make(seed_value, 7)
+		var traited: Dictionary = with_traits[seed_value]
+		_check(plain["problems"] == traited["problems"], "seed %d keeps its problems" % seed_value)
+		_check(plain["papers"] == traited["papers"], "seed %d keeps its papers" % seed_value)
+		_check(plain["record"] == traited["record"], "seed %d keeps its record" % seed_value)
+	days["7"]["traits"] = saved
+	days["7"]["favor_chance"] = saved_favors
+
+
+func _test_favors() -> void:
+	var favors: Dictionary = GameData.json("favors")
+	for id: String in favors:
+		_check(not favors[id]["lines"].is_empty(), "favor %s has lines" % id)
+	var on_clean := 0
+	var on_problem := 0
+	for seed_value in 1000:
+		var student := StudentGen.make(seed_value, 7)
+		if student["favor"] == "":
+			continue
+		_check(favors.has(student["favor"]), "favor %s exists" % student["favor"])
+		if student["problems"].is_empty():
+			on_clean += 1
+		else:
+			on_problem += 1
+	_check(on_clean > 10 and on_problem > 10, "favors come from clean and problem students alike (%d, %d)" % [on_clean, on_problem])
+	for seed_value in 300:
+		_check(StudentGen.make(seed_value, 3)["favor"] == "", "no favors before day 4")
+	var both := 0
+	for seed_value in 5000:
+		var student := StudentGen.make(seed_value, 7)
+		if student["no_id"] and student["favor"] != "":
+			both += 1
+			_check(student["line"]["en"].contains(student["record"]["id_number"]), "no ID: they still say their number")
+			var offers: Array = favors[student["favor"]]["lines"]
+			_check(offers.any(func(o: Dictionary) -> bool: return student["line"]["en"].ends_with(o["en"])), "no ID: they still ask for the favor")
+	_check(both > 0, "some students have no ID and ask for a favor")

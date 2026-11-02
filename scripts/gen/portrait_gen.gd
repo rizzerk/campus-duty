@@ -52,6 +52,18 @@ static func roll(seed_value: int, with_parent: bool = false, year: int = 0) -> D
 	return parts
 
 
+## A trait's visual tell on top of the random roll: forced accessories, a resting expression, or
+## a parent standing behind (rolled again from the same seed, so the face stays the same).
+static func with_tell(parts: Dictionary, seed_value: int, tell: Dictionary) -> Dictionary:
+	var result := roll(seed_value, true, parts["year"]) if tell.get("parent", false) else parts.duplicate(true)
+	for accessory: String in tell.get("accessories", []):
+		if not result["accessories"].has(accessory):
+			result["accessories"].append(accessory)
+	if tell.has("expression"):
+		result["expression"] = tell["expression"]
+	return result
+
+
 ## All part names in a slot folder, found by scanning so a new PNG needs no code change.
 static func list_parts(slot: String) -> PackedStringArray:
 	var names := PackedStringArray()

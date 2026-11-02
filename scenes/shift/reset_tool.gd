@@ -106,6 +106,8 @@ func _look_up(number: String) -> void:
 	if _found:
 		_status.text = "Account found · %s · %s" % [_student["record"]["name"], _student["record"]["account"].to_upper()]
 		_status.add_theme_color_override("font_color", UiKit.INK)
+		if not _locked():
+			_status.text += " · This account isn't locked. Nothing to reset."
 		_number.release_focus()
 	else:
 		_status.text = "No account found for %s." % (number if number != "" else "an empty number")
@@ -122,7 +124,12 @@ func _toggle(index: int) -> void:
 
 
 func _update_print() -> void:
-	_print.disabled = not (_found and _checks.all(func(box: CheckMark) -> bool: return box.checked))
+	_print.disabled = not (_found and _locked() and _checks.all(func(box: CheckMark) -> bool: return box.checked))
+
+
+## Only a locked account can be reset. ISMIS already shows the status, so this isn't a hint.
+func _locked() -> bool:
+	return _student["record"]["account"] == "Locked"
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

@@ -37,7 +37,12 @@ func _ready() -> void:
 	columns.add_theme_constant_override("separation", 24)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	layout.add_child(columns)
-	columns.add_child(_today_card(summary))
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 14)
+	columns.add_child(left)
+	left.add_child(_today_card(summary))
+	if not summary.get("spot_check", []).is_empty():
+		left.add_child(_spot_check_card(summary))
 	columns.add_child(_because_card())
 	var foot := HBoxContainer.new()
 	foot.add_theme_constant_override("separation", 20)
@@ -58,11 +63,13 @@ func _ready() -> void:
 
 func _today_card(summary: Dictionary) -> Control:
 	var card := UiKit.card(UiKit.CREAM, 18, 5)
-	card.custom_minimum_size.x = 420
+	card.custom_minimum_size.x = 440
+	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var compact: bool = not summary.get("spot_check", []).is_empty()
 	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 8)
+	list.add_theme_constant_override("separation", 2 if compact else 8)
 	card.add_child(list)
-	list.add_child(UiKit.label("Today", 28))
+	list.add_child(UiKit.label("Today", 24 if compact else 28))
 	for row: Array in [
 		["Students served", "%d / %d" % [summary["served"], summary["total"]]],
 		["Correct calls", summary["correct"]],
@@ -70,18 +77,63 @@ func _today_card(summary: Dictionary) -> Control:
 		["Walked out angry", summary["walked_out"]],
 		["Mismatches caught", summary["caught"]],
 		["False alarms", summary["false_alarms"]],
-	]:
+	] + ([["Favors done", summary["bends"]]] if summary.get("bends", 0) > 0 else []):
 		var line := HBoxContainer.new()
-		var caption := UiKit.label(row[0], 22, Color("#3a463e"))
+		var caption := UiKit.label(row[0], 19 if compact else 22, Color("#3a463e"))
 		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		line.add_child(caption)
-		line.add_child(UiKit.label(str(row[1]), 26))
+		line.add_child(UiKit.label(str(row[1]), 21 if compact else 26))
 		list.add_child(line)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	list.add_child(spacer)
-	list.add_child(UiKit.wrapped("3 stars needs 90% correct, 90% of the line served and no walkouts.", 17, UiKit.MUTED))
+	list.add_child(UiKit.wrapped("3 stars needs 90% correct, 90% of the line served and no walkouts.", 15 if compact else 17, UiKit.MUTED))
 	return card
+
+
+## Ma'am Lorna's spot check: three of today's transactions, looked at again. Each favor she
+## catches costs a star.
+func _spot_check_card(summary: Dictionary) -> Control:
+	var card := UiKit.card(UiKit.CREAM, 14, 5)
+	card.custom_minimum_size.x = 440
+	var body := HBoxContainer.new()
+	body.add_theme_constant_override("separation", 12)
+	card.add_child(body)
+	var lorna := UiKit.portrait_frame(PortraitGen.data()["staff"]["lorna"], 64, UiKit.INK, Color("#9fd0e8"), 3)
+	lorna.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	body.add_child(lorna)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 2)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(list)
+	list.add_child(UiKit.label("Ma'am Lorna's spot check", 22))
+	var worst := "fine"
+	for row: Dictionary in summary["spot_check"]:
+		var verdict: String = row["verdict"]
+		if verdict == "bent" or (verdict == "wrong" and worst == "fine"):
+			worst = verdict
+		var text: String = { "fine": "Fine", "wrong": "Wrong call", "bent": "Favor caught · −1 star" }[verdict]
+		list.add_child(_spot_row("#%s %s" % [row["number"], row["name"]], text, verdict))
+	var options: Array = GameData.json("dialogue")["spot_check"][worst]
+	var line: Dictionary = options[(GameState.base_seed + GameState.day) % options.size()]
+	list.add_child(UiKit.wrapped("“%s” %s" % [line["ceb"], line["en"]], 15, UiKit.MUTED))
+	return card
+
+
+func _spot_row(who: String, verdict_text: String, verdict: String) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var dot := ColorRect.new()
+	dot.color = { "fine": UiKit.OK, "wrong": UiKit.RED, "bent": UiKit.GOLD_DARK }[verdict]
+	dot.custom_minimum_size = Vector2(10, 10)
+	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(dot)
+	var name_label := UiKit.label(who, 17, Color("#3a463e"))
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.clip_text = true
+	row.add_child(name_label)
+	row.add_child(UiKit.label(verdict_text, 17, UiKit.GOLD_DARK if verdict == "bent" else UiKit.INK))
+	return row
 
 
 ## F7's "Because of you": what the player's calls led to, wrong calls first.

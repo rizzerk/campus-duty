@@ -1,8 +1,9 @@
 class_name SectionPicker
 extends Control
-## F5: the section picker. The week on the left, the subject's sections on the right. Click a
-## section (or press its number) to see it on the week, then enroll. Spotting a clash is up to the
-## player; on open market day the seat counts keep dropping while they look.
+## F5: the section picker. The week on the left, the subject's sections on the right. Fix means
+## moving the student out of a full section: click a section (or press its number) to see it on
+## the week, then move them. Their own section can't be picked, since that changes nothing.
+## Spotting a clash is up to the player; on open market day the seat counts keep dropping.
 
 signal chosen(code: String)
 signal cancelled
@@ -45,7 +46,7 @@ func _build(student: Dictionary, live: bool) -> void:
 	left.add_theme_constant_override("separation", 10)
 	columns.add_child(left)
 	left.add_child(UiKit.label("Section picker · %s %s" % [request["course"], request["title"]], 28))
-	left.add_child(UiKit.label("%s asked for %s. Pick an open section that fits their week." % [student["name"], request["section"]], 17, UiKit.MUTED))
+	left.add_child(UiKit.label("%s picked %s. Is it full? Move them to an open section that fits their week." % [student["name"], request["section"]], 17, UiKit.MUTED))
 	_grid = TimetableGrid.new()
 	_grid.schedule = student["record"]["schedule"]
 	_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -109,7 +110,8 @@ func _make_section_card(index: int) -> Control:
 	var top := HBoxContainer.new()
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	rows.add_child(top)
-	var code := UiKit.label("%d  %s" % [index + 1, section["code"]], 19)
+	var own: bool = section["code"] == _student["request"]["section"]
+	var code := UiKit.label("%d  %s%s" % [index + 1, section["code"], "  · their section" if own else ""], 19)
 	code.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(code)
 	var seats := UiKit.label("", 16)
@@ -137,7 +139,7 @@ func _refresh_seats() -> void:
 	if _selected >= 0:
 		var picked: Dictionary = _sections[_selected]
 		var full := " (FULL)" if picked["seats"] <= 0 else ""
-		_enroll.text = "Enter  Enroll in %s%s" % [picked["code"], full]
+		_enroll.text = _button_text(picked, full)
 
 
 func _select(index: int) -> void:
@@ -148,8 +150,18 @@ func _select(index: int) -> void:
 	_style_card(index)
 	var section: Dictionary = _sections[index]
 	_grid.show_preview(section["code"], section["slots"])
-	_enroll.text = "Enter  Enroll in %s" % section["code"]
-	_enroll.disabled = false
+	_enroll.text = _button_text(section, "")
+	_enroll.disabled = _is_theirs(index)
+
+
+func _is_theirs(index: int) -> bool:
+	return _sections[index]["code"] == _student["request"]["section"]
+
+
+func _button_text(section: Dictionary, full: String) -> String:
+	if section["code"] == _student["request"]["section"]:
+		return "They're already in %s" % section["code"]
+	return "Enter  Move to %s%s" % [section["code"], full]
 
 
 func _style_card(index: int) -> void:
@@ -176,7 +188,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _confirm() -> void:
-	if _selected < 0:
+	if _selected < 0 or _is_theirs(_selected):
 		return
 	chosen.emit(_sections[_selected]["code"])
 	queue_free()

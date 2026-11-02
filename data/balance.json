@@ -14,5 +14,8 @@
 	"patience_flag_bonus": 2,
 	"patience_false_flag_penalty": 5,
 	"ask_minutes": 3,
-	"ask_patience": 2
+	"ask_patience": 2,
+	"bend_patience": 8,
+	"parent_argue_minutes": 4,
+	"spot_check": { "from_day": 4, "count": 3, "bend_weight": 3 }
 }

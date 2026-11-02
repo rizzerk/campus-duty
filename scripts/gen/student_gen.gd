@@ -5,6 +5,9 @@ extends RefCounted
 
 const SECTION_LETTERS := ["A", "B", "C", "D", "E", "F"]
 const SEASON_YEAR := 2026
+## Some students come in worried about an ISMIS error, problem or not.
+const WORRIED_CHANCE := 0.2
+const RANDOM_FAVORS := ["sob_story", "merienda"]
 
 
 static func make(seed_value: int, day_number: int) -> Dictionary:
@@ -30,6 +33,8 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 		"no_id": false,
 		"returns": 0,
 		"mood": "calm",
+		"trait": "",
+		"favor": "",
 	}
 	student["record"] = _make_record(rng, student, program)
 	if visit in ["enroll_subject", "add_subject"]:
@@ -41,8 +46,38 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 		student["papers"].remove_at(0)
 		student["no_id"] = true
 	_roll_harmless(rng, student, program, day)
+	# Traits and favors use their own generator, so adding them never changes anyone's problems.
+	var extra_rng := RandomNumberGenerator.new()
+	extra_rng.seed = seed_value * 31 + 7
+	_roll_trait(extra_rng, student, day)
+	_roll_favor(extra_rng, student, day)
+	student["worried"] = extra_rng.randf() < WORRIED_CHANCE
 	student["line"] = _make_line(rng, student)
 	return student
+
+
+## At most one trait. Traits change how a student behaves, never what the right call is.
+static func _roll_trait(rng: RandomNumberGenerator, student: Dictionary, day: Dictionary) -> void:
+	var traits: Dictionary = GameData.json("traits")
+	for id: String in day.get("traits", {}):
+		var visits: Array = traits[id].get("visits", [])
+		if not visits.is_empty() and not visits.has(student["visit"]):
+			continue
+		if rng.randf() < float(day["traits"][id]):
+			student["trait"] = id
+			break
+	if student["trait"] != "":
+		student["portrait"] = PortraitGen.with_tell(student["portrait"], student["seed"], traits[student["trait"]]["tell"])
+
+
+## Kapit students always push for a favor; anyone else might, whether or not they need one, so
+## an offer on its own gives nothing away.
+static func _roll_favor(rng: RandomNumberGenerator, student: Dictionary, day: Dictionary) -> void:
+	var from_trait: String = GameData.json("traits")[student["trait"]].get("favor", "") if student["trait"] != "" else ""
+	if from_trait != "":
+		student["favor"] = from_trait
+	elif rng.randf() < float(day.get("favor_chance", 0.0)):
+		student["favor"] = _pick(rng, RANDOM_FAVORS)
 
 
 static func _make_name(rng: RandomNumberGenerator, gender: String) -> String:
@@ -305,15 +340,28 @@ static func _forge(rng: RandomNumberGenerator, specimen: String) -> String:
 			return specimen.to_lower() if specimen != specimen.to_lower() else specimen.capitalize()
 
 
+## The opening line. Most important first: no ID card (the player has to type the number), a
+## favor, the trait, a worried question, a problem they know about, then the reason for the visit.
 static func _make_line(rng: RandomNumberGenerator, student: Dictionary) -> Dictionary:
 	var dialogue: Dictionary = GameData.json("dialogue")
 	var options: Array = dialogue["visits"][student["visit"]]
 	for id: String in student["problems"]:
 		if dialogue["problems"].has(id):
 			options = dialogue["problems"][id]
+	if student["worried"]:
+		options = dialogue["worried"]
+	var trait_lines: Array = GameData.json("traits")[student["trait"]].get("lines", []) if student["trait"] != "" else []
+	if not trait_lines.is_empty():
+		options = trait_lines
+	if student["favor"] != "":
+		options = GameData.json("favors")[student["favor"]]["lines"]
 	if student["no_id"]:
 		options = dialogue["no_id"]
 	var line: Dictionary = _pick(rng, options).duplicate()
+	if student["no_id"] and student["favor"] != "":
+		# They still need to say their number, but the favor is the point of the visit.
+		var offer: Dictionary = _pick(rng, GameData.json("favors")[student["favor"]]["lines"])
+		line = { "ceb": "%s %s" % [line["ceb"], offer["ceb"]], "en": "%s %s" % [line["en"], offer["en"]] }
 	var request: Dictionary = student["request"]
 	var section: String = request.get("section", "")
 	for lang: String in ["ceb", "en"]:

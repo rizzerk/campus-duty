@@ -52,7 +52,7 @@
 	},
 	"accessories": [
 		{ "name": "accessory_lanyard", "chance": 0.5 },
-		{ "name": "accessory_sunglasses", "chance": 0.08, "hides_eyes": true },
+		{ "name": "accessory_sunglasses", "chance": 0.0, "hides_eyes": true },
 		{ "name": "accessory_sweat_drop", "chance": 0.0 }
 	],
 	"expressions": {

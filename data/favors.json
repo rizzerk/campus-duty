@@ -1,0 +1,26 @@
+{
+	"connections": {
+		"label": "Dean's nephew",
+		"lines": [
+			{ "ceb": "Pamangkin ko sa Dean, ha. Pasagdi na lang ni, dali ra.", "en": "I'm the Dean's nephew, you know. Just let this through, it's quick." },
+			{ "ceb": "Kaila ko sa Registrar. Ayaw na lang ug kuti-kuti, stamp-i na lang.", "en": "I know the Registrar. Don't nitpick, just stamp it." },
+			{ "ceb": "Tawagan nako si Sir Dean kung dili nimo ni i-approve.", "en": "I'll call the Dean if you don't approve this." }
+		]
+	},
+	"sob_story": {
+		"label": "Sob story",
+		"lines": [
+			{ "ceb": "Palihug. Mawala akong scholarship kung dili ko ma-enroll karon.", "en": "Please. I'll lose my scholarship if I'm not enrolled today." },
+			{ "ceb": "Taga-bukid pa ko, tulo ka sakay ang biyahe. Ayaw na ko pabalika, palihug.", "en": "I'm from the mountains, it's three rides to get here. Please don't send me back." },
+			{ "ceb": "Nasakit akong mama. Kinahanglan ko mahuman ni karon.", "en": "My mom is sick. I need to get this done today." }
+		]
+	},
+	"merienda": {
+		"label": "Merienda",
+		"lines": [
+			{ "ceb": "Ania, nagdala ko og puto para nimo. Dali-dali lang ta, ha?", "en": "Here, I brought you some puto. Let's make this quick, okay?" },
+			{ "ceb": "Gutom na ka? Naa koy siopao diri. Ikaw na bahala sa akong papeles.", "en": "Hungry? I've got siopao. I'll leave my papers to you." },
+			{ "ceb": "Para nimo ning kape. Stamp-i na lang, ha?", "en": "This coffee's for you. Just stamp it, okay?" }
+		]
+	}
+}

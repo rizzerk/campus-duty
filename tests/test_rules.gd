@@ -29,6 +29,9 @@ func _init() -> void:
 	_test_each_problem_has_one_right_action()
 	_test_clean_student_is_approved()
 	_test_reject_beats_routing()
+	_test_any_office_in_the_tier()
+	_test_wrong_order_says_so()
+	_test_two_turn_away_reasons()
 	_test_closed_office_means_hold_or_tomorrow()
 	_test_section_pick_must_fit()
 	_test_office_schedule()
@@ -109,6 +112,72 @@ func _test_reject_beats_routing() -> void:
 	var both := _find(4, ["unpaid_balance"])
 	both["problems"].append("closed_section")
 	_check(RulesCheck.expected(both, _offices(true))["action"] == "route:cashier", "cashier comes before the section picker")
+
+
+## Offices with a given status each: { "cashier": "open", "consultation": "break", ... }.
+func _mixed(statuses: Dictionary) -> Dictionary:
+	var result := _offices(true)
+	for office: String in statuses:
+		var status: String = statuses[office]
+		result[office] = { "status": status, "open": status == "open", "reopens": status == "break" }
+	return result
+
+
+func _balance_and_signature() -> Dictionary:
+	var student := _find(7, ["missing_signature", "unpaid_balance"])
+	if student.is_empty():
+		student = _find(7, ["missing_signature"])
+		student["problems"].append("unpaid_balance")
+	return student
+
+
+func _test_any_office_in_the_tier() -> void:
+	var student := _balance_and_signature()
+	_check(RulesCheck.judge(student, "route:cashier", _offices(true))["correct"], "balance + signature: Cashier is right")
+	_check(RulesCheck.judge(student, "route:consultation", _offices(true))["correct"], "balance + signature: Consultation is right too")
+	_check(RulesCheck.judge(student, "route:consultation", _offices(true))["problem"] == "missing_signature", "the matched office's problem is the one resolved")
+	_check(not RulesCheck.judge(student, "route:dean", _offices(true))["correct"], "an office they don't need is wrong")
+	_check(not RulesCheck.judge(student, "fix", _offices(true))["correct"], "fixing at the window is wrong")
+	var advisers_out := _mixed({ "consultation": "break" })
+	_check(RulesCheck.judge(student, "route:cashier", advisers_out)["correct"], "Consultation on break: Cashier still right")
+	var wasted := RulesCheck.judge(student, "route:consultation", advisers_out)
+	_check(not wasted["correct"] and wasted["reason"].contains("isn't open"), "routing to the office on break is a wasted trip, and says so")
+	_check(not RulesCheck.judge(student, "hold", advisers_out)["correct"], "no hold while another office they need is open")
+	var both_out := _mixed({ "consultation": "break", "cashier": "break" })
+	_check(RulesCheck.judge(student, "hold", both_out)["correct"], "every office they need on break: hold")
+	var one_reopens := _mixed({ "consultation": "break", "cashier": "closed" })
+	_check(RulesCheck.judge(student, "hold", one_reopens)["correct"], "one office reopens later: hold for it")
+	var none := _mixed({ "consultation": "closed", "cashier": "closed" })
+	_check(RulesCheck.judge(student, "reject", none, { "reason": "office_closed" })["correct"], "nothing reopens today: come back tomorrow")
+	_check(RulesCheck.accepted(student, _offices(true)).size() == 2, "two right answers listed")
+
+
+func _test_wrong_order_says_so() -> void:
+	var fake := _balance_and_signature()
+	fake["problems"].erase("missing_signature")
+	fake["problems"].append("fake_signature")
+	var routed := RulesCheck.judge(fake, "route:cashier", _offices(true))
+	_check(not routed["correct"], "fake signature + balance: Cashier is wrong")
+	_check(routed["reason"].begins_with("Right idea, wrong order"), "it says the order was wrong (%s)" % routed["reason"])
+	_check(routed["reason"].contains("Turn-aways come before"), "and which tier comes first")
+	var both := _find(4, ["unpaid_balance"])
+	both["problems"].append("closed_section")
+	var fixed := RulesCheck.judge(both, "fix", _offices(true), { "section": "" })
+	_check(fixed["reason"].contains("Office trips come before fixes"), "fix before the Cashier says office trips come first")
+	var inc := _find(6, ["inc_prereq"])
+	inc["problems"].append("closed_section")
+	var inc_first := RulesCheck.judge(inc, "fix", _offices(true), { "section": "" })
+	_check(inc_first["reason"].contains("INC in prerequisite"), "acronyms keep their capitals: %s" % inc_first["reason"])
+	var clean := _find(3, [])
+	_check(not RulesCheck.judge(clean, "fix", _offices(true))["reason"].begins_with("Right idea"), "nothing wrong isn't an order problem")
+
+
+func _test_two_turn_away_reasons() -> void:
+	var student := _find(7, ["fake_signature"])
+	student["problems"].append("failed_prereq")
+	_check(RulesCheck.judge(student, "reject", _offices(true), { "reason": "fake_signature" })["correct"], "fake signature is a fine reason")
+	_check(RulesCheck.judge(student, "reject", _offices(true), { "reason": "failed_prereq" })["correct"], "so is the 5.0")
+	_check(not RulesCheck.judge(student, "reject", _offices(true), { "reason": "missing_requirement" })["correct"], "a reason they don't have is wrong")
 
 
 func _test_closed_office_means_hold_or_tomorrow() -> void:

@@ -4,6 +4,7 @@ extends RefCounted
 
 
 ## 3 stars needs 90% correct, 90% of the line served and no walkouts. A failed shift gets none.
+## Each favor Ma'am Lorna caught in the spot check costs a star.
 static func stars(summary: Dictionary) -> int:
 	if summary["reason"] == "patience":
 		return 0
@@ -14,7 +15,7 @@ static func stars(summary: Dictionary) -> int:
 			earned += 1
 	if summary["walked_out"] > 0:
 		earned = mini(earned, 2)
-	return earned
+	return maxi(earned - int(summary.get("caught_bends", 0)), 0)
 
 
 ## Mid-shift: the stars the calls so far are heading for. Students still to come aren't counted
@@ -25,4 +26,5 @@ static func projected(summary: Dictionary) -> int:
 	var so_far := summary.duplicate()
 	so_far["served_ratio"] = 1.0
 	so_far["reason"] = ""
+	so_far.erase("caught_bends")
 	return stars(so_far)

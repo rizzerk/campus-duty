@@ -1,0 +1,56 @@
+{
+	"impatient": {
+		"label": "Impatient",
+		"drain_weight": 2.0,
+		"tell": { "accessories": ["accessory_sweat_drop"], "expression": "angry" },
+		"lines": [
+			{ "ceb": "Dali-dali lang, palihug. Naa pa koy klase.", "en": "Hurry up, please. I still have a class." },
+			{ "ceb": "Pila pa ka oras ani? Kapoy na kaayo ko naghulat.", "en": "How many more hours? I'm so tired of waiting." },
+			{ "ceb": "Kadugay ba! Ania na akong papeles, dali.", "en": "This is taking forever! Here are my papers, quick." }
+		]
+	},
+	"palusot": {
+		"label": "Palusot",
+		"tell": { "expression": "annoyed" },
+		"lines": [
+			{ "ceb": "Okay ra tanan, promise. Stamp-i lang.", "en": "Everything's fine, promise. Just stamp it." },
+			{ "ceb": "Kompleto na na tanan. Ayaw na lang tan-awa pag-ayo.", "en": "It's all complete. No need to look too closely." },
+			{ "ceb": "Sakto man na tanan, gi-check na nako kagahapon.", "en": "It's all correct, I checked it yesterday." }
+		],
+		"ask": [
+			{ "ceb": "Ha? Wala man nay problema. Sakto ra na.", "en": "Huh? There's no problem there. That's right." },
+			{ "ceb": "Typo ra na sa ISMIS, dili sa akong papel.", "en": "That's just an ISMIS typo, not my paper." },
+			{ "ceb": "Ingon ana gyud na sukad. Wala pay nag-reklamo.", "en": "It's always been like that. Nobody's complained before." }
+		]
+	},
+	"with_parent": {
+		"label": "With parent",
+		"drain_weight": 0.5,
+		"tell": { "parent": true },
+		"lines": [
+			{ "ceb": "Gikuyogan ko ni Mama, para dali ra daw.", "en": "My mom came with me, she says it'll be faster." },
+			{ "ceb": "Si Papa ang mosulti. Ania ang papeles.", "en": "My dad will do the talking. Here are the papers." }
+		],
+		"argue": [
+			{ "ceb": "Ngano man adto pa? Gikan na mi didto ganina!", "en": "Why go there? We were just there earlier!", "who": "parent" },
+			{ "ceb": "Dili ba nimo ma-buhat diri? Layo kaayo to.", "en": "Can't you do it here, dear? That's so far.", "who": "parent" },
+			{ "ceb": "Sige na lang, pero kung ibalik mi diri, ikaw ang tubag.", "en": "Fine, but if they send us back, that's on you.", "who": "parent" }
+		]
+	},
+	"kapit": {
+		"label": "Kapit",
+		"tell": { "accessories": ["accessory_sunglasses"], "expression": "happy" },
+		"favor": "connections"
+	},
+	"confused": {
+		"label": "Confused freshman",
+		"visits": ["first_year"],
+		"tell": { "accessories": ["accessory_lanyard"], "expression": "surprised" },
+		"lines": [
+			{ "ceb": "Diri ba ko magpa-picture para sa ID?", "en": "Is this where I get my ID picture taken?" },
+			{ "ceb": "Asa man ang library? Ay, diri diay ang Registrar?", "en": "Where's the library? Oh, this is the Registrar?" },
+			{ "ceb": "Diri ba ko mobayad sa uniform?", "en": "Do I pay for my uniform here?" },
+			{ "ceb": "Ingon ang akong ate diri daw ko mag-shift og course?", "en": "My sister said I shift courses here?" }
+		]
+	}
+}

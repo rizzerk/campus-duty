@@ -24,6 +24,8 @@ var mistakes: int = 0
 var walked_out: int = 0
 var caught: int = 0
 var false_alarms: int = 0
+## Favors done for students who had a problem: rule bending, for Ma'am Lorna's spot check.
+var bends: int = 0
 var total_students: int = 0
 var history: Array = []
 var ended: bool = false
@@ -104,9 +106,34 @@ func tick(delta_seconds: float) -> void:
 			_join_line(student)
 	_release_bench()
 	_emit_office_changes()
-	var waiting := line.size()
-	patience -= delta_seconds * (GameData.balance("patience_drain_base") + GameData.balance("patience_drain_per_waiting") * waiting)
+	patience -= delta_seconds * (GameData.balance("patience_drain_base") + GameData.balance("patience_drain_per_waiting") * waiting_weight())
 	_check_end()
+
+
+## How heavily the line weighs on patience. Everyone waiting counts once, an impatient student
+## twice and one with a parent half; whoever is at the window adds their extra on top.
+func waiting_weight() -> float:
+	var total := 0.0
+	for student: Dictionary in line:
+		total += trait_weight(student)
+	if not current.is_empty():
+		total += trait_weight(current) - 1.0
+	return maxf(total, 0.0)
+
+
+static func trait_weight(student: Dictionary) -> float:
+	var id: String = student.get("trait", "")
+	if id == "":
+		return 1.0
+	return float(GameData.json("traits")[id].get("drain_weight", 1.0))
+
+
+## A parent arguing about a routing slows the window down.
+func argue() -> void:
+	if ended:
+		return
+	minute += GameData.balance("parent_argue_minutes")
+	tick(0.0)
 
 
 ## Brings the next student to the window. Returns them, or {} if nobody is waiting.
@@ -141,14 +168,18 @@ func ask() -> void:
 
 ## The player's decision on the student at the window. details holds "section" (section picker)
 ## and "flags" (the player's flagged mismatches, judged now). Returns the rules result plus an
-## outcome: served, stays, routed, held, let_through, sent_back_wrong or walked_out.
+## outcome: served, stays, routed, held, let_through, wrong_fix, bent, sent_back_wrong or walked_out.
+## "favor" waves the student through without the checks: fine if nothing was wrong, rule bending
+## if something was.
 func act(action: String, details: Dictionary = {}) -> Dictionary:
 	if ended or current.is_empty():
 		return {}
 	if action == "hold" and bench_full():
 		return { "error": "bench_full" }
 	var student := current
-	var result := RulesCheck.judge(student, action, offices(), details)
+	var favor := action == "favor"
+	var result := RulesCheck.judge(student, "approve" if favor else action, offices(), details)
+	var bent: bool = favor and not result["correct"]
 	var flag_score := Mismatch.score_flags(student, details.get("flags", []))
 	caught += flag_score["caught"]
 	false_alarms += flag_score["false_alarms"]
@@ -156,7 +187,11 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	patience -= flag_score["false_alarms"] * GameData.balance("patience_false_flag_penalty")
 	patience = minf(patience, GameData.balance("patience_start"))
 	var outcome := ""
-	if result["correct"]:
+	if bent:
+		bends += 1
+		patience -= GameData.balance("bend_patience")
+		outcome = _finish("bent")
+	elif result["correct"]:
 		patience = minf(patience + GameData.balance("patience_correct_bonus"), GameData.balance("patience_start"))
 		if action == "fix":
 			student["problems"].erase(result["problem"])
@@ -178,6 +213,10 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		patience -= GameData.balance("patience_mistake_penalty")
 		if action == "approve":
 			outcome = _finish("let_through")
+		elif action == "fix" and result["expected"] != "fix":
+			# A fix they didn't need (or not yet): they leave with it, so there's nothing to come
+			# back about. A fix that was needed but done wrong (a clashing section) brings them back.
+			outcome = _finish("wrong_fix")
 		elif student["returns"] < int(GameData.balance("max_returns")):
 			student["returns"] += 1
 			student["mood"] = "angry"
@@ -197,7 +236,9 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		"number": student["number"],
 		"name": student["name"],
 		"action": action,
-		"correct": result["correct"],
+		"correct": result["correct"] and not bent,
+		"bent": bent,
+		"favor": student.get("favor", "") if favor else "",
 		"expected": result["expected"],
 		"problem": result["problem"],
 		"reason": result["reason"],
@@ -214,6 +255,10 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		current = {}
 	_check_end()
 	result["outcome"] = outcome
+	result["bent"] = bent
+	if bent:
+		result["correct"] = false
+		result["reason"] = "You did them a favor. %s" % result["reason"]
 	return result
 
 
@@ -241,12 +286,14 @@ func summary() -> Dictionary:
 		"walked_out": walked_out,
 		"caught": caught,
 		"false_alarms": false_alarms,
+		"bends": bends,
 		"total": total_students,
 		"elsewhere": handled_elsewhere(),
 		"served_ratio": float(served + handled_elsewhere()) / maxi(1, total_students),
 		"clock": OfficeSchedule.clock(minute, true),
 		# No decisions at all counts as 0%, so waiting out the clock earns nothing.
-		"accuracy": float(correct) / history.size() if not history.is_empty() else 0.0,
+		# Favors aren't judged here; Ma'am Lorna's spot check deals with them.
+		"accuracy": float(correct) / (history.size() - bends) if history.size() > bends else (1.0 if bends > 0 else 0.0),
 	}
 
 
@@ -264,6 +311,9 @@ func _drain_slots(minutes: float) -> void:
 		var fits := Timetable.fitting_sections(current)
 		for section: Dictionary in current["record"]["sections"][current["request"]["course"]]:
 			if section["seats"] <= 0 or _drain_rng.randf() >= float(live["chance"]):
+				continue
+			# The seat they already hold is theirs; other windows can't take it.
+			if section["code"] == current["request"]["section"]:
 				continue
 			if fits.has(section["code"]) and fits.size() <= 1 and section["seats"] <= 1:
 				continue
@@ -289,15 +339,16 @@ func _join_line(student: Dictionary) -> void:
 func _release_bench() -> void:
 	var released := false
 	for student: Dictionary in bench.duplicate():
-		var problem := RulesCheck.top_problem(student)
-		var action: String = GameData.problem(problem)["action"] if problem != "" else ""
-		if not action.begins_with("route:"):
-			continue
-		var office := action.trim_prefix("route:")
-		if OfficeSchedule.is_open(day, office, minute):
-			bench.erase(student)
-			_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": problem, "office": office })
-			released = true
+		for problem: String in RulesCheck.by_priority(student):
+			var action: String = GameData.problem(problem)["action"]
+			if not action.begins_with("route:"):
+				continue
+			var office := action.trim_prefix("route:")
+			if OfficeSchedule.is_open(day, office, minute):
+				bench.erase(student)
+				_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": problem, "office": office })
+				released = true
+				break
 	if released:
 		bench_changed.emit()
 

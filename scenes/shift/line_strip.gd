@@ -79,7 +79,7 @@ func _make_face(student: Dictionary, index: int, patience: float) -> Control:
 		tag.add_theme_stylebox_override("normal", UiKit.box(tag_color, 2))
 	box.add_child(tag)
 	var parts: Dictionary = student["portrait"].duplicate(true)
-	parts["expression"] = "angry" if student.get("mood", "") == "angry" else "annoyed" if patience < 40.0 else "neutral"
+	parts["expression"] = "angry" if student.get("mood", "") == "angry" else "annoyed" if patience < 40.0 else student["portrait"].get("expression", "neutral")
 	var frame := UiKit.portrait_frame(parts, FACE, UiKit.INK, Color("#9fd0e8"), 2)
 	if student["priority"] != "":
 		frame.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND

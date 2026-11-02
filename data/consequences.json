@@ -14,6 +14,10 @@
 		"office_closed": "You told #{number} {name} to come back tomorrow instead of sending them to a closed office."
 	},
 	"bad": {
+		"bent_caught": "You did #{number} {name} a favor and waved them through, but {reason} Ma'am Lorna found it in the spot check.",
+		"bent": "You did #{number} {name} a favor and waved them through, but {reason} Nobody noticed… this time.",
+		"wrong_order": "#{number} {name}: {reason}",
+		"wrong_fix": "You changed things for #{number} {name} at the window, but {reason}",
 		"walked_out": "#{number} {name} walked out after two wrong calls. The whole line saw it.",
 		"closed_office": "You sent #{number} {name} to {office} while it was closed. They stood there for nothing.",
 		"wrong_office": "You sent #{number} {name} to {office}, but they needed {expected}. They came back angry.",

@@ -27,6 +27,12 @@ func start_shift() -> void:
 
 
 func finish_shift(summary: Dictionary, history: Array) -> void:
+	summary["spot_check"] = []
+	summary["caught_bends"] = 0
+	if summary["reason"] != "patience":
+		var check: Dictionary = SpotCheck.run(history, base_seed * 1000 + day, day)
+		summary["spot_check"] = check["rows"]
+		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
 	last_summary = summary
 	last_history = history

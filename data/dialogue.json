@@ -1,41 +1,163 @@
 {
 	"visits": {
 		"graduation_clearance": [
-			{ "ceb": "Mag-file unta ko sa akong graduation clearance.", "en": "I'd like to file my graduation clearance." },
-			{ "ceb": "Graduating na ko! Kompleto na ni akong papeles, sigurado ko.", "en": "I'm graduating! My papers are complete, I'm sure." },
-			{ "ceb": "Palihug, ipa-check nako akong checklist para sa graduation.", "en": "Please check my graduation checklist." },
-			{ "ceb": "Last requirement na ni nako, ma'am. Ayaw na palihug ko pabalika.", "en": "This is my last requirement. Please don't send me back." },
-			{ "ceb": "Gipaadto ko diri sa akong adviser para sa clearance.", "en": "My adviser sent me here for my clearance." }
+			{
+				"ceb": "Mag-file unta ko sa akong graduation clearance.",
+				"en": "I'd like to file my graduation clearance."
+			},
+			{
+				"ceb": "Graduating na ko! Kompleto na ni akong papeles, sigurado ko.",
+				"en": "I'm graduating! My papers are complete, I'm sure."
+			},
+			{
+				"ceb": "Palihug, ipa-check nako akong checklist para sa graduation.",
+				"en": "Please check my graduation checklist."
+			},
+			{
+				"ceb": "Last requirement na ni nako, ma'am. Ayaw na palihug ko pabalika.",
+				"en": "This is my last requirement. Please don't send me back."
+			},
+			{
+				"ceb": "Gipaadto ko diri sa akong adviser para sa clearance.",
+				"en": "My adviser sent me here for my clearance."
+			}
 		],
 		"enroll_subject": [
-			{ "ceb": "Mag-enroll unta ko sa {course}, section {section}.", "en": "I'd like to enroll in {course}, section {section}." },
-			{ "ceb": "Pwede ko magpa-enroll sa {course}? Mao ni akong form.", "en": "Can I enroll in {course}? Here's my form." },
-			{ "ceb": "Section {section} sa {course} akong gusto, kay duol sa akong ubang klase.", "en": "I want section {section} of {course}, it's close to my other classes." },
-			{ "ceb": "Wala pa koy {course}. Abot pa ba ko?", "en": "I don't have {course} yet. Am I still in time?" },
-			{ "ceb": "Ania akong enrollment form, palihug.", "en": "Here's my enrollment form, please." }
+			{
+				"ceb": "Gi-enroll na nako ang {course} sa ISMIS, pero 'For Registrar approval' pa daw.",
+				"en": "I enrolled in {course} on ISMIS, but it still says 'For Registrar approval'."
+			},
+			{
+				"ceb": "Mao ni akong form para sa {course}, section {section}. Pa-approve lang.",
+				"en": "Here's my form for {course}, section {section}. It just needs your approval."
+			},
+			{
+				"ceb": "Ingon sa ISMIS kinahanglan pa daw ni i-approve sa Registrar.",
+				"en": "ISMIS says the Registrar still has to approve this."
+			},
+			{
+				"ceb": "Section {section} sa {course} akong napili sa ISMIS. Okay na ba?",
+				"en": "I picked section {section} of {course} on ISMIS. Is it okay now?"
+			},
+			{
+				"ceb": "Pending pa akong {course} sa ISMIS. Palihug, i-approve na.",
+				"en": "My {course} is still pending on ISMIS. Please approve it."
+			}
 		],
 		"enrollment_payment": [
-			{ "ceb": "Mag-enroll ko para ani nga sem. Bayad na ko, ha.", "en": "I'm enrolling for this sem. I've already paid, okay?" },
-			{ "ceb": "Ania akong assessment, palihug ko i-process.", "en": "Here's my assessment, please process it." },
-			{ "ceb": "Nibayad na akong mama gahapon, sigurado ko.", "en": "My mom paid yesterday, I'm sure." },
-			{ "ceb": "Pwede na ko ma-enroll? Ania ang akong slip.", "en": "Can I be enrolled now? Here's my slip." }
+			{
+				"ceb": "Nag-enroll na ko sa ISMIS. Bayad na ko, ha. Pa-approve lang.",
+				"en": "I enrolled on ISMIS. I've already paid, okay? It just needs approval."
+			},
+			{
+				"ceb": "Ania akong assessment. 'For validation' pa man daw sa ISMIS.",
+				"en": "Here's my assessment. ISMIS still says 'for validation'."
+			},
+			{
+				"ceb": "Nibayad na akong mama gahapon, sigurado ko.",
+				"en": "My mom paid yesterday, I'm sure."
+			},
+			{
+				"ceb": "Pending pa akong enrollment sa ISMIS. Ania ang akong slip.",
+				"en": "My enrollment is still pending on ISMIS. Here's my slip."
+			}
 		],
 		"first_year": [
-			{ "ceb": "Bag-o pa ko diri. Asa man ko mag-enroll?", "en": "I'm new here. Where do I enroll?" },
-			{ "ceb": "Freshman ko. Ania akong mga papeles.", "en": "I'm a freshman. Here are my papers." },
-			{ "ceb": "Unang adlaw nako sa USC. Unsa may buhaton nako?", "en": "It's my first day at USC. What do I do?" },
-			{ "ceb": "Gisugo ko sa guard nga diri daw ko moadto.", "en": "The guard told me to come here." }
+			{
+				"ceb": "Bag-o pa ko diri. Ingon sa Admissions diri daw ko moadto para sa akong ISMIS account.",
+				"en": "I'm new here. Admissions told me to come here for my ISMIS account."
+			},
+			{
+				"ceb": "Freshman ko. Ania akong mga papeles para sa ISMIS.",
+				"en": "I'm a freshman. Here are my papers for ISMIS."
+			},
+			{
+				"ceb": "Unang adlaw nako sa USC. Unsa may buhaton nako?",
+				"en": "It's my first day at USC. What do I do?"
+			},
+			{
+				"ceb": "Gisugo ko sa guard nga diri daw ko moadto.",
+				"en": "The guard told me to come here."
+			}
 		],
 		"add_subject": [
-			{ "ceb": "Mag-add unta ko og {course}. Pirmado na ni Sir.", "en": "I'd like to add {course}. Sir already signed it." },
-			{ "ceb": "I-add lang ang {course}, palihug.", "en": "Just add {course}, please." },
-			{ "ceb": "Kulang pa akong units. Pwede i-add ang {course}?", "en": "I'm short on units. Can you add {course}?" },
-			{ "ceb": "Gi-advise ko nga mag-add og {course}. Ania ang slip.", "en": "I was advised to add {course}. Here's the slip." },
-			{ "ceb": "Dali ra ni, i-add lang ang {course}.", "en": "This is quick, just add {course}." }
+			{
+				"ceb": "Mag-add unta ko og {course}. Pirmado na ni Sir.",
+				"en": "I'd like to add {course}. Sir already signed it."
+			},
+			{
+				"ceb": "I-add lang ang {course}, palihug.",
+				"en": "Just add {course}, please."
+			},
+			{
+				"ceb": "Kulang pa akong units. Pwede i-add ang {course}?",
+				"en": "I'm short on units. Can you add {course}?"
+			},
+			{
+				"ceb": "Gi-advise ko nga mag-add og {course}. Ania ang slip.",
+				"en": "I was advised to add {course}. Here's the slip."
+			},
+			{
+				"ceb": "Dali ra ni, i-add lang ang {course}.",
+				"en": "This is quick, just add {course}."
+			}
+		]
+	},
+	"worried": [
+		{
+			"ceb": "Naay pula nga error sa ISMIS ganina. Okay ra ba akong enrollment?",
+			"en": "ISMIS showed a red error earlier. Is my enrollment okay?"
+		},
+		{
+			"ceb": "Kulbaan ko. Basin naay sayop sa akong papeles?",
+			"en": "I'm nervous. Is something wrong with my papers?"
+		},
+		{
+			"ceb": "Ingon akong classmate na-drop daw siya. Basin ako pud?",
+			"en": "My classmate said they got dropped. Am I dropped too?"
+		},
+		{
+			"ceb": "Wala ko kasabot sa ISMIS. Palihug ko i-check.",
+			"en": "I don't understand ISMIS. Please check it for me."
+		}
+	],
+	"spot_check": {
+		"fine": [
+			{
+				"ceb": "Limpyo. Padayon lang, ha?",
+				"en": "Clean. Keep it up, okay?"
+			},
+			{
+				"ceb": "Okay ra tanan. Salamat sa kakugi.",
+				"en": "All good. Thanks for the hard work."
+			}
+		],
+		"wrong": [
+			{
+				"ceb": "Naay sayop diri. Pag-amping na ugma.",
+				"en": "There's a mistake here. Be more careful tomorrow."
+			},
+			{
+				"ceb": "Dili ni sakto. Basaha balik ang rulebook, ha?",
+				"en": "This isn't right. Read the rulebook again, okay?"
+			}
+		],
+		"bent": [
+			{
+				"ceb": "Kinsa man ni ang gipalusot nimo? Dili ni pwede.",
+				"en": "Who's this you let slip through? That's not allowed."
+			},
+			{
+				"ceb": "Nakita nako ang pabor. Dili ta ingon ana diri.",
+				"en": "I saw the favor. That's not how we do things here."
+			}
 		]
 	},
 	"lorna_takes_over": [
-		{ "ceb": "Okay, ako na ani. Pahuway sa, ha? Mag-istorya ta unya.", "en": "Okay, I'll take it from here. Take a break, okay? We'll talk later." }
+		{
+			"ceb": "Okay, ako na ani. Pahuway sa, ha? Mag-istorya ta unya.",
+			"en": "Okay, I'll take it from here. Take a break, okay? We'll talk later."
+		}
 	],
 	"failure_tips": [
 		"Tip: call priority students early, and use Hold when an office is on break.",
@@ -43,130 +165,331 @@
 		"Tip: a long line drains patience faster. Quick, correct calls win it back."
 	],
 	"no_id": [
-		{ "ceb": "Nawala akong ID. Ang akong number kay {id}.", "en": "I lost my ID. My number is {id}." },
-		{ "ceb": "Nabilin nako akong ID sa boarding house. {id} akong ID number.", "en": "I left my ID at the boarding house. My ID number is {id}." }
+		{
+			"ceb": "Nawala akong ID. Ang akong number kay {id}.",
+			"en": "I lost my ID. My number is {id}."
+		},
+		{
+			"ceb": "Nabilin nako akong ID sa boarding house. {id} akong ID number.",
+			"en": "I left my ID at the boarding house. My ID number is {id}."
+		}
 	],
 	"returned_from": {
 		"cashier": [
-			{ "ceb": "Bayad na ko sa Cashier. Ania ang resibo.", "en": "I've paid at the Cashier. Here's the receipt." },
-			{ "ceb": "Taas kaayo ang pila, pero bayad na ko!", "en": "The line was so long, but I've paid!" }
+			{
+				"ceb": "Bayad na ko sa Cashier. Ania ang resibo.",
+				"en": "I've paid at the Cashier. Here's the receipt."
+			},
+			{
+				"ceb": "Taas kaayo ang pila, pero bayad na ko!",
+				"en": "The line was so long, but I've paid!"
+			}
 		],
 		"consultation": [
-			{ "ceb": "Napirmahan na ni Sir. Ania na.", "en": "Sir signed it now. Here you go." },
-			{ "ceb": "Okay na daw sabi sa adviser. Ania iyang sulat.", "en": "The adviser says it's okay. Here's the note." }
+			{
+				"ceb": "Napirmahan na ni Sir. Ania na.",
+				"en": "Sir signed it now. Here you go."
+			},
+			{
+				"ceb": "Okay na daw sabi sa adviser. Ania iyang sulat.",
+				"en": "The adviser says it's okay. Here's the note."
+			}
 		],
 		"dean": [
-			{ "ceb": "Gi-approve na sa Dean ang akong overload.", "en": "The Dean approved my overload." },
-			{ "ceb": "Ok na sa Dean. Ania iyang pirma.", "en": "The Dean is okay with it. Here's the signature." }
+			{
+				"ceb": "Gi-approve na sa Dean ang akong overload.",
+				"en": "The Dean approved my overload."
+			},
+			{
+				"ceb": "Ok na sa Dean. Ania iyang pirma.",
+				"en": "The Dean is okay with it. Here's the signature."
+			}
 		]
 	},
 	"wrong_office": {
 		"cashier": [
-			{ "ceb": "Ingon sa Cashier wala man koy utang! Nganong didto ko nimo gipaadto?", "en": "The Cashier said I don't owe anything! Why did you send me there?" },
-			{ "ceb": "Wala man koy balance sa Cashier! Nausik akong oras.", "en": "I don't have a balance at the Cashier! I wasted my time." }
+			{
+				"ceb": "Ingon sa Cashier wala man koy utang! Nganong didto ko nimo gipaadto?",
+				"en": "The Cashier said I don't owe anything! Why did you send me there?"
+			},
+			{
+				"ceb": "Wala man koy balance sa Cashier! Nausik akong oras.",
+				"en": "I don't have a balance at the Cashier! I wasted my time."
+			}
 		],
 		"consultation": [
-			{ "ceb": "Ingon sa adviser dili daw na iyaha. Nausik akong oras.", "en": "The adviser said that's not their job. I wasted my time." },
-			{ "ceb": "Wala man daw problema sabi sa adviser. Nganong didto ko?", "en": "The adviser says there's no problem. Why was I sent there?" }
+			{
+				"ceb": "Ingon sa adviser dili daw na iyaha. Nausik akong oras.",
+				"en": "The adviser said that's not their job. I wasted my time."
+			},
+			{
+				"ceb": "Wala man daw problema sabi sa adviser. Nganong didto ko?",
+				"en": "The adviser says there's no problem. Why was I sent there?"
+			}
 		],
 		"dean": [
-			{ "ceb": "Wala daw labot ang Dean ana. Mibalik ko diri.", "en": "The Dean's office said it's not their concern. So I'm back." },
-			{ "ceb": "Gibalik ko sa Dean. Dili daw overload akong kaso.", "en": "The Dean sent me back. They said mine isn't an overload." }
+			{
+				"ceb": "Wala daw labot ang Dean ana. Mibalik ko diri.",
+				"en": "The Dean's office said it's not their concern. So I'm back."
+			},
+			{
+				"ceb": "Gibalik ko sa Dean. Dili daw overload akong kaso.",
+				"en": "The Dean sent me back. They said mine isn't an overload."
+			}
 		],
 		"closed": [
-			{ "ceb": "Sirado man ang opisina! Naghulat lang ko didto.", "en": "The office was closed! I just stood there waiting." },
-			{ "ceb": "Break pa man sila! Nganong gipaadto ko nimo?", "en": "They were still on break! Why did you send me?" }
+			{
+				"ceb": "Sirado man ang opisina! Naghulat lang ko didto.",
+				"en": "The office was closed! I just stood there waiting."
+			},
+			{
+				"ceb": "Break pa man sila! Nganong gipaadto ko nimo?",
+				"en": "They were still on break! Why did you send me?"
+			}
 		]
 	},
 	"problems": {
 		"ismis_login": [
-			{ "ceb": "Dili ko maka-login sa ISMIS. Unsaon man ni?", "en": "I can't log in to ISMIS. What do I do?" },
-			{ "ceb": "Locked daw akong account. Tabang, palihug.", "en": "It says my account is locked. Help, please." },
-			{ "ceb": "Nakalimtan nako akong password, unya na-lock na hinoon.", "en": "I forgot my password, and now it's locked." },
-			{ "ceb": "Ate, dili ko maka-login sa ISMIS. Unsa man akong password?", "en": "I can't log in to ISMIS. What's my password?" }
+			{
+				"ceb": "Dili ko maka-login sa ISMIS. Unsaon man ni?",
+				"en": "I can't log in to ISMIS. What do I do?"
+			},
+			{
+				"ceb": "Locked daw akong account. Tabang, palihug.",
+				"en": "It says my account is locked. Help, please."
+			},
+			{
+				"ceb": "Nakalimtan nako akong password, unya na-lock na hinoon.",
+				"en": "I forgot my password, and now it's locked."
+			},
+			{
+				"ceb": "Ate, dili ko maka-login sa ISMIS. Unsa man akong password?",
+				"en": "I can't log in to ISMIS. What's my password?"
+			}
 		]
 	},
 	"reactions": {
 		"approved": [
-			{ "ceb": "Salamat kaayo!", "en": "Thank you so much!" },
-			{ "ceb": "Yes! Human na gyud.", "en": "Yes! Finally done." },
-			{ "ceb": "Salamat, ma'am! Ingat ka.", "en": "Thanks! Take care." },
-			{ "ceb": "Grabe, kadali ra diay. Salamat!", "en": "Wow, that was quick. Thanks!" }
+			{
+				"ceb": "Salamat kaayo!",
+				"en": "Thank you so much!"
+			},
+			{
+				"ceb": "Yes! Human na gyud.",
+				"en": "Yes! Finally done."
+			},
+			{
+				"ceb": "Salamat, ma'am! Ingat ka.",
+				"en": "Thanks! Take care."
+			},
+			{
+				"ceb": "Grabe, kadali ra diay. Salamat!",
+				"en": "Wow, that was quick. Thanks!"
+			}
 		],
 		"rejected_right": [
-			{ "ceb": "Ay, sige. Balikan nako.", "en": "Oh, okay. I'll come back." },
-			{ "ceb": "Hala, wala diay ko kabalo.", "en": "Oh no, I didn't know." },
-			{ "ceb": "Sige, kuhaon sa nako.", "en": "Okay, I'll go get it first." },
-			{ "ceb": "Ay, sayang. Ugma na lang ko.", "en": "Aw, too bad. I'll come back tomorrow." }
+			{
+				"ceb": "Ay, sige. Balikan nako.",
+				"en": "Oh, okay. I'll come back."
+			},
+			{
+				"ceb": "Hala, wala diay ko kabalo.",
+				"en": "Oh no, I didn't know."
+			},
+			{
+				"ceb": "Sige, kuhaon sa nako.",
+				"en": "Okay, I'll go get it first."
+			},
+			{
+				"ceb": "Ay, sayang. Ugma na lang ko.",
+				"en": "Aw, too bad. I'll come back tomorrow."
+			}
 		],
 		"routed": [
-			{ "ceb": "Sige, adto sa ko didto.", "en": "Okay, I'll head there first." },
-			{ "ceb": "Ay, ok. Mobalik ra ko.", "en": "Oh, okay. I'll be back." },
-			{ "ceb": "Asa man na dapit? Ah, sige.", "en": "Where's that? Ah, okay." },
-			{ "ceb": "Sige, dali ra ko.", "en": "Okay, I'll be quick." }
+			{
+				"ceb": "Sige, adto sa ko didto.",
+				"en": "Okay, I'll head there first."
+			},
+			{
+				"ceb": "Ay, ok. Mobalik ra ko.",
+				"en": "Oh, okay. I'll be back."
+			},
+			{
+				"ceb": "Asa man na dapit? Ah, sige.",
+				"en": "Where's that? Ah, okay."
+			},
+			{
+				"ceb": "Sige, dali ra ko.",
+				"en": "Okay, I'll be quick."
+			}
 		],
 		"held": [
-			{ "ceb": "Sige, maghulat ko sa bench.", "en": "Okay, I'll wait on the bench." },
-			{ "ceb": "Ok ra, lingkod sa ko didto.", "en": "That's fine, I'll sit over there." },
-			{ "ceb": "Hulaton nako nga moabli.", "en": "I'll wait for it to open." }
+			{
+				"ceb": "Sige, maghulat ko sa bench.",
+				"en": "Okay, I'll wait on the bench."
+			},
+			{
+				"ceb": "Ok ra, lingkod sa ko didto.",
+				"en": "That's fine, I'll sit over there."
+			},
+			{
+				"ceb": "Hulaton nako nga moabli.",
+				"en": "I'll wait for it to open."
+			}
 		],
 		"fixed": [
-			{ "ceb": "Ok na? Salamat!", "en": "All good? Thanks!" },
-			{ "ceb": "Wow, ok na diay. Salamat kaayo!", "en": "Wow, it's fixed. Thank you so much!" },
-			{ "ceb": "Salamat, nakaginhawa na ko.", "en": "Thanks, I can breathe now." }
+			{
+				"ceb": "Ok na? Salamat!",
+				"en": "All good? Thanks!"
+			},
+			{
+				"ceb": "Wow, ok na diay. Salamat kaayo!",
+				"en": "Wow, it's fixed. Thank you so much!"
+			},
+			{
+				"ceb": "Salamat, nakaginhawa na ko.",
+				"en": "Thanks, I can breathe now."
+			}
 		],
 		"wrong": [
-			{ "ceb": "Ha? Sigurado ka?", "en": "Huh? Are you sure?" },
-			{ "ceb": "Ngano man? Sakto man akong papeles!", "en": "Why? My papers are right!" },
-			{ "ceb": "Unsa may sayop? Wala man koy problema.", "en": "What's wrong? I don't have a problem." },
-			{ "ceb": "Grabe, wala man koy nahimo.", "en": "Seriously, I didn't do anything." }
+			{
+				"ceb": "Ha? Sigurado ka?",
+				"en": "Huh? Are you sure?"
+			},
+			{
+				"ceb": "Ngano man? Sakto man akong papeles!",
+				"en": "Why? My papers are right!"
+			},
+			{
+				"ceb": "Unsa may sayop? Wala man koy problema.",
+				"en": "What's wrong? I don't have a problem."
+			},
+			{
+				"ceb": "Grabe, wala man koy nahimo.",
+				"en": "Seriously, I didn't do anything."
+			}
 		],
 		"returned_angry": [
-			{ "ceb": "Mibalik ko kay sayop imong gisulti!", "en": "I'm back because you told me wrong!" },
-			{ "ceb": "Nag-usik ko og oras tungod nimo.", "en": "I wasted my time because of you." },
-			{ "ceb": "Ikaduha na ni nga balik nako!", "en": "This is my second time back!" },
-			{ "ceb": "Pila pa man ka balik ani?", "en": "How many more times do I have to come back?" }
+			{
+				"ceb": "Mibalik ko kay sayop imong gisulti!",
+				"en": "I'm back because you told me wrong!"
+			},
+			{
+				"ceb": "Nag-usik ko og oras tungod nimo.",
+				"en": "I wasted my time because of you."
+			},
+			{
+				"ceb": "Ikaduha na ni nga balik nako!",
+				"en": "This is my second time back!"
+			},
+			{
+				"ceb": "Pila pa man ka balik ani?",
+				"en": "How many more times do I have to come back?"
+			}
 		],
 		"returned": [
-			{ "ceb": "Ok na, nahuman na nako didto.", "en": "Okay, I'm done over there." },
-			{ "ceb": "Ania na ko balik.", "en": "I'm back." },
-			{ "ceb": "Human na, ma'am.", "en": "All done." }
+			{
+				"ceb": "Ok na, nahuman na nako didto.",
+				"en": "Okay, I'm done over there."
+			},
+			{
+				"ceb": "Ania na ko balik.",
+				"en": "I'm back."
+			},
+			{
+				"ceb": "Human na, ma'am.",
+				"en": "All done."
+			}
 		]
 	},
 	"ask": {
 		"requirement": [
-			{ "ceb": "Ay, nakalimtan nako ang {item}. Sorry kaayo.", "en": "Oh, I forgot the {item}. I'm so sorry." },
-			{ "ceb": "Wala pa diay ko kakuha sa {item}...", "en": "I haven't gotten the {item} yet..." },
-			{ "ceb": "Akong balikan ang {item}, promise.", "en": "I'll come back with the {item}, promise." }
+			{
+				"ceb": "Ay, nakalimtan nako ang {item}. Sorry kaayo.",
+				"en": "Oh, I forgot the {item}. I'm so sorry."
+			},
+			{
+				"ceb": "Wala pa diay ko kakuha sa {item}...",
+				"en": "I haven't gotten the {item} yet..."
+			},
+			{
+				"ceb": "Akong balikan ang {item}, promise.",
+				"en": "I'll come back with the {item}, promise."
+			}
 		],
 		"signature_blank": [
-			{ "ceb": "Wala pa diay napirmahan ni Sir. Akong balikan.", "en": "Sir hasn't signed it yet. I'll go back to him." },
-			{ "ceb": "Busy man gud si Sir ganina. Wala pa niya napirmahan.", "en": "Sir was busy earlier. He hasn't signed it yet." }
+			{
+				"ceb": "Wala pa diay napirmahan ni Sir. Akong balikan.",
+				"en": "Sir hasn't signed it yet. I'll go back to him."
+			},
+			{
+				"ceb": "Busy man gud si Sir ganina. Wala pa niya napirmahan.",
+				"en": "Sir was busy earlier. He hasn't signed it yet."
+			}
 		],
 		"signature_fake": [
-			{ "ceb": "Ako ra ang nagpirma, wala man gud si Sir...", "en": "I signed it myself, Sir wasn't around..." },
-			{ "ceb": "Gipirmahan lang sa akong classmate. Ayaw lang ingna si Sir.", "en": "My classmate signed it. Please don't tell Sir." }
+			{
+				"ceb": "Ako ra ang nagpirma, wala man gud si Sir...",
+				"en": "I signed it myself, Sir wasn't around..."
+			},
+			{
+				"ceb": "Gipirmahan lang sa akong classmate. Ayaw lang ingna si Sir.",
+				"en": "My classmate signed it. Please don't tell Sir."
+			}
 		],
 		"balance": [
-			{ "ceb": "Ay, wala pa diay nako nabayran ang tanan.", "en": "Oh, I haven't paid all of it yet." },
-			{ "ceb": "Sa sunod semana pa unta mobayad akong papa.", "en": "My dad was going to pay next week." }
+			{
+				"ceb": "Ay, wala pa diay nako nabayran ang tanan.",
+				"en": "Oh, I haven't paid all of it yet."
+			},
+			{
+				"ceb": "Sa sunod semana pa unta mobayad akong papa.",
+				"en": "My dad was going to pay next week."
+			}
 		],
 		"birthday": [
-			{ "ceb": "Ah... dili diay ni akoa. Gipangayo ra sa akong ig-agaw.", "en": "Ah... it's not actually mine. My cousin asked me to do it." },
-			{ "ceb": "Para ra ni sa akong amiga. Wala man siya kaanhi.", "en": "This is just for my friend. She couldn't come." }
+			{
+				"ceb": "Ah... dili diay ni akoa. Gipangayo ra sa akong ig-agaw.",
+				"en": "Ah... it's not actually mine. My cousin asked me to do it."
+			},
+			{
+				"ceb": "Para ra ni sa akong amiga. Wala man siya kaanhi.",
+				"en": "This is just for my friend. She couldn't come."
+			}
 		],
 		"harmless_name": [
-			{ "ceb": "Gipamubo ra na nako akong pangalan. Ako ra gyud na.", "en": "I just shortened my name. That's really me." },
-			{ "ceb": "Mao ra gihapon na nga pangalan, initial ra.", "en": "It's the same name, just the initial." }
+			{
+				"ceb": "Gipamubo ra na nako akong pangalan. Ako ra gyud na.",
+				"en": "I just shortened my name. That's really me."
+			},
+			{
+				"ceb": "Mao ra gihapon na nga pangalan, initial ra.",
+				"en": "It's the same name, just the initial."
+			}
 		],
 		"harmless_program": [
-			{ "ceb": "Pareho ra man na nga course, gisulat lang lahi.", "en": "That's the same course, just written differently." },
-			{ "ceb": "BS IT ug BSIT, pareha ra man na.", "en": "BS IT and BSIT are the same thing." }
+			{
+				"ceb": "Pareho ra man na nga course, gisulat lang lahi.",
+				"en": "That's the same course, just written differently."
+			},
+			{
+				"ceb": "BS IT ug BSIT, pareha ra man na.",
+				"en": "BS IT and BSIT are the same thing."
+			}
 		],
 		"same": [
-			{ "ceb": "Pareho ra man na, di ba?", "en": "That's the same, isn't it?" },
-			{ "ceb": "Unsa may problema ana?", "en": "What's wrong with that?" },
-			{ "ceb": "Tan-awa ra gud, pareha ra.", "en": "Look, they're the same." }
+			{
+				"ceb": "Pareho ra man na, di ba?",
+				"en": "That's the same, isn't it?"
+			},
+			{
+				"ceb": "Unsa may problema ana?",
+				"en": "What's wrong with that?"
+			},
+			{
+				"ceb": "Tan-awa ra gud, pareha ra.",
+				"en": "Look, they're the same."
+			}
 		]
 	}
 }

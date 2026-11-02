@@ -51,6 +51,10 @@ func _test_every_template_fills() -> void:
 		_entry("reject", "reject", false, "missing_requirement", { "outcome": "walked_out" }),
 		_entry("hold", "hold", true, "missing_signature"),
 		_entry("reject", "reject", true, "overload", { "reason_id": "office_closed" }),
+		_entry("favor", "route:cashier", false, "unpaid_balance", { "bent": true, "outcome": "bent" }),
+		_entry("favor", "route:cashier", false, "unpaid_balance", { "bent": true, "spotted": true, "outcome": "bent" }),
+		_entry("fix", "approve", false, "", { "outcome": "wrong_fix" }),
+		_entry("route:cashier", "reject", false, "fake_signature", { "reason": "Right idea, wrong order. They also have: fake signature." }),
 	]
 	for problem: String in GameData.json("problems"):
 		cases.append(_entry(GameData.problem(problem)["action"], GameData.problem(problem)["action"], true, problem, { "section": "IT 312-D" }))
@@ -60,6 +64,10 @@ func _test_every_template_fills() -> void:
 	_check(office.contains("Cashier") and office.contains("Consultation"), "wrong office names both offices: %s" % office)
 	var closed: String = Consequences.build([_entry("route:consultation", "hold", false, "missing_signature", { "office_open": false })])[0]["text"]
 	_check(closed.contains("closed"), "closed office story: %s" % closed)
+	var order: String = Consequences.build([_entry("route:cashier", "reject", false, "fake_signature", { "reason": "Right idea, wrong order. They also have: fake signature." })])[0]["text"]
+	_check(order.contains("wrong order") and not order.contains("You sent"), "wrong order story: %s" % order)
+	var caught: String = Consequences.build([_entry("favor", "route:cashier", false, "unpaid_balance", { "bent": true, "spotted": true, "outcome": "bent" })])[0]["text"]
+	_check(caught.contains("spot check"), "caught favor story: %s" % caught)
 
 
 func _test_limit_and_false_alarms() -> void:

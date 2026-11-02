@@ -20,6 +20,11 @@ func _init() -> void:
 	_test_open_market_drain()
 	_test_routed_late_counts_as_handled()
 	_test_careful_player_never_fails()
+	_test_wrong_fix_doesnt_come_back()
+	_test_favors()
+	_test_trait_weights()
+	_test_own_section_never_drains()
+	_test_caught_favors_cost_stars()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -346,3 +351,101 @@ func _test_careful_player_never_fails() -> void:
 		var summary := shift.summary()
 		_check(summary["reason"] != "patience", "careful player keeps the line on day %d" % day)
 		_check(Scoring.stars(summary) >= 2, "careful player earns 2+ stars on day %d (got %d)" % [day, Scoring.stars(summary)])
+
+
+func _student(day: int, wanted: Array, visit: String = "") -> Dictionary:
+	for seed_value in 20000:
+		var student := StudentGen.make(seed_value, day)
+		var problems: Array = student["problems"].duplicate()
+		problems.sort()
+		if problems == wanted and (visit == "" or student["visit"] == visit) and not student["no_id"]:
+			student["number"] = 900
+			return student
+	return {}
+
+
+func _test_wrong_fix_doesnt_come_back() -> void:
+	var shift := ShiftState.new(3, 5)
+	var student := _student(3, [], "enroll_subject")
+	shift.current = student
+	var other := ""
+	for code: String in Timetable.fitting_sections(student):
+		if code != student["request"]["section"]:
+			other = code
+	var result := shift.act("fix", { "section": other })
+	_check(not result["correct"] and result["outcome"] == "wrong_fix", "moving a student with nothing wrong is a wrong fix (%s)" % result["outcome"])
+	_check(shift.mistakes == 1 and shift.served == 1, "it's a mistake, and they leave")
+	_check(student["mood"] != "angry", "they don't come back angry")
+	for i in 400:
+		shift.tick(STEP)
+	_check(not shift.line.has(student), "they never rejoin the line")
+	var history: Array = [shift.history[-1]]
+	_check(Consequences.build(history)[0]["text"].contains("changed things"), "the report tells the wrong fix story")
+	# A fix they did need, done wrong, brings them back for a second try.
+	var needs := ShiftState.new(3, 5)
+	var full := _student(3, ["closed_section"])
+	needs.current = full
+	var clashing := ""
+	for section: Dictionary in full["record"]["sections"][full["request"]["course"]]:
+		if section["seats"] > 0 and Timetable.clashes_schedule(section["slots"], full["record"]["schedule"]):
+			clashing = section["code"]
+	_check(clashing != "", "found a clashing section")
+	_check(needs.act("fix", { "section": clashing })["outcome"] == "sent_back_wrong", "a clashing section sends them back to try again")
+
+
+func _test_favors() -> void:
+	var clean_shift := ShiftState.new(4, 5)
+	clean_shift.current = _student(4, [])
+	var clean := clean_shift.act("favor")
+	_check(clean["correct"] and clean["outcome"] == "served" and not clean["bent"], "a favor for a clean student is just an approval")
+	_check(clean_shift.bends == 0, "no bend counted")
+	var shift := ShiftState.new(4, 5)
+	shift.patience = 50.0
+	var student := _student(4, ["unpaid_balance"])
+	shift.current = student
+	var result := shift.act("favor")
+	_check(result["bent"] and result["outcome"] == "bent", "a favor with a balance owed is rule bending")
+	_check(shift.bends == 1 and shift.mistakes == 0 and shift.served == 1, "bent: served, not a mistake (%d %d %d)" % [shift.bends, shift.mistakes, shift.served])
+	_check(is_equal_approx(shift.patience, 50.0 - GameData.balance("bend_patience")), "the line saw it (%.1f)" % shift.patience)
+	_check(shift.history[-1]["bent"] and not shift.history[-1]["correct"], "logged as bent")
+	_check(shift.summary()["bends"] == 1, "summary counts favors")
+	_check(shift.summary()["accuracy"] == 1.0, "favors aren't counted in accuracy")
+	_check(Consequences.build(shift.history)[0]["text"].contains("favor"), "the report tells the favor story")
+
+
+func _test_own_section_never_drains() -> void:
+	var shift := ShiftState.new(6, 5)
+	var student := _student(6, [], "enroll_subject")
+	shift.current = student
+	shift.choosing_section = true
+	var own: Dictionary = Timetable.find_section(student, student["request"]["section"])
+	var seats: int = own["seats"]
+	for i in 2000:
+		shift._drain_slots(1.0)
+	_check(own["seats"] == seats, "open market never takes the seat a student already holds (%d -> %d)" % [seats, own["seats"]])
+
+
+func _test_trait_weights() -> void:
+	var shift := ShiftState.new(2, 5)
+	shift.line = [{ "trait": "impatient" }, { "trait": "" }]
+	_check(is_equal_approx(shift.waiting_weight(), 3.0), "an impatient student counts twice")
+	shift.line = [{ "trait": "with_parent" }, { "trait": "" }]
+	_check(is_equal_approx(shift.waiting_weight(), 1.5), "a student with a parent counts half")
+	shift.line = []
+	shift.current = { "trait": "impatient" }
+	_check(is_equal_approx(shift.waiting_weight(), 1.0), "an impatient student at the window still drains extra")
+	var before := shift.minute
+	shift.argue()
+	_check(is_equal_approx(shift.minute - before, GameData.balance("parent_argue_minutes")), "a parent arguing costs minutes")
+
+
+func _test_caught_favors_cost_stars() -> void:
+	var perfect := ShiftState.new(2, 42)
+	_play(perfect, _perfect)
+	var summary := perfect.summary()
+	summary["caught_bends"] = 1
+	_check(Scoring.stars(summary) == 2, "a caught favor costs a star")
+	summary["caught_bends"] = 5
+	_check(Scoring.stars(summary) == 0, "stars never go below zero")
+	summary["reason"] = ""
+	_check(Scoring.projected(summary) == 3, "the pause projection ignores the spot check")

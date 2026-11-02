@@ -6,10 +6,10 @@
 				{ "day": 2, "title": "Nothing wrong?", "text": "Approve it, then hand the papers back." },
 				{ "day": 2, "title": "Pull up the record", "text": "Drag the student ID onto the ISMIS reader, or press S. No card? Type their number into the search box." },
 				{ "day": 2, "title": "Flagging", "text": "Click a field on the papers, then the same field on ISMIS. Flags are checked when you decide. False alarms cost patience." },
-				{ "day": 2, "title": "Wrong calls", "text": "A wrong call sends the student back angrier. Two wrong calls and they walk out." },
+				{ "day": 2, "title": "Wrong calls", "text": "Every wrong call costs patience. Turn someone away or send them off for nothing and they come back angrier. Twice, and they walk out." },
 				{ "day": 2, "title": "Priority", "text": "GRAD and PWD students can be called out of turn from the line." },
 				{ "day": 3, "title": "Short forms", "text": "Ma. for Maria, J. for Juan, BS IT for BSIT. These are fine. Don't flag them." },
-				{ "day": 5, "title": "Two problems?", "text": "Turn-aways come first, then the Cashier, then the other offices, then fixes at the window." }
+				{ "day": 5, "title": "Two problems?", "text": "Turn away beats everything. Otherwise send them to any office they need; they come back for the next one. Fixes at the window come last." }
 			]
 		},
 		{
@@ -59,6 +59,17 @@
 				{ "day": 7, "title": "On break", "text": "Office on break? Hold them on the bench (3 seats). They go as soon as it reopens." },
 				{ "day": 8, "title": "Overload", "problems": ["overload"], "text": "Over 24 units? Route: Dean's office." },
 				{ "day": 8, "title": "Closed for the day", "text": "The office won't reopen today? Turn away: Office closed today, come back tomorrow." }
+			]
+		},
+		{
+			"name": "People",
+			"entries": [
+				{ "day": 2, "title": "Sweaty and scowling", "text": "Impatient. While they wait, the line loses patience twice as fast. Serve them quickly. The right call doesn't change." },
+				{ "day": 3, "title": "Side-eye and a smirk", "text": "Palusot. They insist everything is fine and deny anything you ask about. Trust the papers, not the talk." },
+				{ "day": 4, "title": "A parent behind them", "text": "With parent. The parent keeps them calm (half the drain), but any routing starts an argument that costs a few minutes." },
+				{ "day": 4, "title": "Sunglasses indoors", "text": "Kapit. They drop names and push you for a favor. Check them like anyone else." },
+				{ "day": 4, "title": "Favors", "text": "Some students ask you to wave them through: 6, Do the favor. If nothing was wrong, it's just an approval. If something was, you bent the rules: the line sees it, and Ma'am Lorna spot-checks three transactions at the end of every day. Each favor she catches costs a star." },
+				{ "day": 5, "title": "Wide-eyed freshman", "text": "Confused freshman. They ask for the wrong thing, like an ID picture. Ignore what they ask for and read the papers." }
 			]
 		}
 	]

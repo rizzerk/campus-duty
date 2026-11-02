@@ -15,6 +15,7 @@ const STAMPS := {
 	"fix": ["FIXED", UiKit.BLUE],
 	"hold": ["HOLD", UiKit.GOLD_DARK],
 	"route": ["ROUTED", UiKit.BLUE],
+	"favor": ["FAVOR", UiKit.GOLD_DARK],
 }
 const HAND_BACK_SECONDS := 0.3
 const REACT_SECONDS := 1.6
@@ -47,6 +48,8 @@ var _stamp: StampMark
 var _menu: Control
 var _handing: bool = false
 var _hand_back_button: Button
+## Only shown when the student at the window asks for a favor (rule bending).
+var _favor_button: Button
 
 
 func _ready() -> void:
@@ -116,6 +119,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		index = KEYPAD_KEYS.find(event.keycode)
 	if index != -1:
 		_on_action(ACTIONS[index]["id"])
+	elif event.keycode in [KEY_6, KEY_KP_6]:
+		_on_action("favor")
 
 
 func _build() -> void:
@@ -146,13 +151,34 @@ func _build() -> void:
 		button.pressed.connect(_on_action.bind(action["id"]))
 		bar.add_child(button)
 		_buttons[action["id"]] = button
+	_favor_button = UiKit.button("6  Do the favor", UiKit.GOLD_DARK, Color.WHITE, 22)
+	_favor_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_favor_button.tooltip_text = "Wave them through without the checks. Ma'am Lorna spot-checks at the end of the day."
+	_favor_button.pressed.connect(_on_action.bind("favor"))
+	bar.add_child(_favor_button)
 	_hand_back_button = UiKit.button("Space  Hand back", UiKit.GOLD, UiKit.INK, 22)
 	_hand_back_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_hand_back_button.size_flags_stretch_ratio = 1.3
 	_hand_back_button.pressed.connect(_hand_back)
 	bar.add_child(_hand_back_button)
+	var hints := UiKit.label(_hint_text(), 15, UiKit.INK)
+	hints.modulate.a = 0.75
+	_place(hints, Rect2(24, 698, 1232, 20))
 	_update_buttons()
 	_fix_sizes.call_deferred()
+
+
+## The strip under the stamps: the order to handle problems in (once students can have two),
+## and the keys for the rulebook and pause.
+func _hint_text() -> String:
+	var parts: Array = []
+	for number in range(int(GameData.json("days")["first_day"]), GameState.day + 1):
+		if int(GameData.day(number)["max_problems"]) > 1:
+			parts.append("Two problems? Turn away  ›  Send out  ›  Fix at the window")
+			break
+	parts.append("Tab  Rulebook")
+	parts.append("Esc  Pause")
+	return "     ·     ".join(parts)
 
 
 func _place(node: Control, rect: Rect2) -> void:
@@ -173,6 +199,8 @@ func _fix_sizes() -> void:
 func _update_buttons() -> void:
 	var busy := shift.ended or shift.current.is_empty() or _react_left > 0.0 or _menu != null or _handing
 	_hand_back_button.disabled = busy or _pending.is_empty()
+	_favor_button.visible = not shift.current.is_empty() and shift.current.get("favor", "") != "" and not shift.ended
+	_favor_button.disabled = busy
 	for id: String in _buttons:
 		var button: Button = _buttons[id]
 		var unlocked: bool = _unlocked.has(id)
@@ -221,7 +249,9 @@ func _on_face_clicked(index: int) -> void:
 func _on_action(action: String) -> void:
 	if shift.ended or shift.current.is_empty() or _react_left > 0.0 or _handing or _menu != null:
 		return
-	if not _unlocked.has(action):
+	if action == "favor" and shift.current.get("favor", "") == "":
+		return
+	if action != "favor" and not _unlocked.has(action):
 		return
 	if action == "hold" and shift.bench_full():
 		return
@@ -248,7 +278,7 @@ func _open_section_picker() -> void:
 	picker.chosen.connect(func(code: String) -> void:
 		_menu = null
 		shift.choosing_section = false
-		_set_pending({ "action": "fix", "reason": "", "items": [], "section": code }, "ENROLLED · %s" % code.get_slice("-", 1), UiKit.BLUE))
+		_set_pending({ "action": "fix", "reason": "", "items": [], "section": code }, "MOVED · %s" % code.get_slice("-", 1), UiKit.BLUE))
 	picker.cancelled.connect(_on_menu_cancelled)
 	_update_buttons()
 
@@ -398,6 +428,7 @@ func _commit(decision: Dictionary) -> void:
 	if shift.ended or shift.current.is_empty():
 		return
 	var action: String = decision["action"]
+	var student := shift.current
 	var result := shift.act(action, {
 		"flags": _flags_for_decision(),
 		"reason": decision["reason"],
@@ -412,7 +443,9 @@ func _commit(decision: Dictionary) -> void:
 		return
 	var outcome: String = result["outcome"]
 	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1])
-	if result["correct"]:
+	if result["bent"]:
+		_ismis.show_banner("FAVOR DONE · %s The line saw it.%s" % [shift.history[-1]["reason"], flag_note], "flag")
+	elif result["correct"]:
 		_ismis.show_banner("CORRECT · %s%s" % [_outcome_text(outcome), flag_note], "right")
 	else:
 		_ismis.show_banner("WRONG CALL · %s%s" % [result["reason"], flag_note], "wrong")
@@ -425,13 +458,28 @@ func _commit(decision: Dictionary) -> void:
 	else:
 		_react_left = REACT_SECONDS
 	_react(action, result)
+	if action.begins_with("route:") and student.get("trait", "") == "with_parent" and outcome != "walked_out":
+		_parent_argues()
 	_refresh_line()
 	_refresh_offices()
 	_update_buttons()
 
 
+## With parent: any routing gets an argument from the parent, which costs the window a few minutes.
+func _parent_argues() -> void:
+	var line: Dictionary = _pick_line(GameData.json("traits")["with_parent"]["argue"]).duplicate()
+	line["en"] = "(Parent) %s" % line["en"]
+	_student_panel.set_expression("annoyed")
+	_student_panel.say(line)
+	shift.argue()
+
+
 func _react(action: String, result: Dictionary) -> void:
 	var outcome: String = result["outcome"]
+	if result["bent"] or (action == "favor" and result["correct"]):
+		_student_panel.set_expression("delighted")
+		_student_panel.say(_reaction("approved"))
+		return
 	if not result["correct"]:
 		_student_panel.set_expression("angry" if action != "approve" else "delighted")
 		_student_panel.say(_reaction("wrong" if action != "approve" else "approved"))
@@ -546,6 +594,9 @@ func _ask() -> void:
 
 
 func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:
+	if student.get("trait", "") == "palusot":
+		# A palusot student denies everything, real problem or not.
+		return _pick_line(GameData.json("traits")["palusot"]["ask"])
 	var key: String = flag["paper"]["key"]
 	var kind := "same"
 	var item := ""

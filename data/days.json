@@ -3,10 +3,11 @@
 	"last_day": 8,
 	"days": {
 		"2": {
+			"traits": { "impatient": 0.15 },
 			"reject_reasons": ["missing_requirement"],
 			"actions": ["approve", "reject"],
 			"phase": "4th-year enrollment",
-			"intro": "Good morning! Graduating students are filing their clearances today. Expect about 16 before noon.",
+			"intro": "Good morning! Students enroll themselves in ISMIS. They only come to us when ISMIS asks for the Registrar's approval, or when something's wrong. Today, graduating students are filing their clearances. Expect about 16 before noon.",
 			"rules": [
 				{ "text": "Nothing wrong with the papers? Approve it.", "new": true },
 				{ "text": "Graduating students need every clearance requirement. Missing one? Return the form with the list.", "new": true },
@@ -20,13 +21,14 @@
 			"max_problems": 1
 		},
 		"3": {
+			"traits": { "impatient": 0.12, "palusot": 0.12 },
 			"no_id_chance": 0.12,
 			"harmless_chance": 0.25,
 			"actions": ["fix"],
 			"phase": "3rd-year enrollment",
 			"intro": "Third years enroll today. Some sections will fill up fast.",
 			"rules": [
-				{ "text": "Full section? Open the section picker and find an open one with no schedule clash.", "new": true },
+				{ "text": "Section full? Fix: move them to an open section with no schedule clash. Their section still has seats? Then there's nothing to fix.", "new": true },
 				{ "text": "Short forms are fine: Ma. for Maria, J. for Juan, BS IT for BSIT. Don't flag them.", "new": true }
 			],
 			"students": 18,
@@ -37,13 +39,16 @@
 			"max_problems": 1
 		},
 		"4": {
+			"traits": { "impatient": 0.1, "palusot": 0.1, "with_parent": 0.1, "kapit": 0.08 },
+			"favor_chance": 0.1,
 			"no_id_chance": 0.12,
 			"harmless_chance": 0.25,
 			"actions": ["route"],
 			"phase": "2nd-year enrollment",
 			"intro": "Second years today. The Cashier gets busy after 10:00.",
 			"rules": [
-				{ "text": "Unpaid balance in ISMIS? Send the student to the Cashier first.", "new": true }
+				{ "text": "Unpaid balance in ISMIS? Send the student to the Cashier first.", "new": true },
+				{ "text": "Some students will ask for favors. Ma'am Lorna spot-checks three of your transactions at the end of every day.", "new": true }
 			],
 			"students": 20,
 			"start_line": 7,
@@ -56,6 +61,8 @@
 			}
 		},
 		"5": {
+			"traits": { "impatient": 0.1, "palusot": 0.08, "with_parent": 0.1, "kapit": 0.06, "confused": 0.2 },
+			"favor_chance": 0.1,
 			"reject_reasons": ["identity_mismatch"],
 			"no_id_chance": 0.12,
 			"harmless_chance": 0.25,
@@ -63,7 +70,8 @@
 			"intro": "Freshmen day. Many of them have never logged in to ISMIS before.",
 			"rules": [
 				{ "text": "Freshman can't log in to ISMIS? Reset their account at the window.", "new": true },
-				{ "text": "Before resetting, the birthday on the admission slip must match ISMIS. If it doesn't, turn them away.", "new": true }
+				{ "text": "Before resetting, the birthday on the admission slip must match ISMIS. If it doesn't, turn them away.", "new": true },
+				{ "text": "Two problems? Turn away beats everything. Otherwise send them to any office they need. Fixes at the window come last.", "new": true }
 			],
 			"students": 20,
 			"start_line": 8,
@@ -73,6 +81,8 @@
 			"max_problems": 2
 		},
 		"6": {
+			"traits": { "impatient": 0.08, "palusot": 0.08, "with_parent": 0.1, "kapit": 0.08, "confused": 0.15 },
+			"favor_chance": 0.1,
 			"no_id_chance": 0.12,
 			"reject_reasons": ["failed_prereq"],
 			"harmless_chance": 0.25,
@@ -81,7 +91,7 @@
 			"rules": [
 				{ "text": "Check the Grades tab: a 5.0 in the prerequisite means reject. An INC goes to Consultation.", "new": true }
 			],
-			"students": 18,
+			"students": 16,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "enroll_subject": 0.5, "enrollment_payment": 0.25, "first_year": 0.25 },
@@ -91,6 +101,8 @@
 			"live_slots": { "every_minutes": 3, "chance": 0.3 }
 		},
 		"7": {
+			"traits": { "impatient": 0.08, "palusot": 0.1, "with_parent": 0.1, "kapit": 0.08 },
+			"favor_chance": 0.1,
 			"no_id_chance": 0.12,
 			"reject_reasons": ["fake_signature"],
 			"harmless_chance": 0.25,
@@ -113,6 +125,8 @@
 			}
 		},
 		"8": {
+			"traits": { "impatient": 0.08, "palusot": 0.1, "with_parent": 0.1, "kapit": 0.1 },
+			"favor_chance": 0.1,
 			"no_id_chance": 0.12,
 			"reject_reasons": ["office_closed"],
 			"harmless_chance": 0.25,
