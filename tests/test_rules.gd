@@ -37,6 +37,8 @@ func _init() -> void:
 	_test_flag_scoring()
 	_test_reject_needs_reason()
 	_test_days_teach_what_they_need()
+	_test_rulebook_covers_problems()
+	_test_memo_counts_match()
 	print("rules: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -242,3 +244,36 @@ func _test_days_teach_what_they_need() -> void:
 		for reason: String in reasons:
 			_check(GameData.json("reject_reasons").has(reason), "reason %s has a label" % reason)
 	_check(actions.has("approve") and actions.has("reject"), "approve and reject are taught")
+
+
+## The handbook has an entry for every problem by the first day that problem can show up.
+func _test_rulebook_covers_problems() -> void:
+	var days: Dictionary = GameData.json("days")
+	var first_day := int(days["first_day"])
+	var last_day := int(days["last_day"])
+	var covered := {}
+	for topic: Dictionary in GameData.json("rulebook")["topics"]:
+		for entry: Dictionary in topic["entries"]:
+			var day := int(entry["day"])
+			_check(day >= first_day and day <= last_day, "rulebook entry %s within the season" % entry["title"])
+			for problem: String in entry.get("problems", []):
+				covered[problem] = mini(covered.get(problem, 99), day)
+	for day in range(first_day, last_day + 1):
+		for problem: String in GameData.day(day)["problems"]:
+			_check(covered.has(problem) and covered[problem] <= day, "rulebook explains %s by day %d" % [problem, day])
+	_check(Rulebook.unlocked_topics(2).size() >= 2, "day 2 already has topics")
+	_check(Rulebook.unlocked_topics(8).size() == GameData.json("rulebook")["topics"].size(), "every topic open by day 8")
+
+
+## A memo that says "about N" students must match the day's line, rush waves included.
+func _test_memo_counts_match() -> void:
+	var regex := RegEx.create_from_string("about (\\d+)")
+	for day in range(int(GameData.json("days")["first_day"]), int(GameData.json("days")["last_day"]) + 1):
+		var info := GameData.day(day)
+		var found := regex.search(info["intro"])
+		if found == null:
+			continue
+		var total := int(info["students"])
+		for rush: Dictionary in info.get("rush", []):
+			total += int(rush["count"])
+		_check(int(found.get_string(1)) == total, "day %d memo says about %s, line has %d" % [day, found.get_string(1), total])

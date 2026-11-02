@@ -16,6 +16,7 @@ func _init() -> void:
 	_test_lanyard_color_shows_year()
 	_test_retired_hair_never_rolled()
 	_test_team_parts_exist()
+	_check(ResourceLoader.exists(PortraitGen.part_path("hair", PortraitGen.data()["staff"]["lorna"]["hair"])), "Ma'am Lorna's hair exists")
 	print("portrait_gen: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 

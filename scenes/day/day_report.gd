@@ -28,6 +28,9 @@ func _ready() -> void:
 	stars.filled = summary["stars"]
 	stars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(stars)
+	var season := UiKit.label("Season so far: %d stars" % GameState.season_stars(), 22, Color("#cfe0d6"))
+	season.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(season)
 	if failed:
 		layout.add_child(UiKit.label("The line ran out of patience. Ma'am Lorna took over the window.", 22, Color("#f3efe2")))
 	var columns := HBoxContainer.new()
@@ -81,7 +84,7 @@ func _today_card(summary: Dictionary) -> Control:
 	return card
 
 
-## Every wrong call with the reason, so the player learns the rule they missed.
+## F7's "Because of you": what the player's calls led to, wrong calls first.
 func _because_card() -> Control:
 	var card := UiKit.card(UiKit.CREAM, 18, 5)
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -90,34 +93,36 @@ func _because_card() -> Control:
 	card.add_child(list)
 	list.add_child(UiKit.label("Because of you", 28))
 	var summary: Dictionary = GameState.last_summary
-	var mistakes: Array = GameState.last_history.filter(func(entry: Dictionary) -> bool: return not entry["correct"])
 	var elsewhere: int = summary.get("elsewhere", 0)
 	var unserved: int = summary["total"] - summary["served"] - elsewhere
-	if elsewhere > 0:
-		list.add_child(UiKit.wrapped("%d student%s you sent to another office %s still there when the window closed. That counts as handled." % [elsewhere, "" if elsewhere == 1 else "s", "was" if elsewhere == 1 else "were"], 19, Color("#3a463e")))
 	if summary["served"] == 0 and elsewhere == 0:
-		list.add_child(UiKit.wrapped("You didn't serve anyone. %d students went home without help." % summary["total"], 21, UiKit.RED))
+		list.add_child(_story("You didn't serve anyone. %d students went home without help." % summary["total"], false))
 	elif unserved > 0:
-		list.add_child(UiKit.wrapped("%d students were still waiting when the window closed." % unserved, 21, UiKit.RED))
-	if mistakes.is_empty() and summary["served"] > 0:
-		list.add_child(UiKit.wrapped("Not a single wrong call today. Ma'am Lorna noticed.", 21, Color("#3a463e")))
-	for entry: Dictionary in mistakes.slice(0, 6):
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 10)
-		var dot := ColorRect.new()
-		dot.color = UiKit.RED
-		dot.custom_minimum_size = Vector2(12, 12)
-		dot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-		row.add_child(dot)
-		var text := UiKit.wrapped("#%d %s at %s: you chose %s. %s" % [entry["number"], entry["name"], entry["clock"], _action_name(entry["action"]), entry["reason"]], 19, Color("#3a463e"))
-		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(text)
-		list.add_child(row)
-	if mistakes.size() > 6:
-		list.add_child(UiKit.label("…and %d more." % (mistakes.size() - 6), 19, UiKit.MUTED))
-	if summary["false_alarms"] > 0:
-		list.add_child(UiKit.wrapped("You flagged %d thing%s that turned out to be fine. Short forms like Ma. for Maria don't count." % [summary["false_alarms"], "" if summary["false_alarms"] == 1 else "s"], 19, UiKit.GOLD_DARK))
+		list.add_child(_story("%d student%s still waiting when the window closed." % [unserved, " was" if unserved == 1 else "s were"], false))
+	if elsewhere > 0:
+		list.add_child(_story("%d student%s you sent to another office %s still there at closing. That counts as handled." % [elsewhere, "" if elsewhere == 1 else "s", "was" if elsewhere == 1 else "were"], true))
+	var stories := Consequences.build(GameState.last_history, 6)
+	for story: Dictionary in stories:
+		list.add_child(_story(story["text"], story["good"]))
+	if stories.is_empty() and summary["served"] > 0:
+		list.add_child(_story("A quiet, clean shift. Ma'am Lorna noticed.", true))
+	elif stories.all(func(story: Dictionary) -> bool: return story["good"]) and summary["mistakes"] == 0 and summary["served"] > 0:
+		list.add_child(_story("Not a single wrong call today. Ma'am Lorna noticed.", true))
 	return card
+
+
+func _story(text: String, good: bool) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	var dot := ColorRect.new()
+	dot.color = UiKit.OK if good else UiKit.RED
+	dot.custom_minimum_size = Vector2(12, 12)
+	dot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(dot)
+	var label := UiKit.wrapped(text, 18, Color("#3a463e"))
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
+	return row
 
 
 func _tomorrow_text() -> String:

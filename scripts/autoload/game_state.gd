@@ -27,15 +27,32 @@ func start_shift() -> void:
 
 
 func finish_shift(summary: Dictionary, history: Array) -> void:
-	summary["stars"] = stars_for(summary)
+	summary["stars"] = Scoring.stars(summary)
 	last_summary = summary
 	last_history = history
 	results[day] = summary
 	go_to("report")
 
 
+## Plays the same day again with the same students, after the line gave up.
+func retry_day() -> void:
+	go_to("window")
+
+
+func season_stars() -> int:
+	var total := 0
+	for number: int in results:
+		total += int(results[number].get("stars", 0))
+	return total
+
+
 func next_day() -> void:
-	day = int(GameData.json("days")["first_day"]) if is_last_day() else day + 1
+	if is_last_day():
+		# A new season: the old season's stars don't carry over.
+		results.clear()
+		day = int(GameData.json("days")["first_day"])
+	else:
+		day += 1
 	go_to("memo")
 
 
@@ -57,20 +74,6 @@ func unlocked_reject_reasons() -> Array:
 	for number in range(int(GameData.json("days")["first_day"]), day + 1):
 		reasons.append_array(GameData.day(number).get("reject_reasons", []))
 	return reasons
-
-
-## 3 stars needs 90% correct, 90% of the line served and no walkouts. A failed shift gets none.
-static func stars_for(summary: Dictionary) -> int:
-	if summary["reason"] == "patience":
-		return 0
-	var score := minf(summary["accuracy"], summary["served_ratio"])
-	var stars := 0
-	for threshold: float in GameData.json("balance")["star_thresholds"]:
-		if score >= threshold:
-			stars += 1
-	if summary["walked_out"] > 0:
-		stars = mini(stars, 2)
-	return stars
 
 
 func go_to(scene: String) -> void:

@@ -43,6 +43,7 @@ func _build(student: Dictionary) -> void:
 	list.add_child(row)
 	row.add_child(UiKit.label("Student number", 18, UiKit.INK, true))
 	_number = LineEdit.new()
+	_number.focus_mode = Control.FOCUS_CLICK
 	_number.max_length = 8
 	_number.placeholder_text = "8 digits"
 	_number.custom_minimum_size.x = 170

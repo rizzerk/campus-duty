@@ -22,7 +22,7 @@ static func top_problem(student: Dictionary) -> String:
 static func expected(student: Dictionary, offices: Dictionary) -> Dictionary:
 	var problem := top_problem(student)
 	if problem == "":
-		return { "action": "approve", "problem": "", "reason": "Nothing wrong with the papers. Approve it.", "reason_id": "", "items": [] }
+		return { "action": "approve", "problem": "", "reason": "There was nothing wrong with the papers. Approve it.", "reason_id": "", "items": [] }
 	var info := GameData.problem(problem)
 	var action: String = info["action"]
 	var reason: String = info["reason"]

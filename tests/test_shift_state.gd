@@ -19,6 +19,7 @@ func _init() -> void:
 	_test_wrong_office_trip()
 	_test_open_market_drain()
 	_test_routed_late_counts_as_handled()
+	_test_careful_player_never_fails()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -133,22 +134,27 @@ func _test_same_seed_same_line() -> void:
 
 
 func _test_stars() -> void:
-	var game_state: GDScript = load("res://scripts/autoload/game_state.gd")
 	var idle := ShiftState.new(2, 42)
 	_play(idle, func(_s: ShiftState) -> Array: return [])
-	_check(game_state.stars_for(idle.summary()) == 0, "waiting out the clock earns no stars (%s)" % idle.end_reason)
+	_check(Scoring.stars(idle.summary()) == 0, "waiting out the clock earns no stars (%s)" % idle.end_reason)
 	var perfect := ShiftState.new(2, 42)
 	_play(perfect, _perfect)
-	_check(game_state.stars_for(perfect.summary()) == 3, "perfect day 2 earns 3 stars")
+	_check(Scoring.stars(perfect.summary()) == 3, "perfect day 2 earns 3 stars")
 	var walkout := perfect.summary()
 	walkout["walked_out"] = 1
-	_check(game_state.stars_for(walkout) == 2, "a walkout caps stars at 2")
+	_check(Scoring.stars(walkout) == 2, "a walkout caps stars at 2")
 	var failed := perfect.summary()
 	failed["reason"] = "patience"
-	_check(game_state.stars_for(failed) == 0, "a failed shift earns no stars")
+	_check(Scoring.stars(failed) == 0, "a failed shift earns no stars")
 	var half := perfect.summary()
 	half["served_ratio"] = 0.6
-	_check(game_state.stars_for(half) == 1, "serving only 60% of the line caps stars at 1")
+	_check(Scoring.stars(half) == 1, "serving only 60% of the line caps stars at 1")
+	var early := perfect.summary()
+	early["served_ratio"] = 0.2
+	early["reason"] = ""
+	_check(Scoring.projected(early) == 3, "mid-shift projection doesn't count students still to come")
+	var none := idle.summary()
+	_check(Scoring.projected(none) == 0, "no calls yet projects nothing")
 
 
 func _test_flags_and_asking() -> void:
@@ -283,7 +289,10 @@ func _test_open_market_drain() -> void:
 	while market.minute < 160.0:
 		market.tick(0.5)
 		market.patience = 100.0
-	_check(rushes[0] == 8, "two rush waves of 4 announced (%d)" % rushes[0])
+	var expected_rush := 0
+	for rush: Dictionary in GameData.day(6)["rush"]:
+		expected_rush += int(rush["count"])
+	_check(rushes[0] == expected_rush, "rush waves announced (%d of %d)" % [rushes[0], expected_rush])
 
 
 func _test_routed_late_counts_as_handled() -> void:
@@ -302,3 +311,38 @@ func _test_routed_late_counts_as_handled() -> void:
 	wrong.current = clean
 	wrong.act("route:cashier")
 	_check(wrong.summary()["elsewhere"] == 0, "a wrong trip doesn't count as handled")
+
+
+## Balance guard: a careful player who takes 15 seconds per student (half that for someone back
+## from an office) and gets 1 call in 10 wrong never loses the line, and earns 2 stars or more.
+func _test_careful_player_never_fails() -> void:
+	for day in range(2, 9):
+		var shift := ShiftState.new(day, 7)
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 7
+		var timer := 0.0
+		while not shift.ended:
+			shift.tick(STEP)
+			if shift.current.is_empty():
+				shift.call_next()
+				timer = 0.0
+			if shift.current.is_empty():
+				continue
+			timer += STEP
+			var trip: Dictionary = shift.current.get("trip", {})
+			var back_ok: bool = trip.get("office", "") != "" and not trip.get("wrong", false)
+			if timer < (7.5 if back_ok else 15.0):
+				continue
+			var want := RulesCheck.expected(shift.current, shift.offices())
+			if want["action"] == "hold" and shift.bench_full():
+				continue
+			var action: String = want["action"]
+			if rng.randf() < 0.1:
+				action = "reject" if action == "approve" else "approve"
+			var section := ""
+			if want["problem"] == "closed_section":
+				section = Timetable.fitting_sections(shift.current)[0]
+			shift.act(action, { "section": section, "reason": want["reason_id"], "items": want["items"] })
+		var summary := shift.summary()
+		_check(summary["reason"] != "patience", "careful player keeps the line on day %d" % day)
+		_check(Scoring.stars(summary) >= 2, "careful player earns 2+ stars on day %d (got %d)" % [day, Scoring.stars(summary)])

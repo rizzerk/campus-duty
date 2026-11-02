@@ -120,6 +120,21 @@
 			"expression": "annoyed"
 		}
 	],
+	"staff": {
+		"lorna": {
+			"hair": "hair_bob_straight",
+			"hair_color": "#4a4240",
+			"skin": "#d9a878",
+			"brow_color": "#432c1f",
+			"eye_style": "round_pretty",
+			"wrinkles": "wrinkles_light",
+			"clothes": "clothes_uniform_female",
+			"clothes_color": "#ffffff",
+			"accessories": ["accessory_lanyard"],
+			"accessory_colors": { "accessory_lanyard": "#1f5a3d" },
+			"expression": "annoyed"
+		}
+	},
 	"team": [
 		{
 			"name": "Razel",

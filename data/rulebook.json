@@ -1,0 +1,65 @@
+{
+	"topics": [
+		{
+			"name": "Basics",
+			"entries": [
+				{ "day": 2, "title": "Nothing wrong?", "text": "Approve it, then hand the papers back." },
+				{ "day": 2, "title": "Pull up the record", "text": "Drag the student ID onto the ISMIS reader, or press S. No card? Type their number into the search box." },
+				{ "day": 2, "title": "Flagging", "text": "Click a field on the papers, then the same field on ISMIS. Flags are checked when you decide. False alarms cost patience." },
+				{ "day": 2, "title": "Wrong calls", "text": "A wrong call sends the student back angrier. Two wrong calls and they walk out." },
+				{ "day": 2, "title": "Priority", "text": "GRAD and PWD students can be called out of turn from the line." },
+				{ "day": 3, "title": "Short forms", "text": "Ma. for Maria, J. for Juan, BS IT for BSIT. These are fine. Don't flag them." },
+				{ "day": 5, "title": "Two problems?", "text": "Turn-aways come first, then the Cashier, then the other offices, then fixes at the window." }
+			]
+		},
+		{
+			"name": "Clearance",
+			"entries": [
+				{ "day": 2, "title": "Missing requirement", "problems": ["missing_requirement"], "text": "Every clearance item must be attached. Missing one? Turn away: Missing requirement, and tick exactly what they need to bring." }
+			]
+		},
+		{
+			"name": "Sections",
+			"entries": [
+				{ "day": 3, "title": "Full section", "problems": ["closed_section"], "text": "Fix: open the section picker. Choose an open section that doesn't clash with their week." },
+				{ "day": 6, "title": "Open market", "text": "Seats drop while the picker is open. Don't take too long." }
+			]
+		},
+		{
+			"name": "Payments",
+			"entries": [
+				{ "day": 4, "title": "Unpaid balance", "problems": ["unpaid_balance"], "text": "Any balance in ISMIS? Route: Cashier first. They come back with a receipt." }
+			]
+		},
+		{
+			"name": "Accounts",
+			"entries": [
+				{ "day": 5, "title": "Locked account", "problems": ["ismis_login"], "text": "Fix: open the reset tool. Type their number, confirm the ID and birthday, print the temporary password." },
+				{ "day": 5, "title": "Birthday doesn't match", "problems": ["identity_mismatch"], "text": "If the admission slip's birthday isn't the one in ISMIS, it isn't their account. Turn away: Details don't match the record." }
+			]
+		},
+		{
+			"name": "Grades",
+			"entries": [
+				{ "day": 6, "title": "Failed prerequisite", "problems": ["failed_prereq"], "text": "A 5.0 in the prerequisite (Grades tab)? Turn away: Failed prerequisite." },
+				{ "day": 6, "title": "INC in the prerequisite", "problems": ["inc_prereq"], "text": "An INC goes to their adviser. Route: Consultation." }
+			]
+		},
+		{
+			"name": "Signatures",
+			"entries": [
+				{ "day": 7, "title": "No signature", "problems": ["missing_signature"], "text": "Adding a subject needs the adviser's signature. Blank? Route: Consultation." },
+				{ "day": 7, "title": "Fake signature", "problems": ["fake_signature"], "text": "Compare it with the specimen on the Advisers tab. Doesn't match? Turn away: Fake signature." }
+			]
+		},
+		{
+			"name": "Offices",
+			"entries": [
+				{ "day": 4, "title": "Check before routing", "text": "Look at an office's status first. Sending someone to a closed office is a wasted trip." },
+				{ "day": 7, "title": "On break", "text": "Office on break? Hold them on the bench (3 seats). They go as soon as it reopens." },
+				{ "day": 8, "title": "Overload", "problems": ["overload"], "text": "Over 24 units? Route: Dean's office." },
+				{ "day": 8, "title": "Closed for the day", "text": "The office won't reopen today? Turn away: Office closed today, come back tomorrow." }
+			]
+		}
+	]
+}

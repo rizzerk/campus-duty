@@ -93,6 +93,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if _menu != null or _ismis.is_typing():
 		return
+	if event.keycode == KEY_ESCAPE:
+		_open_pause()
+		return
+	if event.keycode == KEY_TAB:
+		_open_rulebook()
+		return
 	if event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 		_hand_back()
 		return
@@ -244,6 +250,25 @@ func _open_section_picker() -> void:
 		shift.choosing_section = false
 		_set_pending({ "action": "fix", "reason": "", "items": [], "section": code }, "ENROLLED · %s" % code.get_slice("-", 1), UiKit.BLUE))
 	picker.cancelled.connect(_on_menu_cancelled)
+	_update_buttons()
+
+
+## S5: Esc pauses. The tree pauses, so the clock and patience stop.
+func _open_pause() -> void:
+	if shift.ended or _handing:
+		return
+	var menu := PauseMenu.open(self, shift)
+	_menu = menu
+	menu.resumed.connect(_on_menu_cancelled)
+
+
+## S15: Tab opens the handbook. The clock keeps running.
+func _open_rulebook() -> void:
+	if shift.ended:
+		return
+	var book := Rulebook.open(self, shift.day)
+	_menu = book
+	book.closed.connect(_on_menu_cancelled)
 	_update_buttons()
 
 
@@ -592,8 +617,17 @@ func _refresh_offices() -> void:
 	_offices.refresh(shift.offices(), shift.bench, notes)
 
 
-## Leaves the last verdict on screen for a moment before the report.
-func _on_shift_ended(_reason: String) -> void:
+## Leaves the last verdict on screen for a moment, then the report, or S18 if the line gave up.
+func _on_shift_ended(reason: String) -> void:
 	_update_buttons()
+	if _menu != null and is_instance_valid(_menu):
+		_menu.queue_free()
+		_menu = null
+	if reason == "patience":
+		get_tree().create_timer(0.6).timeout.connect(func() -> void:
+			var failed := ShiftFailed.open(self, shift)
+			failed.retry.connect(GameState.retry_day)
+			failed.carry_on.connect(func() -> void: GameState.finish_shift(shift.summary(), shift.history)))
+		return
 	get_tree().create_timer(REACT_SECONDS + 0.4).timeout.connect(func() -> void:
 		GameState.finish_shift(shift.summary(), shift.history))

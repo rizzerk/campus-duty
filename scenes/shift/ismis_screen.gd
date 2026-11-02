@@ -216,6 +216,8 @@ func _make_search() -> Control:
 	row.add_theme_constant_override("separation", 8)
 	row.add_child(UiKit.label("No ID? Search by ID number", 15, UiKit.MUTED, true))
 	_search = LineEdit.new()
+	# Click to type. Keyboard focus navigation would grab it on Tab, which opens the rulebook.
+	_search.focus_mode = Control.FOCUS_CLICK
 	_search.max_length = 8
 	_search.placeholder_text = "8 digits"
 	_search.custom_minimum_size.x = 130

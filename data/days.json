@@ -81,13 +81,13 @@
 			"rules": [
 				{ "text": "Check the Grades tab: a 5.0 in the prerequisite means reject. An INC goes to Consultation.", "new": true }
 			],
-			"students": 22,
+			"students": 18,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "enroll_subject": 0.5, "enrollment_payment": 0.25, "first_year": 0.25 },
 			"problems": { "closed_section": 0.3, "unpaid_balance": 0.2, "ismis_login": 0.25, "identity_mismatch": 0.2, "failed_prereq": 0.12, "inc_prereq": 0.08 },
 			"max_problems": 2,
-			"rush": [{ "at": 60, "count": 4 }, { "at": 150, "count": 4 }],
+			"rush": [{ "at": 60, "count": 3 }, { "at": 150, "count": 3 }],
 			"live_slots": { "every_minutes": 3, "chance": 0.3 }
 		},
 		"7": {
@@ -96,13 +96,13 @@
 			"harmless_chance": 0.25,
 			"actions": ["hold"],
 			"phase": "Adjustment, day 1",
-			"intro": "Add/drop starts today. Expect a busy line, about 24 students before noon.",
+			"intro": "Add/drop starts today. Expect a busy line, about 22 students before noon.",
 			"rules": [
 				{ "text": "Adding a subject needs the adviser's signature on the consultation slip. No signature? Send them to Consultation.", "new": true },
 				{ "text": "Check every signature against the adviser specimen sheet. Fakes are rejected.", "new": true },
 				{ "text": "Consultation on break? Put the student on the Hold bench until it reopens.", "new": true }
 			],
-			"students": 24,
+			"students": 22,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "add_subject": 0.7, "enroll_subject": 0.3 },
@@ -121,7 +121,7 @@
 			"rules": [
 				{ "text": "Over 24 units is an overload. Send it to the Dean's office.", "new": true }
 			],
-			"students": 24,
+			"students": 20,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "add_subject": 0.8, "enroll_subject": 0.2 },

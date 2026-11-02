@@ -1,0 +1,33 @@
+{
+	"good": {
+		"fake_signature": "You caught #{number} {name}'s fake signature. They'll have to come back with their real adviser.",
+		"identity_mismatch": "You stopped someone from resetting #{number}'s account. It wasn't theirs to reset.",
+		"failed_prereq": "You caught the 5.0 in #{number} {name}'s prerequisite before it became a bigger mess.",
+		"missing_requirement": "You sent #{number} {name} home with the exact list of what to bring.",
+		"unpaid_balance": "You sent #{number} {name} to the Cashier first. They came back with a receipt.",
+		"missing_signature": "You sent #{number} {name} to get their adviser's signature.",
+		"inc_prereq": "You sent #{number} {name} to sort out their INC with their adviser.",
+		"overload": "You sent #{number} {name}'s overload to the Dean's office.",
+		"ismis_login": "You got #{number} {name} back into ISMIS.",
+		"closed_section": "You found #{number} {name} a seat in {section}.",
+		"held": "You kept #{number} {name} on the bench until the office reopened.",
+		"office_closed": "You told #{number} {name} to come back tomorrow instead of sending them to a closed office."
+	},
+	"bad": {
+		"walked_out": "#{number} {name} walked out after two wrong calls. The whole line saw it.",
+		"closed_office": "You sent #{number} {name} to {office} while it was closed. They stood there for nothing.",
+		"wrong_office": "You sent #{number} {name} to {office}, but they needed {expected}. They came back angry.",
+		"needless_trip": "You sent #{number} {name} to {office}, but {reason}",
+		"let_through": "You approved #{number} {name}, but {reason}",
+		"right_call_wrong_detail": "#{number} {name}: right call, wrong details. {reason}",
+		"wrong_call": "You chose {action} for #{number} {name}. {reason}",
+		"more": "…and {count} more wrong call{plural}.",
+		"false_alarms": "You flagged {count} thing{plural} that turned out to be fine. Each false alarm cost the line some patience."
+	},
+	"action_names": {
+		"approve": "to approve",
+		"reject": "to turn them away",
+		"fix": "to fix it at the window",
+		"hold": "to hold them on the bench"
+	}
+}
