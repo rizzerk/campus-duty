@@ -7,6 +7,8 @@ signal student_joined_line(student: Dictionary)
 signal student_called(student: Dictionary)
 signal bench_changed
 signal office_changed(office: String, status: String)
+signal rush_arrived(count: int)
+signal slots_changed
 signal shift_ended(reason: String)
 
 const BENCH_SEATS := 3
@@ -25,11 +27,15 @@ var false_alarms: int = 0
 var total_students: int = 0
 var history: Array = []
 var ended: bool = false
+## True while the player has the section picker open. Open market seats only drain then.
+var choosing_section: bool = false
 var end_reason: String = ""
 
 var _arrivals: Array = []
 var _away: Array = []
 var _office_status: Dictionary = {}
+var _drain_rng := RandomNumberGenerator.new()
+var _drain_clock: float = 0.0
 
 
 func _init(day_number: int, base_seed: int) -> void:
@@ -45,7 +51,9 @@ func _init(day_number: int, base_seed: int) -> void:
 	for i in total:
 		var at := 0.0 if i < start_line else lerpf(10.0, 200.0, float(i - start_line) / maxf(1.0, total - start_line - 1))
 		times.append(at)
+	var rush_times := {}
 	for rush: Dictionary in info.get("rush", []):
+		rush_times[float(rush["at"])] = true
 		for i in int(rush["count"]):
 			times.append(float(rush["at"]))
 	times.sort()
@@ -53,7 +61,8 @@ func _init(day_number: int, base_seed: int) -> void:
 	for i in times.size():
 		var student := StudentGen.make(base_seed * 100000 + day * 1000 + i, day)
 		student["number"] = number + i
-		_arrivals.append({ "student": student, "at": times[i] })
+		_arrivals.append({ "student": student, "at": times[i], "rush": rush_times.has(times[i]) })
+	_drain_rng.seed = base_seed * 7 + day
 	_office_status = _statuses()
 	tick(0.0)
 
@@ -70,10 +79,18 @@ func clock_text() -> String:
 func tick(delta_seconds: float) -> void:
 	if ended:
 		return
+	var before := minute
 	minute = minf(minute + delta_seconds * GameData.balance("shift_minutes") / GameData.balance("shift_seconds"),
 			GameData.balance("shift_minutes"))
+	var rushed := 0
 	while not _arrivals.is_empty() and _arrivals[0]["at"] <= minute:
-		_join_line(_arrivals.pop_front()["student"])
+		var arrival: Dictionary = _arrivals.pop_front()
+		if arrival["rush"]:
+			rushed += 1
+		_join_line(arrival["student"])
+	if rushed > 0:
+		rush_arrived.emit(rushed)
+	_drain_slots(minute - before)
 	for trip: Dictionary in _away.duplicate():
 		if trip["back_at"] <= minute:
 			_away.erase(trip)
@@ -196,6 +213,16 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	return result
 
 
+## Students sent to the right office (or held for it) who aren't back yet. They were handled
+## correctly, so they count toward the line being served even if the window closes first.
+func handled_elsewhere() -> int:
+	var count := bench.size()
+	for trip: Dictionary in _away:
+		if trip["resolve"] != "":
+			count += 1
+	return count
+
+
 func summary() -> Dictionary:
 	var correct := 0
 	for entry: Dictionary in history:
@@ -211,11 +238,37 @@ func summary() -> Dictionary:
 		"caught": caught,
 		"false_alarms": false_alarms,
 		"total": total_students,
-		"served_ratio": float(served) / maxi(1, total_students),
+		"elsewhere": handled_elsewhere(),
+		"served_ratio": float(served + handled_elsewhere()) / maxi(1, total_students),
 		"clock": OfficeSchedule.clock(minute, true),
 		# No decisions at all counts as 0%, so waiting out the clock earns nothing.
 		"accuracy": float(correct) / history.size() if not history.is_empty() else 0.0,
 	}
+
+
+## Open market: other windows keep enrolling students, so while the player has the section picker
+## open, the sections they're looking at lose seats. The last section that still fits is spared,
+## so there's always a right answer, but a slow pick can end up full.
+func _drain_slots(minutes: float) -> void:
+	var live: Dictionary = GameData.day(day).get("live_slots", {})
+	if live.is_empty() or not choosing_section or current.is_empty() or not current["request"].has("course"):
+		return
+	_drain_clock += minutes
+	var changed := false
+	while _drain_clock >= float(live["every_minutes"]):
+		_drain_clock -= float(live["every_minutes"])
+		var fits := Timetable.fitting_sections(current)
+		for section: Dictionary in current["record"]["sections"][current["request"]["course"]]:
+			if section["seats"] <= 0 or _drain_rng.randf() >= float(live["chance"]):
+				continue
+			if fits.has(section["code"]) and fits.size() <= 1 and section["seats"] <= 1:
+				continue
+			section["seats"] -= 1
+			changed = true
+			if section["seats"] == 0:
+				fits.erase(section["code"])
+	if changed:
+		slots_changed.emit()
 
 
 func _finish(outcome: String) -> String:

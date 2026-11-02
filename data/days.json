@@ -79,13 +79,14 @@
 			"rules": [
 				{ "text": "Check the Grades tab: a 5.0 in the prerequisite means reject. An INC goes to Consultation.", "new": true }
 			],
-			"students": 26,
-			"start_line": 10,
+			"students": 22,
+			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "enroll_subject": 0.5, "enrollment_payment": 0.25, "first_year": 0.25 },
 			"problems": { "closed_section": 0.3, "unpaid_balance": 0.2, "ismis_login": 0.25, "failed_prereq": 0.12, "inc_prereq": 0.08 },
 			"max_problems": 2,
-			"rush": [{ "at": 60, "count": 5 }, { "at": 150, "count": 5 }]
+			"rush": [{ "at": 60, "count": 4 }, { "at": 150, "count": 4 }],
+			"live_slots": { "every_minutes": 3, "chance": 0.3 }
 		},
 		"7": {
 			"no_id_chance": 0.12,

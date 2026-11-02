@@ -91,8 +91,11 @@ func _because_card() -> Control:
 	list.add_child(UiKit.label("Because of you", 28))
 	var summary: Dictionary = GameState.last_summary
 	var mistakes: Array = GameState.last_history.filter(func(entry: Dictionary) -> bool: return not entry["correct"])
-	var unserved: int = summary["total"] - summary["served"]
-	if summary["served"] == 0:
+	var elsewhere: int = summary.get("elsewhere", 0)
+	var unserved: int = summary["total"] - summary["served"] - elsewhere
+	if elsewhere > 0:
+		list.add_child(UiKit.wrapped("%d student%s you sent to another office %s still there when the window closed. That counts as handled." % [elsewhere, "" if elsewhere == 1 else "s", "was" if elsewhere == 1 else "were"], 19, Color("#3a463e")))
+	if summary["served"] == 0 and elsewhere == 0:
 		list.add_child(UiKit.wrapped("You didn't serve anyone. %d students went home without help." % summary["total"], 21, UiKit.RED))
 	elif unserved > 0:
 		list.add_child(UiKit.wrapped("%d students were still waiting when the window closed." % unserved, 21, UiKit.RED))

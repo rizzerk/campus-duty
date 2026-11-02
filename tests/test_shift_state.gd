@@ -17,6 +17,8 @@ func _init() -> void:
 	_test_flags_and_asking()
 	_test_routing_round_trips()
 	_test_wrong_office_trip()
+	_test_open_market_drain()
+	_test_routed_late_counts_as_handled()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -235,3 +237,68 @@ func _test_wrong_office_trip() -> void:
 	closed.act("route:consultation")
 	var trips: Array = closed._away.filter(func(t: Dictionary) -> bool: return t["student"]["number"] == 988)
 	_check(not trips.is_empty() and trips[0]["closed"], "sending them to an office on break is a wasted trip")
+
+
+## Day 6: seats drain while the player decides, but one fitting section always survives.
+func _test_open_market_drain() -> void:
+	var shift := ShiftState.new(6, 21)
+	var student := _student_with(6, ["closed_section"])
+	student["number"] = 987
+	var sections: Array = student["record"]["sections"][student["request"]["course"]]
+	var seats_before := 0
+	for section: Dictionary in sections:
+		seats_before += section["seats"]
+	shift.current = student
+	shift.choosing_section = true
+	var drained := [false]
+	shift.slots_changed.connect(func() -> void: drained[0] = true)
+	for i in 600:
+		shift.minute = 20.0
+		shift.tick(0.25)
+	var seats_after := 0
+	for section: Dictionary in sections:
+		seats_after += section["seats"]
+	_check(drained[0] and seats_after < seats_before, "open market drains seats (%d -> %d)" % [seats_before, seats_after])
+	_check(not Timetable.fitting_sections(student).is_empty(), "a fitting section always survives")
+	shift.choosing_section = false
+	var frozen: Array = sections.map(func(x: Dictionary) -> int: return x["seats"])
+	for i in 200:
+		shift.minute = 20.0
+		shift.tick(0.25)
+	_check(sections.map(func(x: Dictionary) -> int: return x["seats"]) == frozen, "seats stop draining once the picker closes")
+	var quiet := ShiftState.new(3, 21)
+	var calm := _student_with(3, ["closed_section"])
+	calm["number"] = 986
+	var calm_sections: Array = calm["record"]["sections"][calm["request"]["course"]]
+	var calm_before: Array = calm_sections.map(func(x: Dictionary) -> int: return x["seats"])
+	quiet.current = calm
+	quiet.choosing_section = true
+	for i in 200:
+		quiet.minute = 20.0
+		quiet.tick(0.25)
+	_check(calm_sections.map(func(x: Dictionary) -> int: return x["seats"]) == calm_before, "seats stay put on other days")
+	var rushes := [0]
+	var market := ShiftState.new(6, 22)
+	market.rush_arrived.connect(func(count: int) -> void: rushes[0] += count)
+	while market.minute < 160.0:
+		market.tick(0.5)
+		market.patience = 100.0
+	_check(rushes[0] == 8, "two rush waves of 4 announced (%d)" % rushes[0])
+
+
+func _test_routed_late_counts_as_handled() -> void:
+	var shift := ShiftState.new(4, 31)
+	var student := _student_with(4, ["unpaid_balance"])
+	student["number"] = 985
+	shift.minute = 235.0
+	shift.current = student
+	shift.act("route:cashier")
+	var summary := shift.summary()
+	_check(summary["elsewhere"] == 1, "a correct late route is handled elsewhere")
+	_check(is_equal_approx(summary["served_ratio"], (summary["served"] + 1.0) / summary["total"]), "handled elsewhere counts toward the served ratio")
+	var wrong := ShiftState.new(4, 32)
+	var clean := _student_with(4, [])
+	clean["number"] = 984
+	wrong.current = clean
+	wrong.act("route:cashier")
+	_check(wrong.summary()["elsewhere"] == 0, "a wrong trip doesn't count as handled")

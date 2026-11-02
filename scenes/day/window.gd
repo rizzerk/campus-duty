@@ -43,7 +43,8 @@ var _rng := RandomNumberGenerator.new()
 ## The stamped decision waiting to be handed back: { action, reason, items }.
 var _pending: Dictionary = {}
 var _stamp: StampMark
-var _menu: ChoiceMenu
+## The open popup (a ChoiceMenu or the SectionPicker), which takes the keyboard while it's up.
+var _menu: Control
 var _handing: bool = false
 var _hand_back_button: Button
 
@@ -57,6 +58,7 @@ func _ready() -> void:
 	shift.bench_changed.connect(_refresh_offices)
 	shift.office_changed.connect(func(_o: String, _status: String) -> void: _refresh_offices())
 	shift.shift_ended.connect(_on_shift_ended)
+	shift.rush_arrived.connect(func(count: int) -> void: _line_strip.flash("RUSH! %d more students just joined the line" % count))
 	_refresh_line()
 	_refresh_offices()
 	_call_left = CALL_DELAY
@@ -221,7 +223,7 @@ func _on_action(action: String) -> void:
 		_open_reject_menu()
 		return
 	if action == "fix" and shift.current["request"].has("course"):
-		_open_section_menu()
+		_open_section_picker()
 		return
 	if action == "route":
 		_open_route_menu()
@@ -229,19 +231,16 @@ func _on_action(action: String) -> void:
 	_set_pending({ "action": action, "reason": "", "items": [] }, STAMPS[action][0], STAMPS[action][1])
 
 
-## Stand-in for the section picker (phase 4): choose a section from the list and check it against
-## the Schedule tab yourself.
-func _open_section_menu() -> void:
-	var request: Dictionary = shift.current["request"]
-	var options: Array = []
-	for section: Dictionary in shift.current["record"]["sections"][request["course"]]:
-		var seats := "FULL" if section["seats"] <= 0 else "%d seats" % section["seats"]
-		options.append({ "id": section["code"], "label": "%s · %s · %s" % [section["code"], Timetable.label(section["slots"]), seats] })
-	_menu = ChoiceMenu.open(self, "Enroll them in which section?", options)
-	_menu.chosen.connect(func(ids: Array) -> void:
+## F5: the section picker. Seats can drain while it's open on open market day.
+func _open_section_picker() -> void:
+	var picker := SectionPicker.open(self, shift.current, not GameData.day(shift.day).get("live_slots", {}).is_empty())
+	_menu = picker
+	shift.choosing_section = true
+	picker.chosen.connect(func(code: String) -> void:
 		_menu = null
-		_set_pending({ "action": "fix", "reason": "", "items": [], "section": ids[0] }, "FIXED · %s" % ids[0].get_slice("-", 1), UiKit.BLUE))
-	_menu.cancelled.connect(_on_menu_cancelled)
+		shift.choosing_section = false
+		_set_pending({ "action": "fix", "reason": "", "items": [], "section": code }, "ENROLLED · %s" % code.get_slice("-", 1), UiKit.BLUE))
+	picker.cancelled.connect(_on_menu_cancelled)
 	_update_buttons()
 
 
@@ -294,6 +293,7 @@ func _open_items_menu() -> void:
 
 func _on_menu_cancelled() -> void:
 	_menu = null
+	shift.choosing_section = false
 	_update_buttons()
 
 

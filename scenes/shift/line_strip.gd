@@ -6,9 +6,13 @@ signal face_clicked(index: int)
 
 const FACE := 54.0
 const MAX_FACES := 12
+const HINT := "Click a GRAD or PWD face to call them out of turn"
+const FLASH_SECONDS := 4.0
 
 var _faces: HBoxContainer
 var _more: Label
+var _hint: Label
+var _flash_left: float = 0.0
 
 
 func _ready() -> void:
@@ -28,10 +32,25 @@ func _ready() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
-	var hint := UiKit.wrapped("Click a GRAD or PWD face to call them out of turn", 16, UiKit.MUTED)
-	hint.custom_minimum_size.x = 200
-	hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(hint)
+	_hint = UiKit.wrapped(HINT, 16, UiKit.MUTED)
+	_hint.custom_minimum_size.x = 200
+	_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_hint)
+
+
+## A short alert where the hint usually is, like a rush wave arriving.
+func flash(text: String) -> void:
+	_hint.text = text
+	_hint.add_theme_color_override("font_color", UiKit.RED)
+	_flash_left = FLASH_SECONDS
+
+
+func _process(delta: float) -> void:
+	if _flash_left > 0.0:
+		_flash_left -= delta
+		if _flash_left <= 0.0:
+			_hint.text = HINT
+			_hint.add_theme_color_override("font_color", UiKit.MUTED)
 
 
 func refresh(line: Array, patience: float) -> void:

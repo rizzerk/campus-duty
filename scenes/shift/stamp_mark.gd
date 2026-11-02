@@ -18,7 +18,8 @@ static func make(text: String, color: Color) -> StampMark:
 	style.content_margin_left = 16
 	style.content_margin_right = 16
 	stamp.add_theme_stylebox_override("panel", style)
-	var label := UiKit.label(text, 40, color)
+	# Long stamps (TO CASHIER, ENROLLED · B) use smaller letters so they stay on the form.
+	var label := UiKit.label(text, 40 if text.length() <= 9 else 28, color)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stamp.add_child(label)
 	stamp.rotation_degrees = -8.0
