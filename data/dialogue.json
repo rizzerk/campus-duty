@@ -103,6 +103,9 @@
 		"balance": [
 			{ "ceb": "Ay, wala pa diay nako nabayran ang tanan.", "en": "Oh, I haven't paid all of it yet." }
 		],
+		"birthday": [
+			{ "ceb": "Ah... dili diay ni akoa. Gipangayo ra sa akong ig-agaw.", "en": "Ah... it's not actually mine. My cousin asked me to do it." }
+		],
 		"harmless_name": [
 			{ "ceb": "Gipamubo ra na nako akong pangalan. Ako ra gyud na.", "en": "I just shortened my name. That's really me." }
 		],

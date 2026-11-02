@@ -7,6 +7,15 @@
 		"excludes": ["missing_signature"],
 		"reason": "The adviser's signature doesn't match the specimen. Fakes are rejected."
 	},
+	"identity_mismatch": {
+		"label": "Details don't match the record",
+		"action": "reject",
+		"priority": 98,
+		"visits": ["first_year"],
+		"requires": ["ismis_login"],
+		"excludes": [],
+		"reason": "The birthday on the admission slip doesn't match ISMIS. Resetting would hand someone else's account over."
+	},
 	"failed_prereq": {
 		"label": "Failed prerequisite (5.0)",
 		"action": "reject",

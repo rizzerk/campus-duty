@@ -225,6 +225,9 @@ func _on_action(action: String) -> void:
 	if action == "fix" and shift.current["request"].has("course"):
 		_open_section_picker()
 		return
+	if action == "fix" and shift.current["visit"] == "first_year":
+		_open_reset_tool()
+		return
 	if action == "route":
 		_open_route_menu()
 		return
@@ -241,6 +244,17 @@ func _open_section_picker() -> void:
 		shift.choosing_section = false
 		_set_pending({ "action": "fix", "reason": "", "items": [], "section": code }, "ENROLLED · %s" % code.get_slice("-", 1), UiKit.BLUE))
 	picker.cancelled.connect(_on_menu_cancelled)
+	_update_buttons()
+
+
+## S11: the password reset tool for freshmen who can't log in.
+func _open_reset_tool() -> void:
+	var tool := ResetTool.open(self, shift.current)
+	_menu = tool
+	tool.printed.connect(func() -> void:
+		_menu = null
+		_set_pending({ "action": "fix", "reason": "", "items": [] }, "RESET", UiKit.BLUE))
+	tool.cancelled.connect(_on_menu_cancelled)
 	_update_buttons()
 
 
@@ -519,6 +533,8 @@ func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:
 			kind = "signature_blank" if value == "" else "signature_fake"
 		elif key == "balance":
 			kind = "balance"
+		elif key == "birthday":
+			kind = "birthday"
 	elif student["harmless"].has(key):
 		kind = "harmless_" + key
 	var options: Array = GameData.json("dialogue")["ask"][kind]

@@ -56,6 +56,12 @@ func _check_student(s: Dictionary, day: int) -> void:
 	_check(s["line"]["ceb"] != "" and s["line"]["en"] != "" and not s["line"]["en"].contains("{"), "%s line filled in" % tag)
 	_check(problems.has("missing_requirement") == _paper(s, "grad_checklist").get("fields", {}).values().has("Missing"), "%s missing requirement shown" % tag)
 	_check(problems.has("ismis_login") == (record["account"] == "Locked"), "%s locked account" % tag)
+	var admission := _paper(s, "admission_slip")
+	_check((s["visit"] == "first_year") == not admission.is_empty(), "%s admission slip only for first years" % tag)
+	if not admission.is_empty():
+		_check(problems.has("identity_mismatch") == (admission["fields"]["birthday"] != record["birthday"]), "%s birthday mismatch means an impostor" % tag)
+	if problems.has("identity_mismatch"):
+		_check(problems.has("ismis_login"), "%s impostors only come for a reset" % tag)
 	_check(problems.has("unpaid_balance") == (record["balance"] != "PHP 0.00"), "%s balance" % tag)
 	if problems.has("unpaid_balance") and not _paper(s, "assessment").is_empty():
 		_check(Mismatch.differs(s, _paper(s, "assessment"), "balance"), "%s balance mismatch flaggable" % tag)

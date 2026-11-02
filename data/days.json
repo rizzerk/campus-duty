@@ -56,18 +56,20 @@
 			}
 		},
 		"5": {
+			"reject_reasons": ["identity_mismatch"],
 			"no_id_chance": 0.12,
 			"harmless_chance": 0.25,
 			"phase": "1st-year enrollment",
 			"intro": "Freshmen day. Many of them have never logged in to ISMIS before.",
 			"rules": [
-				{ "text": "Freshman can't log in to ISMIS? Reset their account at the window.", "new": true }
+				{ "text": "Freshman can't log in to ISMIS? Reset their account at the window.", "new": true },
+				{ "text": "Before resetting, the birthday on the admission slip must match ISMIS. If it doesn't, turn them away.", "new": true }
 			],
 			"students": 20,
 			"start_line": 8,
 			"years": [1],
 			"visits": { "first_year": 1 },
-			"problems": { "ismis_login": 0.45, "unpaid_balance": 0.25 },
+			"problems": { "ismis_login": 0.45, "identity_mismatch": 0.25, "unpaid_balance": 0.25 },
 			"max_problems": 2
 		},
 		"6": {
@@ -83,7 +85,7 @@
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "enroll_subject": 0.5, "enrollment_payment": 0.25, "first_year": 0.25 },
-			"problems": { "closed_section": 0.3, "unpaid_balance": 0.2, "ismis_login": 0.25, "failed_prereq": 0.12, "inc_prereq": 0.08 },
+			"problems": { "closed_section": 0.3, "unpaid_balance": 0.2, "ismis_login": 0.25, "identity_mismatch": 0.2, "failed_prereq": 0.12, "inc_prereq": 0.08 },
 			"max_problems": 2,
 			"rush": [{ "at": 60, "count": 4 }, { "at": 150, "count": 4 }],
 			"live_slots": { "every_minutes": 3, "chance": 0.3 }

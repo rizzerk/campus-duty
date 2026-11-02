@@ -76,6 +76,7 @@ static func _make_record(rng: RandomNumberGenerator, student: Dictionary, progra
 		"account": "Active",
 		"max_units": 24,
 		"units_enrolled": int(_pick(rng, data["unit_loads"])),
+		"birthday": _birthday(rng, student["year"]),
 		"grades": grades,
 		"schedule": [],
 		"sections": {},
@@ -149,8 +150,11 @@ static func _make_papers(rng: RandomNumberGenerator, student: Dictionary, progra
 			for requirement: Dictionary in GameData.json("students")["grad_requirements"]:
 				fields[requirement["key"]] = "Attached"
 			papers.append({ "form": "grad_checklist", "title": "Graduation clearance", "fields": fields })
-		"enrollment_payment", "first_year":
+		"enrollment_payment":
 			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "balance": "PHP 0.00" } })
+		"first_year":
+			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "balance": "PHP 0.00" } })
+			papers.append({ "form": "admission_slip", "title": "Admission slip", "fields": { "id_number": record["id_number"], "birthday": record["birthday"] } })
 		"enroll_subject", "add_subject":
 			var request: Dictionary = student["request"]
 			papers.append({
@@ -172,6 +176,8 @@ static func _make_papers(rng: RandomNumberGenerator, student: Dictionary, progra
 static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day: Dictionary) -> void:
 	var candidates: Array = day["problems"].keys()
 	_shuffle(rng, candidates)
+	# Problems that build on another one (an impostor needs a locked account to reset) go last.
+	candidates.sort_custom(func(a: String, b: String) -> bool: return GameData.problem(a).get("requires", []).size() < GameData.problem(b).get("requires", []).size())
 	for id: String in candidates:
 		if student["problems"].size() >= int(day["max_problems"]):
 			break
@@ -179,6 +185,8 @@ static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day:
 		if not info["visits"].has(student["visit"]):
 			continue
 		if info["excludes"].any(func(other: String) -> bool: return student["problems"].has(other)):
+			continue
+		if not info.get("requires", []).all(func(other: String) -> bool: return student["problems"].has(other)):
 			continue
 		if rng.randf() < float(day["problems"][id]) and _apply_problem(rng, student, id):
 			student["problems"].append(id)
@@ -253,6 +261,13 @@ static func _apply_problem(rng: RandomNumberGenerator, student: Dictionary, id: 
 			record["balance"] = _pick(rng, GameData.json("students")["balances"])
 		"ismis_login":
 			record["account"] = "Locked"
+		"identity_mismatch":
+			var slip := _paper(student, "admission_slip")
+			var real: String = record["birthday"]
+			var fake := real
+			while fake == real:
+				fake = _birthday(rng, student["year"])
+			slip["fields"]["birthday"] = fake
 		"missing_signature":
 			_paper(student, "consultation_slip")["fields"]["signature"] = ""
 		"fake_signature":
@@ -269,6 +284,12 @@ static func _apply_problem(rng: RandomNumberGenerator, student: Dictionary, id: 
 		_:
 			return false
 	return true
+
+
+## MM/DD/YY, for someone starting college around 18.
+static func _birthday(rng: RandomNumberGenerator, year: int) -> String:
+	var born := SEASON_YEAR - 17 - year
+	return "%02d/%02d/%02d" % [rng.randi_range(1, 12), rng.randi_range(1, 28), born % 100]
 
 
 ## A near miss of the real signature: a doubled letter, a dropped letter, a stray dot or a case slip.

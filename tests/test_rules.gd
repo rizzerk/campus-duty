@@ -1,8 +1,10 @@
 extends SceneTree
 ## Run: godot --headless --path . --script res://tests/test_rules.gd
 
-## The problem table from CLAUDE.md, so the data can't drift from the design.
+## The problem table from CLAUDE.md, so the data can't drift from the design. identity_mismatch
+## comes from the S11 reset mockup ("getting a fact wrong prints a password for the wrong student").
 const TABLE := {
+	"identity_mismatch": "reject",
 	"missing_requirement": "reject",
 	"closed_section": "fix",
 	"unpaid_balance": "route:cashier",
@@ -14,7 +16,7 @@ const TABLE := {
 	"inc_prereq": "route:consultation",
 }
 const DAY_FOR := {
-	"missing_requirement": 2, "closed_section": 3, "unpaid_balance": 4, "ismis_login": 5,
+	"identity_mismatch": 5, "missing_requirement": 2, "closed_section": 3, "unpaid_balance": 4, "ismis_login": 5,
 	"failed_prereq": 6, "inc_prereq": 6, "missing_signature": 7, "fake_signature": 7, "overload": 8,
 }
 const ACTIONS := ["approve", "fix", "hold", "reject", "route:cashier", "route:consultation", "route:dean"]
@@ -74,7 +76,8 @@ func _test_table_matches_data() -> void:
 
 func _test_each_problem_has_one_right_action() -> void:
 	for id: String in TABLE:
-		var student := _find(DAY_FOR[id], [id])
+		var wanted: Array = [id] + GameData.problem(id).get("requires", [])
+		var student := _find(DAY_FOR[id], wanted)
 		_check(not student.is_empty(), "generator makes %s on day %d" % [id, DAY_FOR[id]])
 		if student.is_empty():
 			continue

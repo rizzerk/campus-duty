@@ -16,7 +16,8 @@
 		"signature": "Signature",
 		"amount_paid": "Amount paid",
 		"note": "Note",
-		"approved_units": "Approved units"
+		"approved_units": "Approved units",
+		"birthday": "Birthday"
 	},
-	"record_order": ["id_number", "name", "program", "year", "department", "balance", "account", "units_enrolled", "max_units"]
+	"record_order": ["id_number", "name", "program", "year", "birthday", "department", "balance", "account", "units_enrolled", "max_units"]
 }
