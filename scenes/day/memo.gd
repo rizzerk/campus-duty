@@ -2,6 +2,10 @@ extends Control
 ## F3: Ma'am Lorna's morning memo. Today's new rules are highlighted; earlier ones stay listed.
 
 const MAX_RULES := 6
+## How much fits on the paper, in lines of text, and about how many characters make a line.
+const PAPER_LINES := 17
+const RULE_CHARS := 56
+const INTRO_CHARS := 66
 
 var _started: bool = false
 
@@ -104,7 +108,26 @@ func _rules_for(day: int) -> Array:
 	for number in range(day - 1, int(GameData.json("days")["first_day"]) - 1, -1):
 		for rule: Dictionary in GameData.day(number)["rules"]:
 			earlier.append({ "text": rule["text"], "new": false })
-	return earlier.slice(0, maxi(0, MAX_RULES - today.size())) + today
+	var room := PAPER_LINES - _lines(GameData.day(day)["intro"], INTRO_CHARS)
+	for rule: Dictionary in today:
+		room -= _rule_cost(rule["text"])
+	var shown: Array = []
+	for rule: Dictionary in earlier:
+		if shown.size() + today.size() >= MAX_RULES or _rule_cost(rule["text"]) > room:
+			break
+		room -= _rule_cost(rule["text"])
+		shown.append(rule)
+	return shown + today
+
+
+## Rough wrapped line counts, so long rules don't push the memo off its clipboard.
+static func _lines(text: String, per_line: int) -> int:
+	return ceili(float(text.length()) / per_line)
+
+
+## A rule's lines plus the row's padding.
+static func _rule_cost(text: String) -> int:
+	return _lines(text, RULE_CHARS) + 1
 
 
 func _rule_row(number: int, rule: Dictionary) -> Control:
