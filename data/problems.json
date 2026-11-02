@@ -1,0 +1,74 @@
+{
+	"fake_signature": {
+		"label": "Fake signature",
+		"action": "reject",
+		"priority": 100,
+		"visits": ["add_subject"],
+		"excludes": ["missing_signature"],
+		"reason": "The adviser's signature doesn't match the specimen. Fakes are rejected."
+	},
+	"failed_prereq": {
+		"label": "Failed prerequisite (5.0)",
+		"action": "reject",
+		"priority": 95,
+		"visits": ["enroll_subject", "add_subject"],
+		"excludes": ["inc_prereq"],
+		"reason": "A 5.0 in the prerequisite means they can't take this subject yet."
+	},
+	"missing_requirement": {
+		"label": "Missing requirement",
+		"action": "reject",
+		"priority": 90,
+		"visits": ["graduation_clearance"],
+		"excludes": [],
+		"reason": "A clearance requirement is missing. Return the form with the list."
+	},
+	"unpaid_balance": {
+		"label": "Unpaid balance",
+		"action": "route:cashier",
+		"priority": 80,
+		"visits": ["enroll_subject", "enrollment_payment", "first_year", "add_subject"],
+		"excludes": [],
+		"reason": "ISMIS shows an unpaid balance. The Cashier comes first."
+	},
+	"missing_signature": {
+		"label": "Missing adviser signature",
+		"action": "route:consultation",
+		"priority": 70,
+		"visits": ["add_subject"],
+		"excludes": ["fake_signature"],
+		"reason": "Adding a subject needs the adviser's signature. Send them to Consultation."
+	},
+	"inc_prereq": {
+		"label": "INC in prerequisite",
+		"action": "route:consultation",
+		"priority": 68,
+		"visits": ["enroll_subject", "add_subject"],
+		"excludes": ["failed_prereq"],
+		"reason": "An INC in the prerequisite needs the adviser's go-ahead at Consultation."
+	},
+	"overload": {
+		"label": "Overload (over 24 units)",
+		"action": "route:dean",
+		"priority": 60,
+		"visits": ["add_subject"],
+		"excludes": [],
+		"reason": "Over 24 units is an overload. Only the Dean's office can approve it."
+	},
+	"ismis_login": {
+		"label": "ISMIS login issue",
+		"action": "fix",
+		"priority": 40,
+		"visits": ["first_year"],
+		"excludes": [],
+		"reason": "Their ISMIS account is locked. Reset it at the window."
+	},
+	"closed_section": {
+		"label": "Closed section",
+		"action": "fix",
+		"priority": 30,
+		"visits": ["enroll_subject", "add_subject"],
+		"excludes": [],
+		"reason": "The section is full. Find an open section that doesn't clash."
+	}
+}

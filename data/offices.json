@@ -1,0 +1,5 @@
+{
+	"cashier": { "name": "Cashier", "default": "open", "return_minutes": 25, "long_line_extra_minutes": 20 },
+	"consultation": { "name": "Consultation", "default": "open", "return_minutes": 35, "long_line_extra_minutes": 20 },
+	"dean": { "name": "Dean's office", "default": "closed", "return_minutes": 40, "long_line_extra_minutes": 20 }
+}

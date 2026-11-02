@@ -1,0 +1,55 @@
+class_name OfficeSchedule
+extends RefCounted
+## Live office status by day and minute (0 = 8:00, 240 = 12:00), from data/offices.json plus
+## each day's overrides in data/days.json.
+
+const OPEN_STATUSES := ["open", "long_line"]
+
+
+static func status(day_number: int, office: String, minute: float) -> String:
+	var plan := _plan(day_number, office)
+	for window: Dictionary in plan["windows"]:
+		if minute >= window["from"] and minute < window["to"]:
+			return window["status"]
+	return plan["default"]
+
+
+static func is_open(day_number: int, office: String, minute: float) -> bool:
+	return OPEN_STATUSES.has(status(day_number, office, minute))
+
+
+## True when the office is shut now but opens again before the shift ends.
+static func reopens(day_number: int, office: String, minute: float) -> bool:
+	var shift_end := GameData.balance("shift_minutes")
+	for window: Dictionary in _plan(day_number, office)["windows"]:
+		for edge: float in [float(window["from"]), float(window["to"])]:
+			if edge > minute and edge < shift_end and is_open(day_number, office, edge):
+				return true
+	return false
+
+
+static func snapshot(day_number: int, minute: float) -> Dictionary:
+	var result := {}
+	for office: String in GameData.json("offices"):
+		result[office] = {
+			"status": status(day_number, office, minute),
+			"open": is_open(day_number, office, minute),
+			"reopens": reopens(day_number, office, minute),
+		}
+	return result
+
+
+static func return_minutes(day_number: int, office: String, minute: float) -> float:
+	var info: Dictionary = GameData.json("offices")[office]
+	var wait := float(info["return_minutes"])
+	if status(day_number, office, minute) == "long_line":
+		wait += float(info["long_line_extra_minutes"])
+	return wait
+
+
+static func _plan(day_number: int, office: String) -> Dictionary:
+	var override: Dictionary = GameData.day(day_number).get("offices", {}).get(office, {})
+	return {
+		"default": override.get("default", GameData.json("offices")[office]["default"]),
+		"windows": override.get("windows", []),
+	}

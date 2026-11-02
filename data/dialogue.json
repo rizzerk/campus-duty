@@ -1,0 +1,62 @@
+{
+	"visits": {
+		"graduation_clearance": [
+			{ "ceb": "Mag-file unta ko sa akong graduation clearance.", "en": "I'd like to file my graduation clearance." },
+			{ "ceb": "Graduating na ko! Kompleto na ni akong papeles, sigurado ko.", "en": "I'm graduating! My papers are complete, I'm sure." },
+			{ "ceb": "Palihug, ipa-check nako akong checklist para sa graduation.", "en": "Please check my graduation checklist." }
+		],
+		"enroll_subject": [
+			{ "ceb": "Mag-enroll unta ko sa {course}, section {section}.", "en": "I'd like to enroll in {course}, section {section}." },
+			{ "ceb": "Pwede ko magpa-enroll sa {course}? Mao ni akong form.", "en": "Can I enroll in {course}? Here's my form." }
+		],
+		"enrollment_payment": [
+			{ "ceb": "Mag-enroll ko para ani nga sem. Bayad na ko, ha.", "en": "I'm enrolling for this sem. I've already paid, okay?" },
+			{ "ceb": "Ania akong assessment, palihug ko i-process.", "en": "Here's my assessment, please process it." }
+		],
+		"first_year": [
+			{ "ceb": "Bag-o pa ko diri. Asa man ko mag-enroll?", "en": "I'm new here. Where do I enroll?" },
+			{ "ceb": "Freshman ko. Ania akong mga papeles.", "en": "I'm a freshman. Here are my papers." }
+		],
+		"add_subject": [
+			{ "ceb": "Mag-add unta ko og {course}. Pirmado na ni Sir.", "en": "I'd like to add {course}. Sir already signed it." },
+			{ "ceb": "I-add lang ang {course}, palihug.", "en": "Just add {course}, please." }
+		]
+	},
+	"problems": {
+		"ismis_login": [
+			{ "ceb": "Dili ko maka-login sa ISMIS. Unsaon man ni?", "en": "I can't log in to ISMIS. What do I do?" },
+			{ "ceb": "Locked daw akong account. Tabang, palihug.", "en": "It says my account is locked. Help, please." }
+		]
+	},
+	"reactions": {
+		"approved": [
+			{ "ceb": "Salamat kaayo!", "en": "Thank you so much!" },
+			{ "ceb": "Yes! Human na gyud.", "en": "Yes! Finally done." }
+		],
+		"rejected_right": [
+			{ "ceb": "Ay, sige. Balikan nako.", "en": "Oh, okay. I'll come back." },
+			{ "ceb": "Hala, wala diay ko kabalo.", "en": "Oh no, I didn't know." }
+		],
+		"routed": [
+			{ "ceb": "Sige, adto sa ko didto.", "en": "Okay, I'll head there first." },
+			{ "ceb": "Ay, ok. Mobalik ra ko.", "en": "Oh, okay. I'll be back." }
+		],
+		"held": [
+			{ "ceb": "Sige, maghulat ko sa bench.", "en": "Okay, I'll wait on the bench." }
+		],
+		"fixed": [
+			{ "ceb": "Ok na? Salamat!", "en": "All good? Thanks!" }
+		],
+		"wrong": [
+			{ "ceb": "Ha? Sigurado ka?", "en": "Huh? Are you sure?" },
+			{ "ceb": "Ngano man? Sakto man akong papeles!", "en": "Why? My papers are right!" }
+		],
+		"returned_angry": [
+			{ "ceb": "Mibalik ko kay sayop imong gisulti!", "en": "I'm back because you told me wrong!" },
+			{ "ceb": "Nag-usik ko og oras tungod nimo.", "en": "I wasted my time because of you." }
+		],
+		"returned": [
+			{ "ceb": "Ok na, nahuman na nako didto.", "en": "Okay, I'm done over there." }
+		]
+	}
+}

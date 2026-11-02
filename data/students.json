@@ -1,0 +1,126 @@
+{
+	"first_names": {
+		"male": ["Juan", "Miguel", "Carlo", "Paolo", "Jericho", "Kenneth", "Mark", "John Rey", "Christian", "Rafael", "Jomar", "Kyle", "Andrei", "Bryan", "Lance", "Vince", "Gabriel", "Nathan"],
+		"female": ["Maria", "Angela", "Kristine", "Jessa", "Princess", "Bea", "Camille", "Trisha", "Nicole", "Ella", "Joanna", "Rhea", "Mae", "Kaye", "Hazel", "Shaira", "Lovely", "Andrea"]
+	},
+	"last_names": ["Abellana", "Alcantara", "Bacalso", "Cabahug", "Cabrera", "Dela Cruz", "Enriquez", "Flores", "Gabisan", "Go", "Lim", "Mercado", "Navarro", "Ouano", "Pacaña", "Quijano", "Ramos", "Sanchez", "Tan", "Uy", "Villamor", "Ybañez", "Zamora", "Borromeo", "Lapitan", "Sarmiento", "Tabanao", "Yap"],
+	"grad_requirements": [
+		{ "key": "req_library", "label": "Library clearance" },
+		{ "key": "req_exit_survey", "label": "Exit survey" },
+		{ "key": "req_grad_fee", "label": "Graduation fee receipt" },
+		{ "key": "req_photo", "label": "Graduation photo" }
+	],
+	"passing_grades": ["1.0", "1.2", "1.5", "1.7", "2.0", "2.2", "2.5", "2.7", "3.0"],
+	"unit_loads": [15, 18, 21],
+	"balances": ["₱1,250.00", "₱2,480.00", "₱3,450.00", "₱5,900.00", "₱8,125.00"],
+	"programs": [
+		{
+			"code": "BSIT",
+			"department": "Dept. of Computer, Information Sciences and Mathematics",
+			"advisers": [
+				{ "name": "Mr. R. Tan", "specimen": "RTan" },
+				{ "name": "Ms. A. Cruz", "specimen": "ACruz" },
+				{ "name": "Dr. M. Ybañez", "specimen": "MYbanez" },
+				{ "name": "Mr. J. Go", "specimen": "J.Go" }
+			],
+			"courses": {
+				"1": [
+					{ "code": "IT 111", "title": "Introduction to Computing" },
+					{ "code": "IT 112", "title": "Programming 1" },
+					{ "code": "MATH 101", "title": "College Algebra" },
+					{ "code": "GE 101", "title": "Understanding the Self" }
+				],
+				"2": [
+					{ "code": "IT 211", "title": "Data Structures", "prereq": "IT 112" },
+					{ "code": "IT 212", "title": "Database Systems", "prereq": "IT 112" },
+					{ "code": "MATH 201", "title": "Discrete Mathematics", "prereq": "MATH 101" },
+					{ "code": "GE 105", "title": "Purposive Communication" }
+				],
+				"3": [
+					{ "code": "IT 311", "title": "Networking", "prereq": "IT 211" },
+					{ "code": "IT 312", "title": "Software Engineering", "prereq": "IT 211" },
+					{ "code": "IT 313", "title": "Web Development", "prereq": "IT 212" },
+					{ "code": "GE 110", "title": "Ethics" }
+				],
+				"4": [
+					{ "code": "IT 411", "title": "Capstone Project 1", "prereq": "IT 312" },
+					{ "code": "IT 412", "title": "Information Security", "prereq": "IT 311" },
+					{ "code": "IT 413", "title": "IT Elective", "prereq": "IT 313" },
+					{ "code": "IT 414", "title": "Professional Issues in IT" }
+				]
+			}
+		},
+		{
+			"code": "BSA",
+			"department": "Dept. of Accountancy",
+			"advisers": [
+				{ "name": "Ms. L. Bacalso", "specimen": "LBacalso" },
+				{ "name": "Mr. P. Uy", "specimen": "P.Uy" },
+				{ "name": "Dr. C. Ramos", "specimen": "CRamos" },
+				{ "name": "Ms. E. Lim", "specimen": "ELim" }
+			],
+			"courses": {
+				"1": [
+					{ "code": "ACC 111", "title": "Financial Accounting 1" },
+					{ "code": "ACC 112", "title": "Financial Accounting 2" },
+					{ "code": "ECON 101", "title": "Principles of Economics" },
+					{ "code": "GE 101", "title": "Understanding the Self" }
+				],
+				"2": [
+					{ "code": "ACC 211", "title": "Intermediate Accounting 1", "prereq": "ACC 112" },
+					{ "code": "ACC 221", "title": "Cost Accounting", "prereq": "ACC 111" },
+					{ "code": "LAW 201", "title": "Business Law" },
+					{ "code": "GE 105", "title": "Purposive Communication" }
+				],
+				"3": [
+					{ "code": "ACC 311", "title": "Intermediate Accounting 2", "prereq": "ACC 211" },
+					{ "code": "ACC 312", "title": "Management Accounting", "prereq": "ACC 221" },
+					{ "code": "TAX 301", "title": "Income Taxation", "prereq": "LAW 201" },
+					{ "code": "GE 110", "title": "Ethics" }
+				],
+				"4": [
+					{ "code": "ACC 411", "title": "Advanced Accounting", "prereq": "ACC 311" },
+					{ "code": "AUD 401", "title": "Auditing Principles", "prereq": "ACC 312" },
+					{ "code": "TAX 402", "title": "Business Taxation", "prereq": "TAX 301" },
+					{ "code": "RES 401", "title": "Accounting Research" }
+				]
+			}
+		},
+		{
+			"code": "BSCE",
+			"department": "Dept. of Civil Engineering",
+			"advisers": [
+				{ "name": "Engr. D. Navarro", "specimen": "DNavarro" },
+				{ "name": "Engr. S. Cabahug", "specimen": "SCabahug" },
+				{ "name": "Dr. F. Ouano", "specimen": "F.Ouano" },
+				{ "name": "Engr. T. Yap", "specimen": "TYap" }
+			],
+			"courses": {
+				"1": [
+					{ "code": "CE 111", "title": "Engineering Drawing" },
+					{ "code": "MATH 111", "title": "Calculus 1" },
+					{ "code": "PHYS 101", "title": "Physics 1" },
+					{ "code": "GE 101", "title": "Understanding the Self" }
+				],
+				"2": [
+					{ "code": "CE 211", "title": "Statics of Rigid Bodies", "prereq": "PHYS 101" },
+					{ "code": "MATH 211", "title": "Calculus 2", "prereq": "MATH 111" },
+					{ "code": "CE 212", "title": "Surveying", "prereq": "CE 111" },
+					{ "code": "GE 105", "title": "Purposive Communication" }
+				],
+				"3": [
+					{ "code": "CE 311", "title": "Structural Analysis", "prereq": "CE 211" },
+					{ "code": "CE 312", "title": "Fluid Mechanics", "prereq": "MATH 211" },
+					{ "code": "CE 313", "title": "Highway Engineering", "prereq": "CE 212" },
+					{ "code": "GE 110", "title": "Ethics" }
+				],
+				"4": [
+					{ "code": "CE 411", "title": "Reinforced Concrete Design", "prereq": "CE 311" },
+					{ "code": "CE 412", "title": "Hydraulics", "prereq": "CE 312" },
+					{ "code": "CE 413", "title": "Construction Management", "prereq": "CE 313" },
+					{ "code": "CE 414", "title": "CE Project" }
+				]
+			}
+		}
+	]
+}
