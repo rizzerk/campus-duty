@@ -26,6 +26,32 @@
 		{ "ceb": "Nawala akong ID. Ang akong number kay {id}.", "en": "I lost my ID. My number is {id}." },
 		{ "ceb": "Nabilin nako akong ID sa boarding house. {id} akong ID number.", "en": "I left my ID at the boarding house. My ID number is {id}." }
 	],
+	"returned_from": {
+		"cashier": [
+			{ "ceb": "Bayad na ko sa Cashier. Ania ang resibo.", "en": "I've paid at the Cashier. Here's the receipt." }
+		],
+		"consultation": [
+			{ "ceb": "Napirmahan na ni Sir. Ania na.", "en": "Sir signed it now. Here you go." },
+			{ "ceb": "Okay na daw sabi sa adviser. Ania iyang sulat.", "en": "The adviser says it's okay. Here's the note." }
+		],
+		"dean": [
+			{ "ceb": "Gi-approve na sa Dean ang akong overload.", "en": "The Dean approved my overload." }
+		]
+	},
+	"wrong_office": {
+		"cashier": [
+			{ "ceb": "Ingon sa Cashier wala man koy utang! Nganong didto ko nimo gipaadto?", "en": "The Cashier said I don't owe anything! Why did you send me there?" }
+		],
+		"consultation": [
+			{ "ceb": "Ingon sa adviser dili daw na iyaha. Nausik akong oras.", "en": "The adviser said that's not their job. I wasted my time." }
+		],
+		"dean": [
+			{ "ceb": "Wala daw labot ang Dean ana. Mibalik ko diri.", "en": "The Dean's office said it's not their concern. So I'm back." }
+		],
+		"closed": [
+			{ "ceb": "Sirado man ang opisina! Naghulat lang ko didto.", "en": "The office was closed! I just stood there waiting." }
+		]
+	},
 	"problems": {
 		"ismis_login": [
 			{ "ceb": "Dili ko maka-login sa ISMIS. Unsaon man ni?", "en": "I can't log in to ISMIS. What do I do?" },

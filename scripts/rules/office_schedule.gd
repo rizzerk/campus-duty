@@ -58,6 +58,37 @@ static func clock(minute: float, with_suffix: bool = false) -> String:
 	return text
 
 
+## The next minute today when the office's status changes, or -1 if it doesn't.
+static func next_change(day_number: int, office: String, minute: float) -> float:
+	var shift_end := GameData.balance("shift_minutes")
+	var best := -1.0
+	for window: Dictionary in _plan(day_number, office)["windows"]:
+		for edge: float in [float(window["from"]), float(window["to"])]:
+			if edge > minute and edge < shift_end and (best < 0.0 or edge < best):
+				best = edge
+	return best
+
+
+## A short live note for the offices panel and the route menu, like "Back at 11:00".
+static func detail(day_number: int, office: String, minute: float) -> String:
+	var now := status(day_number, office, minute)
+	var change := next_change(day_number, office, minute)
+	match now:
+		"break":
+			return "Back at %s" % clock(change) if change >= 0.0 else "On break"
+		"long_line":
+			return "Long line, slow trip"
+		"closed":
+			return "Opens %s" % clock(change) if reopens(day_number, office, minute) else "Closed today"
+	if change >= 0.0:
+		var next := status(day_number, office, change)
+		if next == "closed":
+			return "Open until %s" % clock(change)
+		if next == "break":
+			return "Break at %s" % clock(change)
+	return "Open"
+
+
 ## One line for the memo, like "Advisers on break 10:30–11:00".
 static func describe(day_number: int, office: String) -> String:
 	var plan := _plan(day_number, office)

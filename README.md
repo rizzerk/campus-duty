@@ -25,6 +25,7 @@ Each day:
    - **Decide.** Fix it at the window, route them (Cashier, Consultation, Dean's office), put them on the Hold bench, or reject them.
 4. **Day report.** Stars, mistakes, a "Because of you" list of consequences, and the supervisor's spot check.
 5. **Desk upgrades.** Spend stars, then go on to the next day.
+
 If the line's patience hits zero, Ma'am Lorna takes over and the shift ends early.
  
 ## Key mechanics

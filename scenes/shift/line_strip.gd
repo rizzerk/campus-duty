@@ -35,8 +35,7 @@ func _ready() -> void:
 
 
 func refresh(line: Array, patience: float) -> void:
-	for old: Node in _faces.get_children():
-		old.queue_free()
+	UiKit.clear(_faces)
 	for i in mini(line.size(), MAX_FACES):
 		_faces.add_child(_make_face(line[i], i, patience))
 	_more.text = "+%d more" % (line.size() - MAX_FACES) if line.size() > MAX_FACES else ""

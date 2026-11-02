@@ -34,13 +34,13 @@ static func make(field_key: String, caption: String, value: String, mono: bool, 
 	row.add_child(stack)
 	if kind == "check":
 		stack.add_child(CheckMark.new(value == "Attached"))
-	var caption_label := UiKit.label(caption, 14 if mono else (17 if kind == "check" else 15), UiKit.MUTED if kind != "check" else UiKit.INK, mono)
+	var caption_label := UiKit.label(caption, 14 if mono else (16 if kind == "check" else 14), UiKit.MUTED if kind != "check" else UiKit.INK, mono)
 	caption_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stack.add_child(caption_label)
 	if mono:
 		caption_label.custom_minimum_size.x = 170
 	if kind != "check":
-		var value_label := UiKit.label(value, 15 if mono else 19, SIGNATURE_INK if field_key == "signature" else UiKit.INK, mono)
+		var value_label := UiKit.label(value, 15 if mono else 18, SIGNATURE_INK if field_key == "signature" else UiKit.INK, mono)
 		value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		value_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		value_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL

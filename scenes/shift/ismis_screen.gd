@@ -72,7 +72,7 @@ func _ready() -> void:
 	_banner_box.add_child(banner_row)
 	_banner = UiKit.wrapped("", 15, Color("#cfe0d6"))
 	_banner.add_theme_font_override("font", UiKit.MONO_FONT)
-	_banner.custom_minimum_size.x = 380
+	_banner.custom_minimum_size.x = 320
 	_banner.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_banner.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	banner_row.add_child(_banner)
@@ -185,8 +185,7 @@ func _show_tab(tab: String) -> void:
 		button.add_theme_stylebox_override("pressed", UiKit.box(SCREEN, 0, UiKit.INK, 0, 6))
 		for state: String in ["font_color", "font_hover_color", "font_pressed_color"]:
 			button.add_theme_color_override(state, UiKit.INK if active else Color("#f3efe2"))
-	for old: Node in _content.get_children():
-		old.queue_free()
+	UiKit.clear(_content)
 	_rows.clear()
 	if _student.is_empty():
 		_content.add_child(UiKit.label("ISMIS · no student", 16, UiKit.MUTED, true))

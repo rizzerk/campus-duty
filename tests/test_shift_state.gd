@@ -15,6 +15,8 @@ func _init() -> void:
 	_test_same_seed_same_line()
 	_test_stars()
 	_test_flags_and_asking()
+	_test_routing_round_trips()
+	_test_wrong_office_trip()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -169,3 +171,67 @@ func _test_flags_and_asking() -> void:
 	shift.ask()
 	_check(is_equal_approx(shift.minute - before_minute, GameData.balance("ask_minutes")), "asking takes game time")
 	_check(shift.patience < before_patience, "asking costs patience")
+
+
+func _student_with(day: int, problems: Array) -> Dictionary:
+	for seed_value in 20000:
+		var student := StudentGen.make(seed_value, day)
+		if student["problems"] == problems and not student["no_id"]:
+			return student
+	return {}
+
+
+## Routed correctly: they come back with proof, nothing left to flag, and Approve is right.
+func _test_routing_round_trips() -> void:
+	for case: Array in [[4, "unpaid_balance", "cashier"], [7, "missing_signature", "consultation"], [6, "inc_prereq", "consultation"], [8, "overload", "dean"]]:
+		var shift := ShiftState.new(case[0], 11)
+		var student := _student_with(case[0], [case[1]])
+		_check(not student.is_empty(), "found a %s student" % case[1])
+		if student.is_empty():
+			continue
+		student["number"] = 990
+		shift.minute = 40.0
+		shift.current = student
+		var papers_before: int = student["papers"].size()
+		var result := shift.act("route:" + case[2])
+		_check(result["correct"] and result["outcome"] == "routed", "%s routes to %s" % [case[1], case[2]])
+		var back := {}
+		while back.is_empty() and shift.minute < 200.0:
+			shift.tick(STEP)
+			for waiting: Dictionary in shift.line:
+				if waiting["number"] == 990:
+					back = waiting
+		_check(not back.is_empty(), "%s student comes back" % case[1])
+		if back.is_empty():
+			continue
+		_check(back["problems"].is_empty(), "%s solved on return" % case[1])
+		_check(Mismatch.real_differences(back).is_empty(), "%s papers no longer show the problem" % case[1])
+		_check(back["trip"]["office"] == case[2] and not back["trip"]["wrong"], "%s trip remembered" % case[1])
+		if case[1] != "missing_signature":
+			_check(back["papers"].size() == papers_before + 1, "%s brings proof from %s" % [case[1], case[2]])
+		_check(RulesCheck.judge(back, "approve", shift.offices())["correct"], "%s approved after the trip" % case[1])
+
+
+func _test_wrong_office_trip() -> void:
+	var shift := ShiftState.new(7, 12)
+	var student := _student_with(7, [])
+	student["number"] = 989
+	shift.minute = 40.0
+	shift.current = student
+	var result := shift.act("route:cashier")
+	_check(not result["correct"] and result["outcome"] == "sent_back_wrong", "routing a clean student is wrong")
+	var back := {}
+	while back.is_empty() and shift.minute < 200.0:
+		shift.tick(STEP)
+		for waiting: Dictionary in shift.line:
+			if waiting["number"] == 989:
+				back = waiting
+	_check(not back.is_empty() and back["trip"]["office"] == "cashier" and back["trip"]["wrong"], "wrong trip remembered for the complaint")
+	var closed := ShiftState.new(7, 13)
+	var needs_adviser := _student_with(7, ["missing_signature"])
+	needs_adviser["number"] = 988
+	closed.minute = 160.0
+	closed.current = needs_adviser
+	closed.act("route:consultation")
+	var trips: Array = closed._away.filter(func(t: Dictionary) -> bool: return t["student"]["number"] == 988)
+	_check(not trips.is_empty() and trips[0]["closed"], "sending them to an office on break is a wasted trip")

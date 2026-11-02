@@ -31,11 +31,14 @@ func _ready() -> void:
 	layout.add_child(_bench)
 
 
-func refresh(offices: Dictionary, bench: Array) -> void:
-	for old: Node in _list.get_children():
-		old.queue_free()
+## notes: office -> a short live note, like "Back at 11:00".
+func refresh(offices: Dictionary, bench: Array, notes: Dictionary = {}) -> void:
+	UiKit.clear(_list)
 	for office: String in offices:
+		var entry := VBoxContainer.new()
+		entry.add_theme_constant_override("separation", 0)
 		var row := HBoxContainer.new()
+		entry.add_child(row)
 		row.add_child(UiKit.label(GameData.json("offices")[office]["name"], 19))
 		var spacer := Control.new()
 		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -44,15 +47,16 @@ func refresh(offices: Dictionary, bench: Array) -> void:
 		var tag := UiKit.label(badge[0], 15, Color.WHITE)
 		tag.add_theme_stylebox_override("normal", UiKit.box(badge[1], 2, UiKit.INK, 0, 3))
 		row.add_child(tag)
-		_list.add_child(row)
-	for old: Node in _bench.get_children():
-		old.queue_free()
+		if notes.has(office):
+			entry.add_child(UiKit.label(notes[office], 15, UiKit.MUTED))
+		_list.add_child(entry)
+	UiKit.clear(_bench)
 	for seat in ShiftState.BENCH_SEATS:
 		if seat < bench.size():
-			_bench.add_child(UiKit.portrait_frame(bench[seat]["portrait"], 62, UiKit.INK, Color("#9fd0e8"), 2))
+			_bench.add_child(UiKit.portrait_frame(bench[seat]["portrait"], 56, UiKit.INK, Color("#9fd0e8"), 2))
 		else:
 			var empty := UiKit.label("free", 16, UiKit.MUTED)
-			empty.custom_minimum_size = Vector2(66, 66)
+			empty.custom_minimum_size = Vector2(60, 60)
 			empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			empty.add_theme_stylebox_override("normal", UiKit.box(UiKit.MINT, 2, UiKit.SOFT))

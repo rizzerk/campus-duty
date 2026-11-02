@@ -13,7 +13,10 @@
 		"section": "Section",
 		"units_after": "Units after",
 		"adviser": "Adviser",
-		"signature": "Signature"
+		"signature": "Signature",
+		"amount_paid": "Amount paid",
+		"note": "Note",
+		"approved_units": "Approved units"
 	},
 	"record_order": ["id_number", "name", "program", "year", "department", "balance", "account", "units_enrolled", "max_units"]
 }

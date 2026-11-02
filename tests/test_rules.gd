@@ -138,6 +138,11 @@ func _test_office_schedule() -> void:
 	_check(not OfficeSchedule.reopens(8, "dean", 220), "dean done for the day at 11:40")
 	_check(OfficeSchedule.status(4, "cashier", 130) == "long_line", "long cashier line after 10:00")
 	_check(OfficeSchedule.return_minutes(4, "cashier", 130) > OfficeSchedule.return_minutes(4, "cashier", 60), "long line takes longer")
+	_check(OfficeSchedule.detail(7, "consultation", 160) == "Back at 11:00", "break note says when they're back")
+	_check(OfficeSchedule.detail(7, "consultation", 100) == "Break at 10:30", "warns before the break")
+	_check(OfficeSchedule.detail(8, "dean", 100) == "Open until 11:30", "dean closing time shown")
+	_check(OfficeSchedule.detail(8, "dean", 220) == "Closed today", "dean done for the day")
+	_check(OfficeSchedule.detail(2, "cashier", 50) == "Open", "plain open")
 
 
 func _test_mismatch() -> void:

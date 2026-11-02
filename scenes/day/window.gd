@@ -14,6 +14,7 @@ const STAMPS := {
 	"approve": ["APPROVED", UiKit.OK],
 	"fix": ["FIXED", UiKit.BLUE],
 	"hold": ["HOLD", UiKit.GOLD_DARK],
+	"route": ["ROUTED", UiKit.BLUE],
 }
 const HAND_BACK_SECONDS := 0.3
 const REACT_SECONDS := 1.6
@@ -120,14 +121,14 @@ func _build() -> void:
 	_place(_line_strip, Rect2(24, 72, 1232, 96))
 	_line_strip.face_clicked.connect(_on_face_clicked)
 	_student_panel = StudentPanel.new()
-	_place(_student_panel, Rect2(24, 176, 360, 440))
+	_place(_student_panel, Rect2(24, 176, 494, 440))
 	_student_panel.paper_field_clicked.connect(_on_paper_field)
 	_ismis = IsmisScreen.new()
-	_place(_ismis, Rect2(400, 176, 556, 440))
+	_place(_ismis, Rect2(532, 176, 478, 440))
 	_ismis.record_field_clicked.connect(_on_record_field)
 	_ismis.ask_pressed.connect(_ask)
 	_offices = OfficePanel.new()
-	_place(_offices, Rect2(972, 176, 284, 440))
+	_place(_offices, Rect2(1024, 176, 232, 440))
 	var bar := HBoxContainer.new()
 	bar.add_theme_constant_override("separation", 14)
 	_place(bar, Rect2(24, 632, 1232, 64))
@@ -185,9 +186,16 @@ func _call_next() -> void:
 	_student_panel.show_student(student)
 	_ismis.show_student(student)
 	var mood: String = student.get("mood", "calm")
-	if mood == "angry":
+	var trip: Dictionary = student.get("trip", {})
+	if trip.get("wrong", false):
+		_student_panel.set_expression("angry")
+		_student_panel.say(_pick_line(GameData.json("dialogue")["wrong_office"]["closed" if trip["closed"] else trip["office"]]))
+	elif mood == "angry":
 		_student_panel.set_expression("angry")
 		_student_panel.say(_reaction("returned_angry"))
+	elif trip.get("office", "") != "":
+		_student_panel.set_expression("happy")
+		_student_panel.say(_pick_line(GameData.json("dialogue")["returned_from"][trip["office"]]))
 	elif student.get("returning", false):
 		_student_panel.say(_reaction("returned"))
 	_refresh_line()
@@ -205,7 +213,7 @@ func _on_face_clicked(index: int) -> void:
 func _on_action(action: String) -> void:
 	if shift.ended or shift.current.is_empty() or _react_left > 0.0 or _handing or _menu != null:
 		return
-	if not _unlocked.has(action) or action == "route":
+	if not _unlocked.has(action):
 		return
 	if action == "hold" and shift.bench_full():
 		return
@@ -214,6 +222,9 @@ func _on_action(action: String) -> void:
 		return
 	if action == "fix" and shift.current["request"].has("course"):
 		_open_section_menu()
+		return
+	if action == "route":
+		_open_route_menu()
 		return
 	_set_pending({ "action": action, "reason": "", "items": [] }, STAMPS[action][0], STAMPS[action][1])
 
@@ -230,6 +241,25 @@ func _open_section_menu() -> void:
 	_menu.chosen.connect(func(ids: Array) -> void:
 		_menu = null
 		_set_pending({ "action": "fix", "reason": "", "items": [], "section": ids[0] }, "FIXED · %s" % ids[0].get_slice("-", 1), UiKit.BLUE))
+	_menu.cancelled.connect(_on_menu_cancelled)
+	_update_buttons()
+
+
+## Where to send them. Each office shows its live status, since a closed office is a wasted trip.
+func _open_route_menu() -> void:
+	var options: Array = []
+	var live := shift.offices()
+	for office: String in GameData.json("offices"):
+		var badge: Array = OfficePanel.BADGES[live[office]["status"]]
+		options.append({
+			"id": office,
+			"label": "%s · %s · %s" % [GameData.json("offices")[office]["name"], badge[0], OfficeSchedule.detail(shift.day, office, shift.minute)],
+		})
+	_menu = ChoiceMenu.open(self, "Send them to which office?", options)
+	_menu.chosen.connect(func(ids: Array) -> void:
+		_menu = null
+		var office_name: String = GameData.json("offices")[ids[0]]["name"]
+		_set_pending({ "action": "route:" + ids[0], "reason": "", "items": [] }, "TO %s" % office_name.to_upper(), STAMPS["route"][1]))
 	_menu.cancelled.connect(_on_menu_cancelled)
 	_update_buttons()
 
@@ -409,7 +439,10 @@ func _outcome_text(outcome: String) -> String:
 
 
 func _reaction(kind: String) -> Dictionary:
-	var options: Array = GameData.json("dialogue")["reactions"][kind]
+	return _pick_line(GameData.json("dialogue")["reactions"][kind])
+
+
+func _pick_line(options: Array) -> Dictionary:
 	return options[_rng.randi_range(0, options.size() - 1)]
 
 
@@ -537,7 +570,10 @@ func _refresh_line() -> void:
 
 
 func _refresh_offices() -> void:
-	_offices.refresh(shift.offices(), shift.bench)
+	var notes := {}
+	for office: String in GameData.json("offices"):
+		notes[office] = OfficeSchedule.detail(shift.day, office, shift.minute)
+	_offices.refresh(shift.offices(), shift.bench, notes)
 
 
 ## Leaves the last verdict on screen for a moment before the report.

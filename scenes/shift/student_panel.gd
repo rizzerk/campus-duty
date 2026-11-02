@@ -25,8 +25,7 @@ func _ready() -> void:
 
 
 func clear_student() -> void:
-	for old: Node in _body.get_children():
-		old.queue_free()
+	UiKit.clear(_body)
 	_rows.clear()
 	_frame = null
 	var waiting := UiKit.label("Waiting for the next student…", 22, UiKit.MUTED)
@@ -37,8 +36,7 @@ func clear_student() -> void:
 
 
 func show_student(student: Dictionary) -> void:
-	for old: Node in _body.get_children():
-		old.queue_free()
+	UiKit.clear(_body)
 	_rows.clear()
 	var header := HBoxContainer.new()
 	header.add_theme_constant_override("separation", 12)
@@ -111,14 +109,19 @@ func set_field_state(form_index: int, key: String, state: String) -> void:
 		row.set_state(state)
 
 
-## Forms go into two columns, each form into whichever column is shorter.
+## Forms go into three columns, each form into whichever column is shorter, so even four papers
+## (say, a returning student with a Dean's approval) fit without scrolling.
+const PAPER_COLUMNS := 3
+
+
 func _make_papers(student: Dictionary) -> Control:
 	var columns := HBoxContainer.new()
 	columns.add_theme_constant_override("separation", 8)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var stacks: Array = []
-	var heights: Array = [0, 0]
-	for c in 2:
+	var heights: Array = []
+	for c in PAPER_COLUMNS:
+		heights.append(0)
 		var stack := VBoxContainer.new()
 		stack.add_theme_constant_override("separation", 8)
 		stack.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -126,7 +129,7 @@ func _make_papers(student: Dictionary) -> Control:
 		stacks.append(stack)
 	var papers: Array = student["papers"]
 	for i in papers.size():
-		var column := 0 if heights[0] <= heights[1] else 1
+		var column := heights.find(heights.min())
 		stacks[column].add_child(_make_form(i, papers[i]))
 		heights[column] += papers[i]["fields"].size() + 1
 	return columns

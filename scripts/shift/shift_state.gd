@@ -80,7 +80,10 @@ func tick(delta_seconds: float) -> void:
 			var student: Dictionary = trip["student"]
 			if trip["resolve"] != "":
 				student["problems"].erase(trip["resolve"])
+				StudentGen.resolve(student, trip["resolve"])
 			student["returning"] = true
+			# Where they went, so the window can say how it went.
+			student["trip"] = { "office": trip.get("office", ""), "wrong": trip.get("wrong", false), "closed": trip.get("closed", false) }
 			_join_line(student)
 	_release_bench()
 	_emit_office_changes()
@@ -145,7 +148,7 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 			outcome = "stays" if not student["problems"].is_empty() else _finish("served")
 		elif action.begins_with("route:"):
 			var office := action.trim_prefix("route:")
-			_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": result["problem"] })
+			_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": result["problem"], "office": office })
 			outcome = "routed"
 		elif action == "hold":
 			bench.append(student)
@@ -161,7 +164,13 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		elif student["returns"] < int(GameData.balance("max_returns")):
 			student["returns"] += 1
 			student["mood"] = "angry"
-			_away.append({ "student": student, "back_at": minute + GameData.balance("wrong_return_minutes"), "resolve": "" })
+			var trip := { "student": student, "back_at": minute + GameData.balance("wrong_return_minutes"), "resolve": "" }
+			if action.begins_with("route:"):
+				var office := action.trim_prefix("route:")
+				trip["office"] = office
+				trip["wrong"] = true
+				trip["closed"] = not OfficeSchedule.is_open(day, office, minute)
+			_away.append(trip)
 			outcome = "sent_back_wrong"
 		else:
 			walked_out += 1
@@ -230,7 +239,7 @@ func _release_bench() -> void:
 		var office := action.trim_prefix("route:")
 		if OfficeSchedule.is_open(day, office, minute):
 			bench.erase(student)
-			_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": problem })
+			_away.append({ "student": student, "back_at": minute + OfficeSchedule.return_minutes(day, office, minute), "resolve": problem, "office": office })
 			released = true
 	if released:
 		bench_changed.emit()

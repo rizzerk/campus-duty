@@ -23,6 +23,14 @@ const MONO_FONT := preload("res://fonts/JetBrainsMono.ttf")
 const PORTRAIT_SCENE := preload("res://scenes/portrait/portrait.tscn")
 
 
+## Empties a container right away. queue_free alone leaves the old children in place until the end
+## of the frame, so a container briefly holds old and new together, grows, and never shrinks back.
+static func clear(container: Node) -> void:
+	for child: Node in container.get_children():
+		container.remove_child(child)
+		child.queue_free()
+
+
 static func box(bg: Color, border: int = 4, border_color: Color = INK, shadow: int = 0, pad: int = 0) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = bg

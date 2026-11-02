@@ -184,6 +184,41 @@ static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day:
 			student["problems"].append(id)
 
 
+## What an office hands back once it has sorted a problem out: the record or papers change so the
+## problem is gone, and the student usually carries proof.
+static func resolve(student: Dictionary, problem: String) -> void:
+	var record: Dictionary = student["record"]
+	match problem:
+		"unpaid_balance":
+			student["papers"].append({
+				"form": "receipt",
+				"title": "Official receipt",
+				"fields": { "id_number": record["id_number"], "amount_paid": record["balance"] },
+			})
+			record["balance"] = "PHP 0.00"
+			var assessment := _paper(student, "assessment")
+			if not assessment.is_empty():
+				assessment["fields"]["balance"] = "PHP 0.00"
+		"missing_signature":
+			var slip := _paper(student, "consultation_slip")
+			for adviser: Dictionary in record["advisers"]:
+				if adviser["name"] == slip["fields"]["adviser"]:
+					slip["fields"]["signature"] = adviser["specimen"]
+		"inc_prereq":
+			var adviser: Dictionary = record["advisers"][0]
+			student["papers"].append({
+				"form": "adviser_note",
+				"title": "Adviser's note",
+				"fields": { "note": "OK to take %s" % student["request"]["course"], "adviser": adviser["name"], "signature": adviser["specimen"] },
+			})
+		"overload":
+			student["papers"].append({
+				"form": "dean_approval",
+				"title": "Dean's approval",
+				"fields": { "approved_units": _paper(student, "add_drop")["fields"]["units_after"], "note": "Overload approved" },
+			})
+
+
 ## A difference that doesn't matter: a shortened first name or another way of writing the
 ## program on the ID card. The record keeps the official spelling.
 static func _roll_harmless(rng: RandomNumberGenerator, student: Dictionary, program: Dictionary, day: Dictionary) -> void:
