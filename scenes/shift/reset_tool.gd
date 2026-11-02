@@ -83,7 +83,13 @@ func _build(student: Dictionary) -> void:
 	_number.grab_focus.call_deferred()
 
 
+## Any edit means looking the number up again, so a match can't be swapped for another number.
 func _keep_digits(text: String) -> void:
+	if _found:
+		_found = false
+		_status.text = "Number changed. Press Enter to look it up again."
+		_status.add_theme_color_override("font_color", UiKit.MUTED)
+		_update_print()
 	var digits := ""
 	for character in text:
 		if character >= "0" and character <= "9":

@@ -261,10 +261,13 @@ func _row(key: String, caption: String, value: String, clickable: bool, context:
 func _fill_record() -> void:
 	var record: Dictionary = _student["record"]
 	_title("ISMIS · Student record")
-	# Unit counts only matter when a subject is being added, so other visits skip them.
+	# Rows only show for the visits they matter to (units when adding a subject, birthday for a
+	# freshman's reset), so the screen fits. That depends on the visit, never on a problem.
 	var has_course: bool = _student["request"].has("course")
 	for key: String in GameData.json("fields")["record_order"]:
 		if key in ["units_enrolled", "max_units"] and not has_course:
+			continue
+		if key == "birthday" and _student["visit"] != "first_year":
 			continue
 		_row(key, StudentPanel._caption(key), str(record[key]), true)
 	var requirements: Array = GameData.json("students")["grad_requirements"]
