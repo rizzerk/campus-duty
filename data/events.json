@@ -1,0 +1,308 @@
+{
+	"onboarding": {
+		"welcome": "Ma'am Lorna: “Maayong buntag! Welcome to Window 3. Start by pressing S (or dragging the Student ID onto the reader) to open ISMIS.”",
+		"after_scan_clean": "Ma'am Lorna: “Compare the paper checklist with the ISMIS Record tab. Every item is Attached and matches—press 1 (Approve), then Space to hand the papers back.”",
+		"missing_intro": "Ma'am Lorna: “Next student. Remember our goal: 90% accuracy, 90% of the line served, and zero walkouts for 3 stars. Scan their ID (S) and check carefully.”",
+		"missing_after_scan": "Ma'am Lorna: “Look at Library clearance: 'Missing' on the paper, 'Required' in ISMIS. Click Library clearance on both sides to flag the mismatch. (Real flags boost patience; false alarms cost patience!)”",
+		"missing_after_flag": "Ma'am Lorna: “Good catch! You can press A to ask the student about a flag, or press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space.”",
+		"missing_after_ask": "Ma'am Lorna: “They admitted they forgot it. Now press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space. Wrong calls bring students back angry—twice and they walk out!”",
+		"triage_intro": "Ma'am Lorna: “See the GRAD and PWD badges in the line above? Click a priority student's face in the line strip to call them to the front, and watch the live office statuses on the right.”",
+		"solo_practice": "Ma'am Lorna: “Ikaw na bahala sa nahabilin sa pila. Press Tab anytime for the SA Handbook—I'll be watching your stamps!”"
+	},
+	"bulletins": {
+		"2": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · 4th-year graduation clearance filing.",
+			"announcement": "Registrar notice: Graduating seniors have priority today. Watch for impatient seniors in the queue—they drain the line's patience twice as fast.",
+			"policy": "All four clearance attachments (Library, Exit survey, Graduation fee, Photo) must be verified against ISMIS before stamping.",
+			"event_preview": "Expected today: Heavy mid-morning senior turnout and OAS scholarship clearance verification."
+		},
+		"3": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · 3rd-year subject enrollment & sectioning.",
+			"announcement": "Department notice: Major 3rd-year block sections are filling up across all windows. Use the Section Picker (2 Fix) to reassign full sections.",
+			"policy": "Official abbreviations on IDs (Ma. for Maria, J. for Juan, BS IT for BSIT) are valid—do not flag them as mismatches.",
+			"event_preview": "Expected today: Students arriving without ID cards (search by ID number) and section bottlenecks."
+		},
+		"4": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · 2nd-year enrollment & assessment validation.",
+			"announcement": "Cashier advisory: Window queues at the Accounting & Cashier's Office will back up starting at 10:00 AM (+20 min trip time).",
+			"policy": "Any unpaid balance in ISMIS must be routed to the Cashier (3 Route) before enrollment can be approved. Random spot checks begin today.",
+			"event_preview": "Expected today: Parents accompanying sophomores, VIP favor requests, and a long Cashier line after 10:00 AM."
+		},
+		"5": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · 1st-year freshman enrollment & ISMIS activation.",
+			"announcement": "ITO advisory: High volume of locked freshman accounts. Verify the birthday on the Admission Slip before printing a temporary password.",
+			"policy": "Multiple issues? Handle in strict tier order: 1. Turn away › 2. Route to office › 3. Fix at the window.",
+			"event_preview": "Expected today: Confused freshmen at the wrong window, thermal printer hiccups, and relatives trying to claim accounts."
+		},
+		"6": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · Open Market (all year levels, live slot drain).",
+			"announcement": "All registrar windows are enrolling simultaneously—open section seats will drain in real time while the Section Picker is open.",
+			"policy": "Check the Grades tab for prerequisites: 5.0 is rejected (5 Turn away); INC is routed to Consultation (3 Route).",
+			"event_preview": "Expected today: Rush waves at 9:00 AM and 10:30 AM, plus brief campus ISMIS network lag."
+		},
+		"7": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · Adjustment Period, Day 1 (Add/Drop).",
+			"announcement": "Departmental advisers will be on break from 10:30 AM to 11:00 AM. Use the Hold bench (4 Hold, 3 seats max) while Consultation is on break.",
+			"policy": "Adding a subject requires an authentic adviser signature matching the Advisers tab specimen. Forged signatures are rejected immediately.",
+			"event_preview": "Expected today: Adviser break at 10:30 AM, forged consultation slips, and scholarship interview rush."
+		},
+		"8": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · Adjustment Period, Day 2 (Overloads & Final Changes).",
+			"announcement": "The Dean's Office is open for overload approvals until 11:30 AM only. After 11:30 AM, it closes for the day.",
+			"policy": "Loads exceeding 24 units must be routed to the Dean's Office while open, or turned away ('Office closed today') once shut.",
+			"event_preview": "Expected today: Final-day overload cramming and Dean's Office cutoff at 11:30 AM."
+		}
+	},
+	"day_events": {
+		"2": [
+			{
+				"at": 55,
+				"id": "registrar_photo_reminder",
+				"kind": "announcement",
+				"flash": "ANNOUNCEMENT · Ma'am Lorna: Watch for missing graduation photos on senior checklists!",
+				"banner": "Ma'am Lorna: “Daghang graduating nga nakalimot sa graduation photo ug library clearance. Check every line.”"
+			},
+			{
+				"at": 135,
+				"id": "scholarship_interview_call",
+				"kind": "event",
+				"flash": "OAS NOTICE · Scholarship exit interviews starting at the Guidance Center",
+				"banner": "Office Announcement: Graduating scholars are rushing to finish clearance before their 10:30 AM exit interviews."
+			}
+		],
+		"3": [
+			{
+				"at": 50,
+				"id": "window1_section_crunch",
+				"kind": "announcement",
+				"flash": "WINDOW 1 · Kuya Jun: “Puno na ang morning sections sa IT ug Accounting!”",
+				"banner": "Coworker Kuya Jun (Window 1): “Morning sections are filling up fast! Check the Schedule tab before approving.”"
+			},
+			{
+				"at": 140,
+				"id": "lost_id_wave",
+				"kind": "event",
+				"flash": "GUARDHOUSE NOTICE · Several 3rd-years left their IDs at the gate; use ID number search",
+				"banner": "Guardhouse Notice: Students without ID cards will state their 8-digit ID number—type it into the ISMIS search box."
+			}
+		],
+		"4": [
+			{
+				"at": 65,
+				"id": "vip_visitor_warning",
+				"kind": "announcement",
+				"flash": "MA'AM LORNA · “Heads up: someone claiming to be the Dean's nephew is in the building.”",
+				"banner": "Ma'am Lorna: “Kon naay mangayo og pabor o moingon nga kaila sa Dean, ayaw kahadlok. Follow the rules—I check the logs.”"
+			},
+			{
+				"at": 120,
+				"id": "cashier_rush_start",
+				"kind": "event",
+				"flash": "CASHIER ALERT · Long line at the Cashier's Office! Trips now take longer",
+				"banner": "Office Update: The Cashier queue has backed up down the hallway. Routed students will take longer to return."
+			}
+		],
+		"5": [
+			{
+				"at": 45,
+				"id": "freshman_orientation_spillover",
+				"kind": "event",
+				"flash": "CAMPUS EVENT · Freshman orientation just let out—expect lost 1st-years at Window 3!",
+				"banner": "Ate Bea (Window 2): “Freshman orientation just finished! Half of them think we issue PE uniforms—just check their papers.”"
+			},
+			{
+				"at": 130,
+				"id": "printer_hiccup",
+				"kind": "malfunction",
+				"flash": "EQUIPMENT · Window 3 thermal slip printer sputtered—roller cleared!",
+				"banner": "Printer Notice: The thermal password printer hiccupped on a curled roll, but Kuya Jun tapped it back into alignment."
+			}
+		],
+		"6": [
+			{
+				"at": 40,
+				"id": "network_lag_notice",
+				"kind": "outage",
+				"flash": "ISMIS ADVISORY · Heavy campus traffic causing brief server hiccups across windows",
+				"banner": "ITO Network Advisory: All four year levels are logged into ISMIS at once. Expect seats to drain rapidly while picking sections!"
+			},
+			{
+				"at": 115,
+				"id": "emergency_prereq_memo",
+				"kind": "announcement",
+				"flash": "REGISTRAR MEMO · Strict audit on prerequisite grades (5.0 vs INC) during Open Market",
+				"banner": "Ma'am Lorna: “Ayaw kalimti ang Grades tab! A 5.0 in the prerequisite is a hard reject; an INC goes to Consultation.”"
+			}
+		],
+		"7": [
+			{
+				"at": 85,
+				"id": "scholarship_deadline_rush",
+				"kind": "event",
+				"flash": "SCHOLARSHIP RUSH · Scholars need 18+ units validated before their interview!",
+				"banner": "OAS Advisory: Scholarship interviewees are lining up to add subjects—verify their adviser signatures against the specimen sheet."
+			},
+			{
+				"at": 145,
+				"id": "adviser_break_warning",
+				"kind": "announcement",
+				"flash": "CONSULTATION NOTICE · Advisers go on coffee break at 10:30 AM—get the Hold bench ready!",
+				"banner": "Ma'am Lorna: “Consultation closes for break at 10:30 AM. Don't send students to an empty room—use 4 (Hold) to park them on the bench!”"
+			}
+		],
+		"8": [
+			{
+				"at": 90,
+				"id": "overload_audit_notice",
+				"kind": "announcement",
+				"flash": "DEAN'S OFFICE · Overload petitions (>24 units) accepted only until 11:30 AM today!",
+				"banner": "Dean's Office Notice: Any student exceeding 24 units after adding a subject must be routed to the Dean before 11:30 AM."
+			},
+			{
+				"at": 205,
+				"id": "dean_closing_soon",
+				"kind": "event",
+				"flash": "LAST CALL · Dean's Office closes in 5 minutes (11:30 AM)!",
+				"banner": "Ma'am Lorna: “Hapita na mag-11:30! Once the Dean's Office closes for the day, turn overload students away to come back tomorrow.”"
+			}
+		]
+	},
+	"regulars": [
+		{
+			"id": "jericho_112",
+			"number": 112,
+			"name": "Jericho Gomez",
+			"gender": "male",
+			"program": "BSIT",
+			"year": 3,
+			"portrait_seed": 112003,
+			"appearances": {
+				"3": {
+					"slot": 2,
+					"ceb": "Ate/Kuya! Ako tong nag-atang sa IT 312 ganinang kadlawon. Palihug ingna ko nga naa pay bakante!",
+					"en": "Hey! I've been camping out for IT 312 since dawn. Please tell me there's still a slot open!"
+				},
+				"4": {
+					"slot": 4,
+					"ceb": "Ako na pud, si Jericho (#112). Nagdali ko gahapon mao nga nakalimot ko sa akong balance sa Cashier...",
+					"en": "It's me again, Jericho (#112). I was in such a rush yesterday I forgot about my balance..."
+				},
+				"6": {
+					"slot": 3,
+					"ceb": "Jericho (#112) balik! Grabe ang Open Market, nag-unhanay mi sa akong mga blockmate!",
+					"en": "Jericho (#112) back again! Open Market is wild, my blockmates and I are racing for slots!"
+				},
+				"8": {
+					"slot": 5,
+					"ceb": "Last adjustment na gyud ni nako, promise! Kon ma-okay ni, librehon tika og banana cue sa gawas.",
+					"en": "This is my very last adjustment, I promise! If this goes through, I owe you banana cue outside."
+				}
+			}
+		},
+		{
+			"id": "carlo_104",
+			"number": 104,
+			"name": "Carlo Bacalso",
+			"gender": "male",
+			"program": "BSCE",
+			"year": 3,
+			"portrait_seed": 104003,
+			"appearances": {
+				"3": {
+					"slot": 5,
+					"force_no_id": true,
+					"ceb": "Hala, nahulog akong ID sa 13C nga jeep! {id} akong ID number, saag na kaayo ko.",
+					"en": "Oh man, my ID fell out on the 13C jeepney! My ID number is {id}, I'm a mess today."
+				},
+				"5": {
+					"slot": 6,
+					"ceb": "Nakit-an na nako akong ID sa T-shirt pocket—ay, para diay ni sa akong manghod nga freshman!",
+					"en": "I finally found my ID in my shirt pocket—oh wait, today I'm helping with freshman papers!"
+				},
+				"7": {
+					"slot": 4,
+					"ceb": "Carlo (#104) na pud! Naa na koy ID karon, ha, bantay lang kon ang pirma na pud ni Engr. ang kulang.",
+					"en": "Carlo (#104) again! I actually brought my ID today—watch it be the adviser's signature that's off."
+				}
+			}
+		},
+		{
+			"id": "mae_118",
+			"number": 118,
+			"name": "Mae Alcantara",
+			"gender": "female",
+			"program": "BSA",
+			"year": 2,
+			"portrait_seed": 118002,
+			"appearances": {
+				"4": {
+					"slot": 3,
+					"ceb": "Maayong buntag! Gi-alphabetize ug gi-color-code na nako akong slips para sa scholarship interview unya.",
+					"en": "Good morning! I alphabetized and color-coded my slips for my scholarship interview later."
+				},
+				"6": {
+					"slot": 5,
+					"ceb": "Mae (#118) balik! Gi-double check na nako akong prereqs sa Grades tab, kompleto gyud unta ni.",
+					"en": "Mae (#118) again! I double-checked my prereqs for the Grades tab—this should be in order."
+				},
+				"7": {
+					"slot": 6,
+					"ceb": "Mag-add pa ko og usa ka Accounting subject para sa akong scholarship maintaining load!",
+					"en": "I'm adding one more Accounting subject to meet my scholarship maintaining load!"
+				}
+			}
+		}
+	],
+	"special_customers": [
+		{
+			"id": "funny_lunch_course",
+			"personality": "funny",
+			"expression": "happy",
+			"ceb": "Pwede ba mag-enroll sa 'Lunch Break 101'? Joke lang! Ania akong tinuod nga papeles.",
+			"en": "Can I enroll in 'Lunch Break 101'? Just kidding! Here are my real papers."
+		},
+		{
+			"id": "funny_canteen_receipt",
+			"personality": "funny",
+			"expression": "surprised",
+			"ceb": "Hala, resibo man diay ni sa siomai sa canteen! Huwat sa, ania diay akong form.",
+			"en": "Wait, that's my siomai receipt from the canteen! Hold on, here's my actual form."
+		},
+		{
+			"id": "panicked_scholarship",
+			"personality": "panicked",
+			"expression": "nervous",
+			"ceb": "10:30 akong scholarship interview sa OAS! Palihug tabangi ko nga ma-process ni dayon!",
+			"en": "My scholarship interview at OAS is at 10:30! Please help me get this processed quickly!"
+		},
+		{
+			"id": "overprepared_binder",
+			"personality": "overprepared",
+			"expression": "happy",
+			"ceb": "Nagdala ko og tulo ka photocopy, duha ka ballpen, ug plastic envelope. Ready na ko!",
+			"en": "I brought three photocopies, two pens, and a plastic envelope. I'm ready!"
+		},
+		{
+			"id": "lost_campus_map",
+			"personality": "lost",
+			"expression": "surprised",
+			"ceb": "Taga-Downtown Campus man unta ko, nganong naabot man ko diri sa Talamban?! Ay, sakto diay.",
+			"en": "I thought my class was at Downtown Campus, how did I end up in Talamban?! Oh wait, this is right."
+		},
+		{
+			"id": "emergency_last_bus",
+			"personality": "panicked",
+			"expression": "nervous",
+			"ceb": "Emergency lang gyud—kinahanglan na ko ma-enroll karon kay mobalik pa ko sa probinsya unyang hapon!",
+			"en": "It's an emergency—I really need to finish enrolling today before my bus home to the province!"
+		}
+	]
+}
+
