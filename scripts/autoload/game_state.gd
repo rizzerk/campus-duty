@@ -7,6 +7,7 @@ const SCENES := {
 	"memo": "res://scenes/day/memo.tscn",
 	"window": "res://scenes/day/window.tscn",
 	"report": "res://scenes/day/day_report.tscn",
+	"title": "res://scenes/main/title.tscn",
 }
 
 var day: int = 2

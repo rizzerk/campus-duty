@@ -1,0 +1,20 @@
+{
+	"title": "CAMPUS DUTY",
+	"tagline": "Registrar's Office · Window 3 · Enrollment season",
+	"footer": "A Game Development final project · University of San Carlos",
+	"continue_soon": "Coming soon: saves aren't built yet.",
+	"settings_soon": "Coming soon: settings aren't built yet.",
+	"credits": {
+		"team": [
+			{ "name": "Razel", "role": "Gameplay programming", "detail": "Shift logic, rules check, scoring, saves" },
+			{ "name": "Zsof", "role": "Pixel art and UX", "detail": "Portraits, screens, UI" },
+			{ "name": "Torcy", "role": "Writing and level design", "detail": "Cases, Bisaya dialogue, regulars' stories, playtesting" }
+		],
+		"thanks": [
+			"Jersey 20 by The Soft Type Project Authors (SIL Open Font License)",
+			"JetBrains Mono by The JetBrains Mono Project Authors (SIL Open Font License)",
+			"Made with Godot Engine",
+			"And every Carolinian who has stood in the enrollment line"
+		]
+	}
+}
