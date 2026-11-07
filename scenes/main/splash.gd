@@ -1,5 +1,5 @@
 extends Control
-## S1: the team pops in, the bar fills, everyone smiles, then hands off to whatever comes next.
+## S1: the team pops in, the bar fills, everyone smiles, then hands off to the title screen.
 
 signal finished
 
@@ -159,4 +159,4 @@ func _finish() -> void:
 	if not _done:
 		_done = true
 		finished.emit()
-		GameState.start_new_game()
+		GameState.go_to("title")
