@@ -22,6 +22,26 @@ const DISABLED := Color("#c9cfcb")
 const MONO_FONT := preload("res://fonts/JetBrainsMono.ttf")
 const PORTRAIT_SCENE := preload("res://scenes/portrait/portrait.tscn")
 
+## F4 window art, drawn by tools/art/window_art.py at 3x. The 9-slice margins below (left, top,
+## right, bottom, in screen pixels) have to match the drawings, so update both together.
+const DESK_TILE := preload("res://art/window/desk_tile.png")
+const DESK_EDGE := preload("res://art/window/desk_edge.png")
+const PAPER_TEXTURE := preload("res://art/window/paper.png")
+const ID_CARD_TEXTURE := preload("res://art/window/id_card.png")
+const MONITOR_TEXTURE := preload("res://art/window/monitor.png")
+const SCANLINES_TEXTURE := preload("res://art/window/screen_scanlines.png")
+const BUTTON_TEXTURE := preload("res://art/window/button.png")
+const BUTTON_PRESSED_TEXTURE := preload("res://art/window/button_pressed.png")
+const BUTTON_DISABLED_TEXTURE := preload("res://art/window/button_disabled.png")
+const PAPER_SLICE := [6, 15, 18, 9]
+const ID_CARD_SLICE := [6, 15, 9, 9]
+const MONITOR_SLICE := [15, 15, 18, 27]
+const BUTTON_SLICE := [6, 6, 9, 12]
+## Every piece with a drop shadow draws it 3px past its rect, so layouts stay the same size.
+const SHADOW := 3
+## The button face is drawn a little under white so its highlight survives tinting.
+const BUTTON_FACE := 240.0 / 255.0
+
 
 ## Empties a container right away. queue_free alone leaves the old children in place until the end
 ## of the frame, so a container briefly holds old and new together, grows, and never shrinks back.
@@ -66,16 +86,73 @@ static func wrapped(text: String, size: int = 20, color: Color = INK) -> Label:
 	return node
 
 
+## A 9-slice panel from one of the window textures. `content` is the inner padding (left, top,
+## right, bottom); a shadowed piece draws its shadow outside the rect, past the right and bottom.
+static func slice(texture: Texture2D, margins: Array, content: Array, shadow: bool = true, tint: Color = Color.WHITE) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = texture
+	style.modulate_color = tint
+	for side in 4:
+		style.set_texture_margin(side, margins[side])
+		style.set_content_margin(side, content[side])
+	if shadow:
+		style.expand_margin_right = SHADOW
+		style.expand_margin_bottom = SHADOW
+	return style
+
+
+## A form on the desk. The ID card has a green band across the top, so its text starts lower.
+static func paper_style(id_card: bool = false) -> StyleBoxTexture:
+	if id_card:
+		return slice(ID_CARD_TEXTURE, ID_CARD_SLICE, [6, 14, 6, 6])
+	return slice(PAPER_TEXTURE, PAPER_SLICE, [6, 6, 6, 6])
+
+
+## The ISMIS monitor's plastic bezel, with a deeper chin for the power light.
+static func monitor_style() -> StyleBoxTexture:
+	return slice(MONITOR_TEXTURE, MONITOR_SLICE, [15, 15, 15, 24])
+
+
+## The ISMIS screen glass: the screen color with faint scanlines.
+static func screen_style(pad: int = 10) -> StyleBoxTexture:
+	var style := slice(SCANLINES_TEXTURE, [0, 0, 0, 0], [pad, pad, pad, pad], false)
+	style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+	style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+	return style
+
+
+## The counter the window sits on: tiled wood with a lip along the top edge.
+static func desk() -> Control:
+	var desk_node := TextureRect.new()
+	desk_node.texture = DESK_TILE
+	desk_node.stretch_mode = TextureRect.STRETCH_TILE
+	desk_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var edge := TextureRect.new()
+	edge.texture = DESK_EDGE
+	edge.stretch_mode = TextureRect.STRETCH_TILE
+	edge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	edge.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	edge.offset_bottom = DESK_EDGE.get_height()
+	desk_node.add_child(edge)
+	return desk_node
+
+
+## Tints the grey button art. Dividing by the face's grey keeps the face the exact color asked for.
+static func _button_tint(color: Color) -> Color:
+	return Color(color.r / BUTTON_FACE, color.g / BUTTON_FACE, color.b / BUTTON_FACE, color.a)
+
+
 static func button(text: String, bg: Color = PAPER, fg: Color = INK, size: int = 22) -> Button:
 	var node := Button.new()
 	node.text = text
 	node.focus_mode = Control.FOCUS_NONE
 	node.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	node.add_theme_font_size_override("font_size", size)
-	node.add_theme_stylebox_override("normal", box(bg, 4, INK, 4, 8))
-	node.add_theme_stylebox_override("hover", box(bg.lightened(0.12), 4, INK, 4, 8))
-	node.add_theme_stylebox_override("pressed", box(bg.darkened(0.15), 4, INK, 1, 8))
-	node.add_theme_stylebox_override("disabled", box(DISABLED, 4, SOFT, 0, 8))
+	node.add_theme_stylebox_override("normal", slice(BUTTON_TEXTURE, BUTTON_SLICE, [8, 8, 8, 10], true, _button_tint(bg)))
+	node.add_theme_stylebox_override("hover", slice(BUTTON_TEXTURE, BUTTON_SLICE, [8, 8, 8, 10], true, _button_tint(bg.lightened(0.12))))
+	# Pressed, the button sits where its shadow was, so the text moves with it.
+	node.add_theme_stylebox_override("pressed", slice(BUTTON_PRESSED_TEXTURE, BUTTON_SLICE, [11, 11, 5, 7], true, _button_tint(bg.darkened(0.15))))
+	node.add_theme_stylebox_override("disabled", slice(BUTTON_DISABLED_TEXTURE, BUTTON_SLICE, [8, 8, 8, 10]))
 	node.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color"]:
 		node.add_theme_color_override(state, fg)

@@ -128,6 +128,8 @@ func _build() -> void:
 	wall.color = UiKit.MINT
 	wall.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(wall)
+	# Everything under the line sits on the counter.
+	_place(UiKit.desk(), Rect2(0, 168, 1280, 552))
 	_top_bar = ShiftTopBar.new()
 	_place(_top_bar, Rect2(0, 0, 1280, 64))
 	_line_strip = LineStrip.new()

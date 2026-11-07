@@ -37,7 +37,7 @@ var _search: LineEdit
 
 
 func _ready() -> void:
-	add_theme_stylebox_override("panel", UiKit.box(UiKit.INK, 4, UiKit.INK, 5, 6))
+	add_theme_stylebox_override("panel", UiKit.monitor_style())
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 6)
 	add_child(layout)
@@ -54,7 +54,7 @@ func _ready() -> void:
 		tabs.add_child(button)
 		_tab_buttons[tab] = button
 	var screen := PanelContainer.new()
-	screen.add_theme_stylebox_override("panel", UiKit.box(SCREEN, 0, UiKit.INK, 0, 10))
+	screen.add_theme_stylebox_override("panel", UiKit.screen_style())
 	screen.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	layout.add_child(screen)
 	var scroll := ScrollContainer.new()

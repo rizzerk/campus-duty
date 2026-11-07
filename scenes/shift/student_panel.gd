@@ -17,7 +17,8 @@ var _main_form: Control
 
 
 func _ready() -> void:
-	add_theme_stylebox_override("panel", UiKit.box(UiKit.MINT, 0, UiKit.INK, 0, 0))
+	# No background of its own: the student and their papers sit on the desk.
+	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_body = VBoxContainer.new()
 	_body.add_theme_constant_override("separation", 8)
 	add_child(_body)
@@ -138,7 +139,7 @@ func _make_papers(student: Dictionary) -> Control:
 func _make_form(index: int, form: Dictionary) -> Control:
 	var card := PaperCard.new()
 	card.form_kind = form["form"]
-	card.add_theme_stylebox_override("panel", UiKit.box(UiKit.CREAM, 3, UiKit.INK, 3, 6))
+	card.add_theme_stylebox_override("panel", UiKit.paper_style(form["form"] == "id_card"))
 	if form["form"] != "id_card" and _main_form == null:
 		_main_form = card
 	if form["form"] == "id_card":
