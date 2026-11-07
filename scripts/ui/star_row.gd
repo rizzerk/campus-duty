@@ -27,8 +27,8 @@ func _draw() -> void:
 			points.append(center + Vector2(cos(angle), sin(angle)) * radius)
 		var shadow := points.duplicate()
 		for p in shadow.size():
-			shadow[p] += Vector2(4, 4)
+			shadow[p] += Vector2.ONE * maxf(2.0, roundf(star_size / 14.0))
 		draw_colored_polygon(shadow, UiKit.INK)
 		draw_colored_polygon(points, UiKit.GOLD if i < filled else UiKit.DISABLED)
 		points.append(points[0])
-		draw_polyline(points, UiKit.INK, 3.0)
+		draw_polyline(points, UiKit.INK, maxf(2.0, star_size / 18.0))

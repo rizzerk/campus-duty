@@ -1,0 +1,17 @@
+{
+	"month": "August",
+	"title": "Enrollment season",
+	"weekdays": ["MON", "TUE", "WED", "THU", "FRI"],
+	"days": [
+		{ "day": 1, "date": 4, "phase": "Prep week", "teaser": "Learn the applicant checklists, flagging and stamping." },
+		{ "day": 2, "date": 5, "phase": "4th-year enrollment", "teaser": "Graduating students file their clearances. Some are missing requirements." },
+		{ "day": 3, "date": 6, "phase": "3rd-year enrollment", "teaser": "Sections fill up fast. Move students into an open section with no clash." },
+		{ "day": 4, "date": 7, "phase": "2nd-year enrollment", "teaser": "Unpaid balances. Those students go to the Cashier." },
+		{ "day": 5, "date": 8, "phase": "1st-year enrollment", "teaser": "Freshmen locked out of ISMIS. Reset their logins at the window." },
+		{ "day": 6, "date": 11, "phase": "Open market", "teaser": "The hardest day: every problem at once, seats draining live and rush waves." },
+		{ "day": 7, "date": 12, "phase": "Adjustment, day 1", "teaser": "Adviser signatures, fake signatures and the Hold bench." },
+		{ "day": 8, "date": 13, "phase": "Adjustment, day 2", "teaser": "Overloads over 24 units go to the Dean's office." },
+		{ "day": 9, "date": 14, "phase": "Extension", "teaser": "Only listed departments may adjust. Turn the rest away politely." },
+		{ "day": 10, "date": 15, "phase": "Classes begin", "teaser": "The payment window: match the cash to the assessment." }
+	]
+}

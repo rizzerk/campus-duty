@@ -3,6 +3,7 @@ extends Node
 ## went. Also moves between the daily screens.
 
 const SCENES := {
+	"calendar": "res://scenes/day/calendar.tscn",
 	"memo": "res://scenes/day/memo.tscn",
 	"window": "res://scenes/day/window.tscn",
 	"report": "res://scenes/day/day_report.tscn",
@@ -19,7 +20,7 @@ func start_new_game(seed_value: int = 0) -> void:
 	base_seed = seed_value if seed_value > 0 else randi_range(1, 99999)
 	day = int(GameData.json("days")["first_day"])
 	results.clear()
-	go_to("memo")
+	go_to("calendar")
 
 
 func start_shift() -> void:
@@ -59,7 +60,7 @@ func next_day() -> void:
 		day = int(GameData.json("days")["first_day"])
 	else:
 		day += 1
-	go_to("memo")
+	go_to("calendar")
 
 
 func is_last_day() -> bool:
