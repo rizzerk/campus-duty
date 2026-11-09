@@ -1,17 +1,32 @@
 {
-	"first_day": 2,
+	"first_day": 1,
 	"last_day": 8,
 	"days": {
-		"2": {
-			"traits": { "impatient": 0.15 },
+		"1": {
+			"onboarding": true,
 			"reject_reasons": ["missing_requirement"],
 			"actions": ["approve", "reject"],
-			"phase": "4th-year enrollment",
-			"intro": "Good morning! Students enroll themselves in ISMIS. They only come to us when ISMIS asks for the Registrar's approval, or when something's wrong. Today, graduating students are filing their clearances. Expect about 16 before noon.",
+			"phase": "Prep week",
+			"intro": "Welcome to Window 3! Today is prep week—about 8 early clearance applicants are lined up so you can learn the ropes. I'll guide you through scanning IDs, flagging mismatches, approvals, and rejections.",
 			"rules": [
-				{ "text": "Nothing wrong with the papers? Approve it.", "new": true },
-				{ "text": "Graduating students need every clearance requirement. Missing one? Return the form with the list.", "new": true },
-				{ "text": "Wrong calls send students back angrier, and the line notices.", "new": true }
+				{ "text": "Scan the student ID (press S or drag it to the reader) to inspect their ISMIS record.", "new": true },
+				{ "text": "Click a mismatched field on the paper and on ISMIS to flag it. Everything complete? Approve (1).", "new": true },
+				{ "text": "Missing a clearance item? Turn away (5) and tick the exact items they need to bring.", "new": true }
+			],
+			"students": 8,
+			"start_line": 4,
+			"years": [4],
+			"visits": { "graduation_clearance": 1 },
+			"problems": { "missing_requirement": 0.5 },
+			"max_problems": 1
+		},
+		"2": {
+			"traits": { "impatient": 0.15 },
+			"phase": "4th-year enrollment",
+			"intro": "Good morning! Prep week is over—real enrollment starts today. Graduating seniors are filing their clearances, about 16 before noon. Keep the queue moving and watch for impatient faces.",
+			"rules": [
+				{ "text": "Graduating students need every clearance requirement attached. Missing one? Return the form with the exact list.", "new": true },
+				{ "text": "Impatient students (sweat drop, scowl) drain line patience twice as fast. Click GRAD or PWD faces in the line to call them early.", "new": true }
 			],
 			"students": 16,
 			"start_line": 6,

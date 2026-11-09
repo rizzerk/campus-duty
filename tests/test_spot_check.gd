@@ -8,6 +8,7 @@ func _init() -> void:
 	_test_picks()
 	_test_bends_are_likelier()
 	_test_run()
+	_test_mid_shift_inspections()
 	print("spot_check: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -74,3 +75,19 @@ func _test_run() -> void:
 	_check(SpotCheck.verdict({ "correct": true }) == "fine", "fine")
 	_check(SpotCheck.verdict({ "correct": false }) == "wrong", "wrong")
 	_check(SpotCheck.verdict({ "correct": false, "bent": true }) == "bent", "bent")
+
+
+func _test_mid_shift_inspections() -> void:
+	var h := _history(5)
+	_check(not SpotCheck.should_inspect_mid_shift(h, 7, 1), "no mid-shift spot check on day 1 onboarding")
+	var praise := SpotCheck.inspect_latest(h, 7, 3)
+	_check(praise["kind"] == "praise" and praise["banner"] != "", "accurate work gets praise from Ma'am Lorna")
+	var bent_h := _history(4, 3)
+	var warn := SpotCheck.inspect_latest(bent_h, 7, 4)
+	_check(warn["kind"] == "warning" and warn["banner"].contains("favor"), "rule bending gets a warning")
+	var wrong_entry := [{
+		"number": 115, "name": "Juan Cruz", "action": "approve", "correct": false, "bent": false,
+		"problem": "failed_prereq", "reason": "A 5.0 in the prerequisite.", "office_open": true, "false_alarms": 0,
+	}]
+	var reminder := SpotCheck.inspect_latest(wrong_entry, 7, 6)
+	_check(reminder["kind"] == "rule_reminder" and reminder["banner"].contains("5.0"), "wrong call reminds the player of the forgotten rule")

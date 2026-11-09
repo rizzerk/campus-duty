@@ -103,6 +103,86 @@
 			}
 		]
 	},
+	"routine": {
+		"graduation_clearance": [
+			{ "ceb": "Ania akong clearance.", "en": "Here's my clearance." },
+			{ "ceb": "Pa-check lang sa checklist.", "en": "Just checking the checklist." }
+		],
+		"enroll_subject": [
+			{ "ceb": "{course}, section {section}.", "en": "{course}, section {section}." },
+			{ "ceb": "Pa-approve sa {course}.", "en": "For approval: {course}." }
+		],
+		"enrollment_payment": [
+			{ "ceb": "Ania akong assessment slip.", "en": "Here's my assessment slip." },
+			{ "ceb": "Pa-validate lang ko.", "en": "Just for validation." }
+		],
+		"first_year": [
+			{ "ceb": "Ania akong admission slip.", "en": "Here's my admission slip." },
+			{ "ceb": "Magpa-activate ko sa ISMIS.", "en": "Here for ISMIS activation." }
+		],
+		"add_subject": [
+			{ "ceb": "Add/drop form para sa {course}.", "en": "Add/drop form for {course}." },
+			{ "ceb": "Mag-add ko og {course}.", "en": "Adding {course}." }
+		]
+	},
+	"personalities": {
+		"nervous": {
+			"expression": "nervous",
+			"lines": [
+				{ "ceb": "Nagkurog akong kamot, basin naay kulang sa akong papeles...", "en": "My hands are shaking, I hope nothing's missing from my papers..." },
+				{ "ceb": "Hala, ako na diay sunod? Palihug ayaw ko kasab-i kon naay sayop.", "en": "Oh, it's my turn already? Please don't scold me if something's wrong." }
+			]
+		},
+		"confident": {
+			"expression": "happy",
+			"lines": [
+				{ "ceb": "Kompleto na ni tanan, 100 percent sure! Stamp na lang kulang.", "en": "Everything here is complete, 100 percent sure! Just needs a stamp." },
+				{ "ceb": "Gi-triple check na nako ni ganinang buntag. Dali ra kaayo ni.", "en": "I triple-checked this all morning. This'll take five seconds." }
+			]
+		},
+		"rude": {
+			"expression": "annoyed",
+			"lines": [
+				{ "ceb": "ganina ra ko nagbarog diri. Pwede paspasan gamay?", "en": "I've been standing here forever. Can we speed this up a bit?" },
+				{ "ceb": "Nganong daghan man kaayog proseso? I-approve na lang gud na.", "en": "Why is there so much red tape? Just approve it already." }
+			]
+		},
+		"funny": {
+			"expression": "happy",
+			"lines": [
+				{ "ceb": "Mas lisod pa man ang mag-enroll kaysa finals exam namo!", "en": "Enrolling is way harder than our actual final exams!" },
+				{ "ceb": "Kon ma-enroll ko karon, mag-novena gyud ko sa Sto. Niño!", "en": "If I get enrolled today, I swear I'm praying a novena!" }
+			]
+		},
+		"lost": {
+			"expression": "surprised",
+			"lines": [
+				{ "ceb": "Hala, Window 3 diay ni? Nagtuo ko nga pila ni sa canteen!", "en": "Wait, this is Window 3? I thought this was the canteen line!" },
+				{ "ceb": "Sakto ba ning akong gipilahan nga window? Gisunod ra nako ang tawo sa atubangan.", "en": "Am I even in the right window line? I just followed the person ahead of me." }
+			]
+		},
+		"friendly": {
+			"expression": "happy",
+			"lines": [
+				{ "ceb": "Maayong buntag! Kumusta inyong shift, dili ra kaayo kapoy?", "en": "Good morning! How's your shift going, not too exhausting?" },
+				{ "ceb": "Salamat daan sa tabang ha, kabalo ko daghan kaayo mog gi-atiman karon.", "en": "Thanks in advance for the help, I know you're swamped today." }
+			]
+		},
+		"panicked": {
+			"expression": "nervous",
+			"lines": [
+				{ "ceb": "Tabang! Mahutdan na ko og slot kon dili pa ni ma-process karon!", "en": "Help! I'm going to run out of slots if this isn't processed right now!" },
+				{ "ceb": "Hapit na mag-cutoff akong scholarship! Palihug tabangi ko!", "en": "My scholarship cutoff is almost here! Please help me out!" }
+			]
+		},
+		"overprepared": {
+			"expression": "happy",
+			"lines": [
+				{ "ceb": "Naa koy original, photocopy, ug backup folder kon kinahanglan nimo!", "en": "I have the original, a photocopy, and a backup folder if you need it!" },
+				{ "ceb": "Gi-butangan na nako og sticky notes tanan nakong forms para dali ra nimo makita.", "en": "I put sticky notes on all my forms so you can check them faster." }
+			]
+		}
+	},
 	"worried": [
 		{
 			"ceb": "Naay pula nga error sa ISMIS ganina. Okay ra ba akong enrollment?",
@@ -130,6 +210,10 @@
 			{
 				"ceb": "Okay ra tanan. Salamat sa kakugi.",
 				"en": "All good. Thanks for the hard work."
+			},
+			{
+				"ceb": "Hapsay imong agi karon. Bilib ko.",
+				"en": "Your work is sharp today. Color me impressed."
 			}
 		],
 		"wrong": [
@@ -140,6 +224,10 @@
 			{
 				"ceb": "Dili ni sakto. Basaha balik ang rulebook, ha?",
 				"en": "This isn't right. Read the rulebook again, okay?"
+			},
+			{
+				"ceb": "Nagdali ra kaayo ka ani nga papel. Tan-awa ang ISMIS sa sunod.",
+				"en": "You rushed this paper. Check ISMIS closely next time."
 			}
 		],
 		"bent": [
@@ -150,8 +238,46 @@
 			{
 				"ceb": "Nakita nako ang pabor. Dili ta ingon ana diri.",
 				"en": "I saw the favor. That's not how we do things here."
+			},
+			{
+				"ceb": "Bisag kaila pa na sa Dean o nagdala og siopao, walay palusot sa Window 3.",
+				"en": "Even if they know the Dean or brought siopao, no favors at Window 3."
 			}
-		]
+		],
+		"mid_praise": [
+			{
+				"ceb": "Lorna: “Hapsay imong agi kang #{number}. Walay sipyat—padayon.”",
+				"en": "Ma'am Lorna checked #{number}: Clean work. Accurate and steady—keep it up."
+			},
+			{
+				"ceb": "Lorna: “Sakto tanan imong gi-stamp karon. Mao nay akong gusto.”",
+				"en": "Ma'am Lorna checked #{number}: Every stamp on the mark so far. Good job."
+			}
+		],
+		"mid_warn": [
+			{
+				"ceb": "Lorna: “Nagtan-aw ko sa imong stamp kang #{number}, ha. Walay palusot diri.”",
+				"en": "Ma'am Lorna inspected #{number}: I saw that favor. Don't bend the rules at my window."
+			},
+			{
+				"ceb": "Lorna: “Ayaw sige og flag kon sakto ra ang papel—malangan ang pila.”",
+				"en": "Ma'am Lorna warned you: Stop flagging matching or harmless fields—false alarms drain the line's patience."
+			}
+		],
+		"rule_reminders": {
+			"missing_requirement": "Lorna's spot check on #{number}: “Remember—graduating students need all 4 clearance items attached. Return with the exact missing list.”",
+			"closed_section": "Lorna's spot check on #{number}: “Remember—when a section is FULL on the Schedule tab, use 2 (Fix) to move them to an open, non-clashing section.”",
+			"unpaid_balance": "Lorna's spot check on #{number}: “Remember—any unpaid balance in ISMIS goes to the Cashier (3 Route) before we can approve.”",
+			"ismis_login": "Lorna's spot check on #{number}: “Remember—when a freshman's ISMIS account is Locked and their birthday matches, reset it at the window (2 Fix).”",
+			"identity_mismatch": "Lorna's spot check on #{number}: “Careful! That admission slip's birthday didn't match ISMIS. Never reset an account for the wrong person!”",
+			"failed_prereq": "Lorna's spot check on #{number}: “You missed the Grades tab—a 5.0 in the prerequisite means they cannot take the subject (5 Turn away).”",
+			"inc_prereq": "Lorna's spot check on #{number}: “Check the Grades tab—an INC in the prerequisite needs the adviser's note from Consultation (3 Route).”",
+			"missing_signature": "Lorna's spot check on #{number}: “Adding a subject requires an adviser's signature on the slip. Send unsigned slips to Consultation (or Hold if on break).”",
+			"fake_signature": "Lorna's spot check on #{number}: “Compare the signature against the Advisers tab specimen! Forged signatures must be rejected.”",
+			"overload": "Lorna's spot check on #{number}: “Over 24 units is an overload. Route them to the Dean's Office (or turn away if the Dean is closed for the day).”",
+			"office_closed": "Lorna's spot check on #{number}: “Watch the office clock! Never route a student to an office that is closed or on break.”",
+			"clean": "Lorna's spot check on #{number}: “Nothing was wrong with #{number}'s papers—don't turn away or route a clean application!”"
+		}
 	},
 	"lorna_takes_over": [
 		{

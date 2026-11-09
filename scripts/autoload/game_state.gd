@@ -9,7 +9,7 @@ const SCENES := {
 	"report": "res://scenes/day/day_report.tscn",
 }
 
-var day: int = 2
+var day: int = 1
 var base_seed: int = 1
 var last_summary: Dictionary = {}
 var last_history: Array = []

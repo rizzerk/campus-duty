@@ -8,6 +8,8 @@ signal student_called(student: Dictionary)
 signal bench_changed
 signal office_changed(office: String, status: String)
 signal rush_arrived(count: int)
+signal event_triggered(event: Dictionary)
+signal spot_inspected(inspection: Dictionary)
 signal slots_changed
 signal shift_ended(reason: String)
 
@@ -38,10 +40,13 @@ var _away: Array = []
 var _office_status: Dictionary = {}
 var _drain_rng := RandomNumberGenerator.new()
 var _drain_clock: float = 0.0
+var _base_seed: int = 1
+var _scheduled_events: Array = []
 
 
 func _init(day_number: int, base_seed: int) -> void:
 	day = day_number
+	_base_seed = base_seed
 	patience = GameData.balance("patience_start")
 	var info := GameData.day(day)
 	var rng := RandomNumberGenerator.new()
@@ -64,6 +69,11 @@ func _init(day_number: int, base_seed: int) -> void:
 		var student := StudentGen.make(base_seed * 100000 + day * 1000 + i, day)
 		student["number"] = number + i
 		_arrivals.append({ "student": student, "at": times[i], "rush": rush_times.has(times[i]) })
+	if ShiftEvents.is_onboarding(day):
+		ShiftEvents.prepare_day_one_line(_arrivals)
+	else:
+		ShiftEvents.apply_daily_flavor(_arrivals, day, base_seed)
+		_scheduled_events = ShiftEvents.events_for_day(day)
 	_drain_rng.seed = base_seed * 7 + day
 	_office_status = _statuses()
 	tick(0.0)
@@ -92,6 +102,8 @@ func tick(delta_seconds: float) -> void:
 		_join_line(arrival["student"])
 	if rushed > 0:
 		rush_arrived.emit(rushed)
+	while not _scheduled_events.is_empty() and float(_scheduled_events[0]["at"]) <= minute:
+		event_triggered.emit(_scheduled_events.pop_front())
 	_drain_slots(minute - before)
 	for trip: Dictionary in _away.duplicate():
 		if trip["back_at"] <= minute:
@@ -253,6 +265,8 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	})
 	if outcome != "stays":
 		current = {}
+	if SpotCheck.should_inspect_mid_shift(history, _base_seed, day):
+		spot_inspected.emit(SpotCheck.inspect_latest(history, _base_seed, day))
 	_check_end()
 	result["outcome"] = outcome
 	result["bent"] = bent

@@ -3,11 +3,11 @@
 		{
 			"name": "Basics",
 			"entries": [
-				{ "day": 2, "title": "Nothing wrong?", "text": "Approve it, then hand the papers back." },
-				{ "day": 2, "title": "Pull up the record", "text": "Drag the student ID onto the ISMIS reader, or press S. No card? Type their number into the search box." },
-				{ "day": 2, "title": "Flagging", "text": "Click a field on the papers, then the same field on ISMIS. Flags are checked when you decide. False alarms cost patience." },
-				{ "day": 2, "title": "Wrong calls", "text": "Every wrong call costs patience. Turn someone away or send them off for nothing and they come back angrier. Twice, and they walk out." },
-				{ "day": 2, "title": "Priority", "text": "GRAD and PWD students can be called out of turn from the line." },
+				{ "day": 1, "title": "Nothing wrong?", "text": "Approve it, then hand the papers back." },
+				{ "day": 1, "title": "Pull up the record", "text": "Drag the student ID onto the ISMIS reader, or press S. No card? Type their number into the search box." },
+				{ "day": 1, "title": "Flagging", "text": "Click a field on the papers, then the same field on ISMIS. Flags are checked when you decide. False alarms cost patience." },
+				{ "day": 1, "title": "Wrong calls", "text": "Every wrong call costs patience. Turn someone away or send them off for nothing and they come back angrier. Twice, and they walk out." },
+				{ "day": 1, "title": "Priority", "text": "GRAD and PWD students can be called out of turn from the line." },
 				{ "day": 3, "title": "Short forms", "text": "Ma. for Maria, J. for Juan, BS IT for BSIT. These are fine. Don't flag them." },
 				{ "day": 5, "title": "Two problems?", "text": "Turn away beats everything. Otherwise send them to any office they need; they come back for the next one. Fixes at the window come last." }
 			]
@@ -15,7 +15,7 @@
 		{
 			"name": "Clearance",
 			"entries": [
-				{ "day": 2, "title": "Missing requirement", "problems": ["missing_requirement"], "text": "Every clearance item must be attached. Missing one? Turn away: Missing requirement, and tick exactly what they need to bring." }
+				{ "day": 1, "title": "Missing requirement", "problems": ["missing_requirement"], "text": "Every clearance item must be attached. Missing one? Turn away: Missing requirement, and tick exactly what they need to bring." }
 			]
 		},
 		{

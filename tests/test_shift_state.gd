@@ -25,6 +25,7 @@ func _init() -> void:
 	_test_trait_weights()
 	_test_own_section_never_drains()
 	_test_caught_favors_cost_stars()
+	_test_day_one_onboarding_and_events()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -65,7 +66,7 @@ func _perfect(shift: ShiftState) -> Array:
 
 
 func _test_perfect_player_never_fails() -> void:
-	for day in range(2, 9):
+	for day in range(1, 9):
 		var shift := ShiftState.new(day, 42)
 		_play(shift, _perfect)
 		var summary := shift.summary()
@@ -449,3 +450,26 @@ func _test_caught_favors_cost_stars() -> void:
 	_check(Scoring.stars(summary) == 0, "stars never go below zero")
 	summary["reason"] = ""
 	_check(Scoring.projected(summary) == 3, "the pause projection ignores the spot check")
+
+
+func _test_day_one_onboarding_and_events() -> void:
+	_check(ShiftEvents.is_onboarding(1), "day 1 is onboarding")
+	for day in range(2, 9):
+		_check(not ShiftEvents.is_onboarding(day), "day %d never repeats the tutorial" % day)
+		var bulletin := ShiftEvents.bulletin_for_day(day)
+		_check(bulletin.has("schedule") and bulletin.has("announcement") and bulletin.has("policy") and bulletin.has("event_preview"),
+			"day %d has a complete office bulletin" % day)
+		_check(not ShiftEvents.events_for_day(day).is_empty(), "day %d has mid-shift events" % day)
+	var day1 := ShiftState.new(1, 42)
+	_check(day1.line[0]["problems"].is_empty(), "day 1 first student is a clean approval tutorial case")
+	_check(ShiftEvents.onboarding_banner(day1.line[0], "called").contains("Welcome to Window 3"), "day 1 shows Ma'am Lorna's welcome")
+	_check(day1.line[1]["problems"] == ["missing_requirement"], "day 1 second student teaches flagging and rejection")
+	_check(RulesCheck.missing_items(day1.line[1]) == ["req_library"], "day 1 second student is missing library clearance")
+	_check(day1.line[3]["priority"] == "pwd", "day 1 fourth student teaches priority triage")
+	var day2 := ShiftState.new(2, 42)
+	_check(ShiftEvents.onboarding_banner(day2.line[0], "called") == "", "day 2+ never shows onboarding banners")
+	var fired := [0]
+	var day6 := ShiftState.new(6, 42)
+	day6.event_triggered.connect(func(_e: Dictionary) -> void: fired[0] += 1)
+	_play(day6, _perfect)
+	_check(fired[0] > 0, "mid-shift events fire during a day 2+ shift")

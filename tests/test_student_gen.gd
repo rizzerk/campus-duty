@@ -10,17 +10,18 @@ func _init() -> void:
 	_check(StudentGen.make(5, 7) == StudentGen.make(5, 7), "same seed gives the same student")
 	_check(StudentGen.make(5, 7)["name"] != StudentGen.make(6, 7)["name"] or StudentGen.make(5, 7)["record"]["id_number"] != StudentGen.make(6, 7)["record"]["id_number"], "different seeds differ")
 	var seen := {}
-	for day in range(2, 9):
+	for day in range(1, 9):
 		for seed_value in SEEDS:
 			var student := StudentGen.make(seed_value, day)
 			_check_student(student, day)
 			for id: String in student["problems"]:
 				seen[id] = true
 	for id: String in GameData.json("problems"):
-		_check(seen.has(id), "problem %s shows up somewhere in days 2-8" % id)
+		_check(seen.has(id), "problem %s shows up somewhere in days 1-8" % id)
 	_test_traits()
 	_test_traits_dont_change_problems()
 	_test_favors()
+	_test_personalities()
 	print("student_gen: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -169,3 +170,20 @@ func _test_favors() -> void:
 			var offers: Array = favors[student["favor"]]["lines"]
 			_check(offers.any(func(o: Dictionary) -> bool: return student["line"]["en"].ends_with(o["en"])), "no ID: they still ask for the favor")
 	_check(both > 0, "some students have no ID and ask for a favor")
+
+
+func _test_personalities() -> void:
+	var personalities: Dictionary = GameData.json("dialogue")["personalities"]
+	var seen_personalities := {}
+	var routine_count := 0
+	for seed_value in 400:
+		var student := StudentGen.make(seed_value, 2)
+		var p: String = student.get("personality", "")
+		_check(p == "routine" or personalities.has(p), "valid personality %s" % p)
+		if p == "routine":
+			routine_count += 1
+		else:
+			seen_personalities[p] = true
+	_check(routine_count > 150, "most normal transactions use concise routine dialogue (%d/400)" % routine_count)
+	for p: String in personalities:
+		_check(seen_personalities.has(p), "personality %s appears" % p)
