@@ -39,7 +39,7 @@ func _ready() -> void:
 	side.add_theme_constant_override("separation", 18)
 	_place(side, Rect2(760, 40, 460, 640))
 	side.add_child(_offices_card(day))
-	side.add_child(_tips_card())
+	side.add_child(_tips_card() if ShiftEvents.is_onboarding(day) else _bulletin_card(day))
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	side.add_child(spacer)
@@ -171,14 +171,28 @@ func _tips_card() -> Control:
 	var list := VBoxContainer.new()
 	list.add_theme_constant_override("separation", 4)
 	card.add_child(list)
-	list.add_child(UiKit.label("How to check papers", 24))
+	list.add_child(UiKit.label("Day 1 · Onboarding with Ma'am Lorna", 24))
 	for tip: String in [
 		"Drag the student ID onto the ISMIS reader (or press S) to pull up their record.",
 		"Think something's off? Click the field on the paper, then the same field on ISMIS to flag it. Flags are checked when you decide, and false alarms cost patience.",
 		"Press A to ask the student about a flag. It takes a few minutes.",
-		"Stamp a decision (keys 1 to 5), then hand the papers back with Space. Click a stamp to lift it off.",
+		"Stamp a decision (1 to Approve, 5 to Turn away), then hand the papers back with Space. Click a stamp to lift it off.",
 	]:
 		list.add_child(UiKit.wrapped(tip, 17, Color("#3a463e")))
+	return card
+
+
+## Day 2+: never repeat the tutorial. Show today's schedule, announcements, policy and events.
+func _bulletin_card(day: int) -> Control:
+	var bulletin := ShiftEvents.bulletin_for_day(day)
+	var card := UiKit.card(UiKit.CREAM, 16, 5)
+	var list := VBoxContainer.new()
+	list.add_theme_constant_override("separation", 6)
+	card.add_child(list)
+	list.add_child(UiKit.label(bulletin.get("title", "Today's office bulletin"), 24))
+	for field: String in ["schedule", "announcement", "policy", "event_preview"]:
+		if bulletin.has(field):
+			list.add_child(UiKit.wrapped(bulletin[field], 17, Color("#3a463e")))
 	return card
 
 

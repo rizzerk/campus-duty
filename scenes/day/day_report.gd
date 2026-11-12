@@ -50,7 +50,7 @@ func _ready() -> void:
 	var tomorrow := UiKit.wrapped(_tomorrow_text(), 20, Color("#f3efe2"))
 	tomorrow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	foot.add_child(tomorrow)
-	var next := UiKit.button("Play again from day 2" if GameState.is_last_day() else "Next day", UiKit.GOLD, UiKit.INK, 26)
+	var next := UiKit.button("Play again from day %d" % int(GameData.json("days")["first_day"]) if GameState.is_last_day() else "Next day", UiKit.GOLD, UiKit.INK, 26)
 	next.custom_minimum_size = Vector2(300, 64)
 	# Only once: a double click must not skip a day.
 	next.pressed.connect(func() -> void:

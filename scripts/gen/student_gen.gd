@@ -35,6 +35,7 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 		"mood": "calm",
 		"trait": "",
 		"favor": "",
+		"personality": "routine",
 	}
 	student["record"] = _make_record(rng, student, program)
 	if visit in ["enroll_subject", "add_subject"]:
@@ -52,8 +53,25 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 	_roll_trait(extra_rng, student, day)
 	_roll_favor(extra_rng, student, day)
 	student["worried"] = extra_rng.randf() < WORRIED_CHANCE
+	var flavor_rng := RandomNumberGenerator.new()
+	flavor_rng.seed = seed_value * 53 + 19
+	_roll_personality(flavor_rng, student)
 	student["line"] = _make_line(rng, student)
 	return student
+
+
+## Most students are routine so repetitive work stays brisk; some show a distinct personality.
+static func _roll_personality(rng: RandomNumberGenerator, student: Dictionary) -> void:
+	if rng.randf() >= 0.35:
+		student["personality"] = "routine"
+		return
+	var keys: Array = GameData.json("dialogue")["personalities"].keys()
+	var picked: String = _pick(rng, keys)
+	student["personality"] = picked
+	if student["trait"] == "":
+		var info: Dictionary = GameData.json("dialogue")["personalities"][picked]
+		if info.has("expression"):
+			student["portrait"]["expression"] = info["expression"]
 
 
 ## At most one trait. Traits change how a student behaves, never what the right call is.
@@ -86,8 +104,8 @@ static func _make_name(rng: RandomNumberGenerator, gender: String) -> String:
 
 
 static func _roll_priority(rng: RandomNumberGenerator, year: int, day_number: int) -> String:
-	# On day 2 everyone is graduating, so GRAD only stands out on other days.
-	if year == 4 and day_number != 2 and rng.randf() < 0.2:
+	# On days 1 and 2 everyone is graduating, so GRAD only stands out on other days.
+	if year == 4 and not (day_number in [1, 2]) and rng.randf() < 0.2:
 		return "grad"
 	if rng.randf() < 0.05:
 		return "pwd"
@@ -341,10 +359,14 @@ static func _forge(rng: RandomNumberGenerator, specimen: String) -> String:
 
 
 ## The opening line. Most important first: no ID card (the player has to type the number), a
-## favor, the trait, a worried question, a problem they know about, then the reason for the visit.
+## favor, the trait, a worried question, a problem they know about, a personality moment, or a
+## concise routine line so repetitive transactions don't chatter unnecessarily.
 static func _make_line(rng: RandomNumberGenerator, student: Dictionary) -> Dictionary:
 	var dialogue: Dictionary = GameData.json("dialogue")
-	var options: Array = dialogue["visits"][student["visit"]]
+	var options: Array = dialogue["routine"].get(student["visit"], dialogue["visits"][student["visit"]])
+	var personality: String = student.get("personality", "routine")
+	if personality != "routine" and dialogue.get("personalities", {}).has(personality):
+		options = dialogue["personalities"][personality]["lines"]
 	for id: String in student["problems"]:
 		if dialogue["problems"].has(id):
 			options = dialogue["problems"][id]

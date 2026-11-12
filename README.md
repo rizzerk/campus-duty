@@ -19,8 +19,8 @@ A registrar window sim set during enrollment season at the University of San Car
 Each day:
 
 1. **Season calendar.** Pick up where you left off and see what's new today.
-2. **Morning memo.** Ma'am Lorna, the University Registrar, posts today's rules. Each day adds one new rule.
-3. **The shift.** Students come to the window one at a time:
+2. **Morning memo.** Ma'am Lorna, the University Registrar, posts today's rules. Day 1 includes full onboarding guidance; Day 2+ never repeats the tutorial, showing the daily office bulletin (enrollment schedule, announcements, policy changes, and expected events) before jumping straight into the shift.
+3. **The shift.** Students come to the window one at a time while daily events and random spot inspections unfold:
    - **Triage** the line. Call priority students (graduating, PWD) out of turn.
    - **Inspect.** Compare the student's papers with their ISMIS record and flag any mismatch.
    - **Decide.** Fix it at the window, route them (Cashier, Consultation, Dean's office), put them on the Hold bench, or reject them.
@@ -37,9 +37,9 @@ If the line's patience hits zero, Ma'am Lorna takes over and the shift ends earl
 
 **Live offices and the Hold bench.** Each office has a live status (advisers on break, long cashier line, Dean only handles overloads). Sending someone to a closed office is a wasted trip. Hold parks a student on a bench (3 seats) until the office reopens.
 
-**Rule bending.** Some students push you to break the rules: the Dean's "nephew," sob stories, the occasional merienda. Bending is fast and makes that student happy, but the line sees it (patience drops) and Ma'am Lorna spot-checks three random transactions at the end of each day. Getting caught costs rating.
+**Rule bending and spot checks.** Some students push you to break the rules: the Dean's "nephew," sob stories, the occasional merienda. Bending is fast and makes that student happy, but the line sees it (patience drops). Instead of repeating tutorials on Day 2+, Ma'am Lorna conducts random live mid-shift spot checks—praising accurate streaks, warning against favors or false alarms, and citing specific rules you missed—followed by her formal end-of-day audit from Day 4 onward.
 
-**Student traits.** Traits change how a student behaves, never the correct answer, and each has a visual tell on the portrait:
+**Student traits and personalities.** Traits change how a student behaves, never the correct answer, and each has a visual tell on the portrait. Alongside concise routine lines, students also roll distinct personalities (`nervous`, `confident`, `rude`, `funny`, `lost`, `friendly`, `panicked`, `overprepared`):
 
 | Trait | Effect | Visual tell |
 | --- | --- | --- |
@@ -49,20 +49,20 @@ If the line's patience hits zero, Ma'am Lorna takes over and the shift ends earl
 | Kapit | Pressures you to skip the rules | Sunglasses |
 | With parent | Twice the patience, but argues every routing | Parent portrait behind |
 
-**Regulars.** A few recurring students (for example #112, who needs IT 312, and #24, who keeps losing his ID) have 4–5 story beats across the season. Your choices decide how their stories end.
+**Regulars and special events.** Recurring students—including `#112 Jericho Gomez` (camping out for `IT 312`), `#104 Carlo Bacalso` (who loses his ID on the 13C jeepney), and `#118 Mae Alcantara` (with her color-coded scholarship slips)—return across multiple days. Shifts are also punctuated by special customer encounters and timed office events such as coworker announcements, scholarship interview rushes, thermal printer hiccups, ISMIS network lag, and office cutoffs.
 
 ## The season (10 days)
 
 | Day | Phase | What's new |
 | --- | --- | --- |
-| 1 | Prep week | Tutorial: applicant checklists, flagging, stamping |
-| 2 | 4th-year enrollment | Graduating students missing requirements |
-| 3 | 3rd-year enrollment | Closed sections and the section picker |
-| 4 | 2nd-year enrollment | Unpaid balances go to the Cashier |
-| 5 | 1st-year enrollment | ISMIS login resets at the window |
+| 1 | Prep week | Full onboarding with Ma'am Lorna: ID scanning, flagging, asking, approvals, rejections, triage, and office schedules |
+| 2 | 4th-year enrollment | Graduating students missing requirements, impatient seniors, daily office bulletins |
+| 3 | 3rd-year enrollment | Closed sections, the section picker, missing IDs, and harmless abbreviations |
+| 4 | 2nd-year enrollment | Unpaid balances go to the Cashier, rule-bending favors, and end-of-day spot checks |
+| 5 | 1st-year enrollment | ISMIS login resets at the window, birthday verification, and multi-problem priority order |
 | 6 | Open market | Hardest day: every problem at once, slots draining live, rush waves |
 | 7 | Adjustment, day 1 | Adviser signatures, fake signatures, the Hold bench |
-| 8 | Adjustment, day 2 | Overloads (over 24 units) go to the Dean |
+| 8 | Adjustment, day 2 | Overloads (over 24 units) go to the Dean before 11:30 AM |
 | 9 | Extension | Only listed departments may adjust; turn the rest away |
 | 10 | Classes begin | Payment window: match cash to the assessment |
 
@@ -100,9 +100,9 @@ After day 10, the supervisor's evaluation gives one of three endings based on ac
 
 ## Status
 
-**Playable now:** days 2–8, from the morning memo through the shift to the day report. This covers inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, student traits, rule bending and the spot check.
+**Playable now:** days 1–8, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, and both live mid-shift and end-of-day spot checks.
 
-**Still to come:** days 1, 9 and 10; title screen, saves and settings; season calendar and desk upgrades; regulars; endings; audio and final art.
+**Still to come:** days 9 and 10; title screen, saves and settings; desk upgrades; endings; audio and final art.
 
 ## Running it
 

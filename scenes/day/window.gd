@@ -50,6 +50,7 @@ var _handing: bool = false
 var _hand_back_button: Button
 ## Only shown when the student at the window asks for a favor (rule bending).
 var _favor_button: Button
+var _spot_note: String = ""
 
 
 func _ready() -> void:
@@ -62,6 +63,8 @@ func _ready() -> void:
 	shift.office_changed.connect(func(_o: String, _status: String) -> void: _refresh_offices())
 	shift.shift_ended.connect(_on_shift_ended)
 	shift.rush_arrived.connect(func(count: int) -> void: _line_strip.flash("RUSH! %d more students just joined the line" % count))
+	shift.event_triggered.connect(_on_event_triggered)
+	shift.spot_inspected.connect(_on_spot_inspected)
 	_refresh_line()
 	_refresh_offices()
 	_call_left = CALL_DELAY
@@ -142,6 +145,7 @@ func _build() -> void:
 	_place(_ismis, Rect2(532, 176, 478, 440))
 	_ismis.record_field_clicked.connect(_on_record_field)
 	_ismis.ask_pressed.connect(_ask)
+	_ismis.scanned.connect(_on_id_scanned)
 	_offices = OfficePanel.new()
 	_place(_offices, Rect2(1024, 176, 232, 440))
 	var bar := HBoxContainer.new()
@@ -223,6 +227,9 @@ func _call_next() -> void:
 	_clear_stamp()
 	_student_panel.show_student(student)
 	_ismis.show_student(student)
+	var onboarding := ShiftEvents.onboarding_banner(student, "called")
+	if onboarding != "":
+		_ismis.show_banner(onboarding, "")
 	var mood: String = student.get("mood", "calm")
 	var trip: Dictionary = student.get("trip", {})
 	if trip.get("wrong", false):
@@ -245,6 +252,28 @@ func _on_face_clicked(index: int) -> void:
 	if shift.call_out_of_turn(index):
 		_refresh_line()
 		_ismis.show_banner("Called a priority student to the front of the line.", "")
+
+
+func _on_id_scanned() -> void:
+	if shift.current.is_empty():
+		return
+	var onboarding := ShiftEvents.onboarding_banner(shift.current, "scanned")
+	if onboarding != "":
+		_ismis.show_banner(onboarding, "")
+
+
+func _on_event_triggered(event: Dictionary) -> void:
+	if event.has("flash"):
+		_line_strip.flash(event["flash"])
+	if event.has("banner") and _react_left <= 0.0:
+		_ismis.show_banner(event["banner"], "flag" if event.get("kind", "") in ["outage", "malfunction"] else "")
+
+
+func _on_spot_inspected(inspection: Dictionary) -> void:
+	if inspection.is_empty():
+		return
+	_line_strip.flash("SPOT CHECK · %s" % inspection.get("ceb", ""))
+	_spot_note = " · %s" % inspection.get("banner", "")
 
 
 ## Picking a stamp. Nothing is judged until the papers are handed back.
@@ -431,6 +460,7 @@ func _commit(decision: Dictionary) -> void:
 		return
 	var action: String = decision["action"]
 	var student := shift.current
+	_spot_note = ""
 	var result := shift.act(action, {
 		"flags": _flags_for_decision(),
 		"reason": decision["reason"],
@@ -444,7 +474,7 @@ func _commit(decision: Dictionary) -> void:
 		_update_buttons()
 		return
 	var outcome: String = result["outcome"]
-	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1])
+	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1]) + _spot_note
 	if result["bent"]:
 		_ismis.show_banner("FAVOR DONE · %s The line saw it.%s" % [shift.history[-1]["reason"], flag_note], "flag")
 	elif result["correct"]:
@@ -576,7 +606,8 @@ func _select(picked: Dictionary) -> void:
 	_flags.append(flag)
 	_set_mark(paper, "claimed")
 	_set_mark(record, "claimed")
-	_ismis.show_banner("Flagged · %s. It gets checked when you decide." % caption, "flag", true)
+	var onboarding_flag := ShiftEvents.onboarding_banner(shift.current, "flagged")
+	_ismis.show_banner(onboarding_flag if onboarding_flag != "" else "Flagged · %s. It gets checked when you decide." % caption, "flag", true)
 
 
 ## Asks the student about the latest flag they haven't been asked about. Costs time and patience.
@@ -592,7 +623,8 @@ func _ask() -> void:
 	flag["asked"] = true
 	shift.ask()
 	_student_panel.say(_ask_line(shift.current, flag))
-	_ismis.show_banner("You asked about %s. That took a few minutes." % StudentPanel._caption(flag["paper"]["key"]), "")
+	var onboarding_ask := ShiftEvents.onboarding_banner(shift.current, "asked")
+	_ismis.show_banner(onboarding_ask if onboarding_ask != "" else "You asked about %s. That took a few minutes." % StudentPanel._caption(flag["paper"]["key"]), "")
 
 
 func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:

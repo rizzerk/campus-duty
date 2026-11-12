@@ -10,7 +10,7 @@ const SCENES := {
 	"title": "res://scenes/main/title.tscn",
 }
 
-var day: int = 2
+var day: int = 1
 var base_seed: int = 1
 var last_summary: Dictionary = {}
 var last_history: Array = []
