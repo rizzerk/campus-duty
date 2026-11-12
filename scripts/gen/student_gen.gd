@@ -104,8 +104,8 @@ static func _make_name(rng: RandomNumberGenerator, gender: String) -> String:
 
 
 static func _roll_priority(rng: RandomNumberGenerator, year: int, day_number: int) -> String:
-	# On day 2 everyone is graduating, so GRAD only stands out on other days.
-	if year == 4 and day_number != 2 and rng.randf() < 0.2:
+	# On days 1 and 2 everyone is graduating, so GRAD only stands out on other days.
+	if year == 4 and not (day_number in [1, 2]) and rng.randf() < 0.2:
 		return "grad"
 	if rng.randf() < 0.05:
 		return "pwd"

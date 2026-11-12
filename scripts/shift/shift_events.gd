@@ -25,6 +25,8 @@ static func events_for_day(day: int) -> Array:
 static func prepare_day_one_line(arrivals: Array) -> void:
 	if arrivals.size() < 4:
 		return
+	for arrival: Dictionary in arrivals:
+		arrival["student"]["priority"] = ""
 	_set_clearance_case(arrivals[0]["student"], [], "clean_approve")
 	arrivals[0]["student"]["line"] = {
 		"ceb": "Maayong buntag! Mag-file unta ko sa akong graduation clearance. Kompleto na ni tanan.",
@@ -98,19 +100,8 @@ static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> voi
 		var appearance: Dictionary = regular["appearances"][day_key]
 		var slot: int = clampi(int(appearance["slot"]), 0, arrivals.size() - 1)
 		var student: Dictionary = arrivals[slot]["student"]
-		if student["no_id"] or student["favor"] != "":
-			continue
 		used_slots[slot] = true
-		student["regular_id"] = regular["id"]
-		student["number"] = int(regular["number"])
-		student["name"] = regular["name"]
-		student["record"]["name"] = regular["name"]
-		for paper: Dictionary in student["papers"]:
-			if paper["fields"].has("name") and not student["harmless"].has("name"):
-				paper["fields"]["name"] = regular["name"]
-		var line := { "ceb": str(appearance["ceb"]), "en": str(appearance["en"]) }
-		_format_student_line(line, student)
-		student["line"] = line
+		_apply_regular(student, regular, appearance)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = base_seed * 97 + day * 13
 	var specials: Array = events_data["special_customers"]
@@ -134,6 +125,70 @@ static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> voi
 		student["line"] = line
 
 
+static func _apply_regular(student: Dictionary, regular: Dictionary, appearance: Dictionary) -> void:
+	var name_str := str(regular["name"])
+	var gender := str(regular["gender"])
+	var program_code := str(regular["program"])
+	var year := int(regular["year"])
+	var id_number := str(regular.get("id_number", "%d%04d" % [StudentGen.SEASON_YEAR - (year - 1), 1000 + int(regular["number"])]))
+	var program_info := _program_info(program_code)
+	student["regular_id"] = regular["id"]
+	student["number"] = int(regular["number"])
+	student["name"] = name_str
+	student["gender"] = gender
+	student["program"] = program_code
+	student["year"] = year
+	student["favor"] = ""
+	student["trait"] = ""
+	student["record"]["id_number"] = id_number
+	student["record"]["name"] = name_str
+	student["record"]["program"] = program_code
+	student["record"]["year"] = str(year)
+	if not program_info.is_empty():
+		student["record"]["department"] = program_info["department"]
+	if bool(appearance.get("force_no_id", false)):
+		student["no_id"] = true
+		if not student["papers"].is_empty() and student["papers"][0]["form"] == "id_card":
+			student["papers"].remove_at(0)
+		student["harmless"].clear()
+	elif student["no_id"]:
+		student["no_id"] = false
+		student["papers"].push_front({
+			"form": "id_card",
+			"title": "Student ID",
+			"fields": { "id_number": id_number, "name": name_str, "program": program_code, "year": str(year) },
+		})
+	for paper: Dictionary in student["papers"]:
+		var fields: Dictionary = paper["fields"]
+		if fields.has("id_number"):
+			fields["id_number"] = id_number
+		if fields.has("name"):
+			if student["harmless"].has("name"):
+				var first: String = name_str.get_slice(" ", 0)
+				var short := "Ma." if first == "Maria" else first.left(1) + "."
+				fields["name"] = name_str.replace(first, short)
+			else:
+				fields["name"] = name_str
+		if fields.has("program"):
+			if student["harmless"].has("program") and not program_info.is_empty():
+				fields["program"] = program_info["aliases"][0]
+			else:
+				fields["program"] = program_code
+		if fields.has("year"):
+			fields["year"] = str(year)
+	student["portrait"] = PortraitGen.roll(int(regular["portrait_seed"]), false, year, gender)
+	var line := { "ceb": str(appearance["ceb"]), "en": str(appearance["en"]) }
+	_format_student_line(line, student)
+	student["line"] = line
+
+
+static func _program_info(code: String) -> Dictionary:
+	for program: Dictionary in GameData.json("students")["programs"]:
+		if program["code"] == code:
+			return program
+	return {}
+
+
 static func _format_student_line(line: Dictionary, student: Dictionary) -> void:
 	var request: Dictionary = student["request"]
 	var section: String = request.get("section", "")
@@ -143,4 +198,3 @@ static func _format_student_line(line: Dictionary, student: Dictionary) -> void:
 			"section": section.get_slice("-", 1),
 			"id": student["record"]["id_number"],
 		})
-

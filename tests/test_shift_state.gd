@@ -465,6 +465,8 @@ func _test_day_one_onboarding_and_events() -> void:
 	_check(ShiftEvents.onboarding_banner(day1.line[0], "called").contains("Welcome to Window 3"), "day 1 shows Ma'am Lorna's welcome")
 	_check(day1.line[1]["problems"] == ["missing_requirement"], "day 1 second student teaches flagging and rejection")
 	_check(RulesCheck.missing_items(day1.line[1]) == ["req_library"], "day 1 second student is missing library clearance")
+	_check(day1.line[0]["priority"] == "" and day1.line[1]["priority"] == "" and day1.line[2]["priority"] == "",
+		"day 1 earlier students have no priority badge so triage stands out")
 	_check(day1.line[3]["priority"] == "pwd", "day 1 fourth student teaches priority triage")
 	var day2 := ShiftState.new(2, 42)
 	_check(ShiftEvents.onboarding_banner(day2.line[0], "called") == "", "day 2+ never shows onboarding banners")
@@ -473,3 +475,15 @@ func _test_day_one_onboarding_and_events() -> void:
 	day6.event_triggered.connect(func(_e: Dictionary) -> void: fired[0] += 1)
 	_play(day6, _perfect)
 	_check(fired[0] > 0, "mid-shift events fire during a day 2+ shift")
+	for regular: Dictionary in GameData.json("events")["regulars"]:
+		var expected_portrait := PortraitGen.roll(int(regular["portrait_seed"]), false, int(regular["year"]))
+		_check(expected_portrait["gender"] == regular["gender"], "%s portrait_seed rolls %s" % [regular["id"], regular["gender"]])
+		for day_key: String in regular["appearances"]:
+			var shift := ShiftState.new(int(day_key), 4242)
+			var slot := int(regular["appearances"][day_key]["slot"])
+			var s: Dictionary = shift.line[slot] if slot < shift.line.size() else shift._arrivals[slot - shift.line.size()]["student"]
+			_check(s["name"] == regular["name"] and s["number"] == int(regular["number"]), "%s day %s name and number" % [regular["id"], day_key])
+			_check(s["program"] == regular["program"] and s["record"]["program"] == regular["program"], "%s day %s program" % [regular["id"], day_key])
+			_check(s["year"] == int(regular["year"]) and s["record"]["year"] == str(int(regular["year"])), "%s day %s year" % [regular["id"], day_key])
+			_check(s["record"]["id_number"] == regular["id_number"], "%s day %s fixed id_number" % [regular["id"], day_key])
+			_check(s["portrait"] == expected_portrait, "%s day %s portrait matches portrait_seed" % [regular["id"], day_key])

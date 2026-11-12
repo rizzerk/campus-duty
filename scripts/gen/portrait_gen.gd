@@ -16,12 +16,14 @@ static func data() -> Dictionary:
 ## Returns the same part set every time for the same seed.
 ## Pass with_parent = true for the "With parent" trait.
 ## The lanyard color shows the year level (1 to 4). Year 0 picks one at random.
-static func roll(seed_value: int, with_parent: bool = false, year: int = 0) -> Dictionary:
+static func roll(seed_value: int, with_parent: bool = false, year: int = 0, forced_gender: String = "") -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var d := data()
 
 	var gender: String = "male" if rng.randf() < 0.5 else "female"
+	if forced_gender != "":
+		gender = forced_gender
 	var tone: Dictionary = _pick(rng, d["skin_tones"])
 	var year_level: int = year if year > 0 else rng.randi_range(1, 4)
 	var parts := {

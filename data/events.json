@@ -6,7 +6,7 @@
 		"missing_after_scan": "Ma'am Lorna: “Look at Library clearance: 'Missing' on the paper, 'Required' in ISMIS. Click Library clearance on both sides to flag the mismatch. (Real flags boost patience; false alarms cost patience!)”",
 		"missing_after_flag": "Ma'am Lorna: “Good catch! You can press A to ask the student about a flag, or press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space.”",
 		"missing_after_ask": "Ma'am Lorna: “They admitted they forgot it. Now press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space. Wrong calls bring students back angry—twice and they walk out!”",
-		"triage_intro": "Ma'am Lorna: “See the GRAD and PWD badges in the line above? Click a priority student's face in the line strip to call them to the front, and watch the live office statuses on the right.”",
+		"triage_intro": "Ma'am Lorna: “See the PWD badge in the line above? Click a priority student's face (PWD or GRAD) in the line strip to call them to the front, and watch the live office statuses on the right.”",
 		"solo_practice": "Ma'am Lorna: “Ikaw na bahala sa nahabilin sa pila. Press Tab anytime for the SA Handbook—I'll be watching your stamps!”"
 	},
 	"bulletins": {
@@ -178,6 +178,7 @@
 		{
 			"id": "jericho_112",
 			"number": 112,
+			"id_number": "20240112",
 			"name": "Jericho Gomez",
 			"gender": "male",
 			"program": "BSIT",
@@ -209,6 +210,7 @@
 		{
 			"id": "carlo_104",
 			"number": 104,
+			"id_number": "20240104",
 			"name": "Carlo Bacalso",
 			"gender": "male",
 			"program": "BSCE",
@@ -236,6 +238,7 @@
 		{
 			"id": "mae_118",
 			"number": 118,
+			"id_number": "20250118",
 			"name": "Mae Alcantara",
 			"gender": "female",
 			"program": "BSA",

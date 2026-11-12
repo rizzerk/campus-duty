@@ -176,7 +176,7 @@ func _tips_card() -> Control:
 		"Drag the student ID onto the ISMIS reader (or press S) to pull up their record.",
 		"Think something's off? Click the field on the paper, then the same field on ISMIS to flag it. Flags are checked when you decide, and false alarms cost patience.",
 		"Press A to ask the student about a flag. It takes a few minutes.",
-		"Stamp a decision (keys 1 to 5), then hand the papers back with Space. Click a stamp to lift it off.",
+		"Stamp a decision (1 to Approve, 5 to Turn away), then hand the papers back with Space. Click a stamp to lift it off.",
 	]:
 		list.add_child(UiKit.wrapped(tip, 17, Color("#3a463e")))
 	return card
