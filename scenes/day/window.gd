@@ -62,7 +62,9 @@ func _ready() -> void:
 	shift.bench_changed.connect(_refresh_offices)
 	shift.office_changed.connect(func(_o: String, _status: String) -> void: _refresh_offices())
 	shift.shift_ended.connect(_on_shift_ended)
-	shift.rush_arrived.connect(func(count: int) -> void: _line_strip.flash("RUSH! %d more students just joined the line" % count))
+	shift.rush_arrived.connect(func(count: int) -> void:
+		Sfx.play("alert")
+		_line_strip.flash("RUSH! %d more students just joined the line" % count))
 	shift.event_triggered.connect(_on_event_triggered)
 	shift.spot_inspected.connect(_on_spot_inspected)
 	_refresh_line()
@@ -221,6 +223,8 @@ func _call_next() -> void:
 	var student := shift.call_next()
 	if student.is_empty():
 		return
+	Sfx.play("bell")
+	Sfx.play("paper_slide")
 	_selection = {}
 	_marks.clear()
 	_flags.clear()
@@ -250,6 +254,7 @@ func _call_next() -> void:
 
 func _on_face_clicked(index: int) -> void:
 	if shift.call_out_of_turn(index):
+		Sfx.play("bell")
 		_refresh_line()
 		_ismis.show_banner("Called a priority student to the front of the line.", "")
 
@@ -263,6 +268,7 @@ func _on_id_scanned() -> void:
 
 
 func _on_event_triggered(event: Dictionary) -> void:
+	Sfx.play("alert")
 	if event.has("flash"):
 		_line_strip.flash(event["flash"])
 	if event.has("banner") and _react_left <= 0.0:
@@ -272,6 +278,7 @@ func _on_event_triggered(event: Dictionary) -> void:
 func _on_spot_inspected(inspection: Dictionary) -> void:
 	if inspection.is_empty():
 		return
+	Sfx.play("correct" if inspection.get("kind", "") == "praise" else "alert")
 	_line_strip.flash("SPOT CHECK · %s" % inspection.get("ceb", ""))
 	_spot_note = " · %s" % inspection.get("banner", "")
 
@@ -327,6 +334,7 @@ func _open_pause() -> void:
 func _open_rulebook() -> void:
 	if shift.ended:
 		return
+	Sfx.play("paper_slide")
 	var book := Rulebook.open(self, shift.day)
 	_menu = book
 	book.closed.connect(_on_menu_cancelled)
@@ -404,6 +412,7 @@ func _set_reject(reason: String, items: Array) -> void:
 ## Presses the stamp onto the papers. A new stamp replaces the old one.
 func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 	_clear_stamp()
+	Sfx.play("stamp")
 	_pending = decision
 	_stamp = StampMark.make(text, color)
 	add_child(_stamp)
@@ -422,6 +431,7 @@ func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 func _lift_stamp() -> void:
 	if _pending.is_empty() or _handing:
 		return
+	Sfx.play("stamp_lift")
 	_clear_stamp()
 	_ismis.show_banner("Stamp lifted. Pick another.", "")
 	_update_buttons()
@@ -439,8 +449,10 @@ func _hand_back() -> void:
 	if _handing or shift.ended or shift.current.is_empty() or _react_left > 0.0 or _menu != null:
 		return
 	if _pending.is_empty():
+		Sfx.play("wrong")
 		_ismis.show_banner("Stamp the papers first (keys 1 to 5).", "")
 		return
+	Sfx.play("paper_slide")
 	_handing = true
 	_update_buttons()
 	_student_panel.slide_out(HAND_BACK_SECONDS)
@@ -476,10 +488,13 @@ func _commit(decision: Dictionary) -> void:
 	var outcome: String = result["outcome"]
 	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1]) + _spot_note
 	if result["bent"]:
+		Sfx.play("alert")
 		_ismis.show_banner("FAVOR DONE · %s The line saw it.%s" % [shift.history[-1]["reason"], flag_note], "flag")
 	elif result["correct"]:
+		Sfx.play("correct")
 		_ismis.show_banner("CORRECT · %s%s" % [_outcome_text(outcome), flag_note], "right")
 	else:
+		Sfx.play("wrong")
 		_ismis.show_banner("WRONG CALL · %s%s" % [result["reason"], flag_note], "wrong")
 	if outcome == "stays":
 		_selection = {}
@@ -579,6 +594,7 @@ func _select(picked: Dictionary) -> void:
 	if shift.ended or shift.current.is_empty() or _react_left > 0.0:
 		return
 	if _selection.is_empty() or _selection["side"] == picked["side"]:
+		Sfx.play("click")
 		_clear_selection_highlight()
 		_selection = picked
 		_highlight(picked, "selected")
@@ -592,16 +608,19 @@ func _select(picked: Dictionary) -> void:
 	_clear_selection_highlight()
 	_selection = {}
 	if paper["key"] != record["key"]:
+		Sfx.play("wrong")
 		_ismis.show_banner("Those aren't the same field. Pick matching fields to flag.", "")
 		return
 	var caption := StudentPanel._caption(paper["key"])
 	for flag: Dictionary in _flags:
 		if _mark_key(flag["paper"]) == _mark_key(paper) and _mark_key(flag["record"]) == _mark_key(record):
+			Sfx.play("stamp_lift")
 			_flags.erase(flag)
 			_set_mark(paper, "")
 			_set_mark(record, "")
 			_ismis.show_banner("Flag removed · %s." % caption, "")
 			return
+	Sfx.play("flag")
 	var flag := { "paper": paper, "record": record, "asked": false }
 	_flags.append(flag)
 	_set_mark(paper, "claimed")

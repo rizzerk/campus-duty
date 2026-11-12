@@ -50,7 +50,9 @@ func _ready() -> void:
 		button.focus_mode = Control.FOCUS_NONE
 		button.add_theme_font_override("font", UiKit.MONO_FONT)
 		button.add_theme_font_size_override("font_size", 15)
-		button.pressed.connect(func() -> void: _show_tab(tab))
+		button.pressed.connect(func() -> void:
+			Sfx.play("click")
+			_show_tab(tab))
 		tabs.add_child(button)
 		_tab_buttons[tab] = button
 	var screen := PanelContainer.new()
@@ -104,6 +106,7 @@ func search(number: String) -> void:
 	if number.strip_edges() == _student["record"]["id_number"]:
 		_load_record()
 	else:
+		Sfx.play("wrong")
 		show_banner("No record found for %s. Check the number and try again." % (number if number != "" else "an empty search"), "")
 		if _search != null and is_instance_valid(_search):
 			_search.select_all()
@@ -136,6 +139,7 @@ func _input(event: InputEvent) -> void:
 func _load_record() -> void:
 	if _student.is_empty() or _scanned or _loading:
 		return
+	Sfx.play("scan")
 	_loading = true
 	_show_tab(_tab)
 	var student := _student
