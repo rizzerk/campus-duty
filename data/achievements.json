@@ -1,0 +1,29 @@
+{
+	"_note": "Achievements, in the order the achievements screen lists them. 'badge' is the short text on the badge until real art exists. 'hidden' ones show as ??? until earned. An entry with 'stat' and 'goal' unlocks once that lifetime counter reaches the goal and shows a progress bar; the rest are checked in scripts/rules/achievement_rules.gd by id.",
+	"achievements": [
+		{ "id": "first_call", "name": "Next, Please!", "desc": "Make your first correct call at Window 3.", "badge": "1" },
+		{ "id": "first_shift", "name": "First Day Jitters", "desc": "Finish Day 1 without the line giving up.", "badge": "D1" },
+		{ "id": "streak_10", "name": "On a Roll", "desc": "Make 10 correct calls in a row in one shift.", "badge": "x10" },
+		{ "id": "streak_25", "name": "In the Zone", "desc": "Make 25 correct calls in a row in one shift.", "badge": "x25" },
+		{ "id": "three_stars", "name": "Gold Star", "desc": "Earn 3 stars in a shift.", "badge": "3*" },
+		{ "id": "flawless", "name": "By the Book", "desc": "Finish a shift with at least 8 calls and no wrong calls, false alarms or favors.", "badge": "OK" },
+		{ "id": "line_cleared", "name": "Line Cleared", "desc": "Handle every student before the window closes.", "badge": "0" },
+		{ "id": "sharp_eye", "name": "Sharp Eye", "desc": "Catch 10 mismatches in one shift without a single false alarm.", "badge": "!?" },
+		{ "id": "right_office", "name": "Right This Way", "desc": "Correctly send students to the Cashier, Consultation and the Dean in one shift.", "badge": "->" },
+		{ "id": "full_bench", "name": "Full House", "desc": "Fill all three seats on the Hold bench.", "badge": "3" },
+		{ "id": "priority_call", "name": "Seniors First", "desc": "Call a priority student out of turn.", "badge": "P" },
+		{ "id": "not_today", "name": "Not Today", "desc": "Turn down a student's favor and make the right call anyway.", "badge": "NO" },
+		{ "id": "market_survivor", "name": "Market Survivor", "desc": "Earn 3 stars on open market day.", "badge": "D6" },
+		{ "id": "star_employee", "name": "Star Employee", "desc": "Earn 20 stars in one season.", "badge": "20" },
+		{ "id": "season_done", "name": "See You Next Sem", "desc": "Finish the last day of the season.", "badge": "END" },
+		{ "id": "familiar_faces", "name": "Familiar Faces", "desc": "Correctly help Jericho, Carlo and Mae.", "badge": "R", "stat": "regulars_helped", "goal": 3 },
+		{ "id": "forgery_detector", "name": "Forgery Detector", "desc": "Reject 5 fake signatures.", "badge": "FS", "stat": "fakes_rejected", "goal": 5 },
+		{ "id": "section_wizard", "name": "Section Wizard", "desc": "Find open sections for 10 students.", "badge": "SW", "stat": "sections_fixed", "goal": 10 },
+		{ "id": "turn_it_off", "name": "Turn It Off and On", "desc": "Reset 10 ISMIS logins at the window.", "badge": "PW", "stat": "ismis_resets", "goal": 10 },
+		{ "id": "eagle_eye", "name": "Eagle Eye", "desc": "Catch 50 mismatches in total.", "badge": "50", "stat": "mismatches_caught", "goal": 50 },
+		{ "id": "veteran", "name": "Window 3 Veteran", "desc": "Make 100 correct calls in total.", "badge": "100", "stat": "correct_calls", "goal": 100 },
+		{ "id": "just_this_once", "name": "Just This Once", "desc": "Do a student a favor.", "badge": "$", "hidden": true },
+		{ "id": "caught_red_handed", "name": "Caught Red-Handed", "desc": "Have Ma'am Lorna catch one of your favors.", "badge": "!!", "hidden": true },
+		{ "id": "lorna_takes_over", "name": "Ma'am Lorna Takes Over", "desc": "Let the line run out of patience.", "badge": "X", "hidden": true }
+	]
+}

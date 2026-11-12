@@ -51,6 +51,25 @@ If the line's patience hits zero, Ma'am Lorna takes over and the shift ends earl
 
 **Regulars and special events.** Recurring students—including `#112 Jericho Gomez` (camping out for `IT 312`), `#104 Carlo Bacalso` (who loses his ID on the 13C jeepney), and `#118 Mae Alcantara` (with her color-coded scholarship slips)—return across multiple days. Shifts are also punctuated by special customer encounters and timed office events such as coworker announcements, scholarship interview rushes, thermal printer hiccups, ISMIS network lag, and office cutoffs.
 
+## Achievements
+
+Achievements reward playing the window well, and a few reward playing it badly. An "Achievement unlocked" toast slides in the moment one is earned, in the middle of a shift or on the day report. The full list opens from the title screen and from the day report, where the button counts what that shift unlocked.
+
+| Kind | Examples |
+| --- | --- |
+| Skill in one call or shift | **On a Roll** (10 correct calls in a row), **By the Book** (8+ calls, no wrong calls, false alarms or favors), **Sharp Eye** (10 catches, no false alarms), **Line Cleared** |
+| Using the mechanics | **Seniors First** (call a priority student out of turn), **Full House** (fill the Hold bench), **Right This Way** (correct trips to the Cashier, Consultation and the Dean in one shift), **Not Today** (turn down a favor and still get the call right) |
+| Season goals | **Gold Star** (3 stars in a shift), **Market Survivor** (3 stars on open market day), **Star Employee** (20 stars in one season), **See You Next Sem** |
+| Lifetime, with progress bars | **Familiar Faces** (help Jericho, Carlo and Mae), **Forgery Detector**, **Section Wizard**, **Turn It Off and On**, **Eagle Eye**, **Window 3 Veteran** |
+| Secret until earned | Three, shown as ??? on the list |
+
+There are 24 in all. Unlocks and lifetime counters are kept across seasons and restarts in `user://achievements.json`. To start over, use **Project → Open User Data Folder** in the editor and delete that file.
+
+**For the team:**
+- Names, descriptions, badge text and goals live in `data/achievements.json`, so they can be reworded or rebalanced without touching code.
+- An entry with `stat` and `goal` becomes a lifetime achievement on its own. Any other entry also needs a rule in `scripts/rules/achievement_rules.gd`.
+- Badges are drawn as text on gold squares in `scripts/ui/achievement_badge.gd` until pixel-art icons replace them.
+
 ## The season (10 days)
 
 | Day | Phase | What's new |
@@ -89,6 +108,7 @@ After day 10, the supervisor's evaluation gives one of three endings based on ac
 - **Daily loop:** season calendar, morning memo, the window (the shift), day report, desk upgrades
 - **Inside a shift:** section picker, route menu, ISMIS reset, rulebook, Hold bench, shift failed
 - **Story and endings:** thank-you notes, regulars logbook, the end-of-season evaluation
+- **Achievements:** the unlock toast, and the achievements list on the title screen and the day report
 
 ## Art and audio
 
@@ -100,13 +120,17 @@ After day 10, the supervisor's evaluation gives one of three endings based on ac
 
 ## Status
 
-**Playable now:** days 1–8, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, and both live mid-shift and end-of-day spot checks.
+**Playable now:** days 1–8, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
 
 **Still to come:** days 9 and 10; title screen, saves and settings; desk upgrades; endings; audio and final art.
 
 ## Running it
 
-Open `project.godot` in Godot 4 and press F5. The rules and generator tests run headless with `tests/run_tests.sh`.
+Open `project.godot` in Godot 4 and press F5. The rules, generator and achievement tests run headless with `tests/run_tests.sh`. It looks for Godot at the default macOS path. Elsewhere, set `GODOT` to your Godot executable first, for example in Git Bash on Windows:
+
+```sh
+GODOT="/path/to/Godot_v4.7.1-stable_win64.exe" sh tests/run_tests.sh
+```
 
 ## Team
 

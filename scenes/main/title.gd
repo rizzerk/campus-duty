@@ -19,6 +19,7 @@ var _data: Dictionary
 var _rng := RandomNumberGenerator.new()
 var _students: Array[Portrait] = []
 var _credits: Control
+var _achievements: AchievementsScreen
 var _starting: bool = false
 
 
@@ -47,6 +48,8 @@ func _ready() -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	# Ignore key repeats, so holding Enter from the splash can't skip ahead.
 	if not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	if _achievements != null:
 		return
 	if _credits != null:
 		if event.keycode in [KEY_ESCAPE, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
@@ -114,18 +117,19 @@ func _add_menu() -> void:
 	var card := UiKit.card(UiKit.CREAM, 18, 6)
 	_place(card, MENU)
 	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 12)
+	list.add_theme_constant_override("separation", 10)
 	card.add_child(list)
 	var items := [
 		["New game", UiKit.GREEN, UiKit.PAPER, _new_game, ""],
 		["Continue", UiKit.PAPER, UiKit.INK, Callable(), _data["continue_soon"]],
 		["Settings", UiKit.PAPER, UiKit.INK, Callable(), _data["settings_soon"]],
+		["Achievements", UiKit.PAPER, UiKit.INK, _open_achievements, ""],
 		["Credits", UiKit.PAPER, UiKit.INK, _open_credits, ""],
 		["Quit", UiKit.PAPER, UiKit.INK, func() -> void: get_tree().quit(), ""],
 	]
 	for item: Array in items:
 		var button := UiKit.button(item[0], item[1], item[2], 24)
-		button.custom_minimum_size.y = 52
+		button.custom_minimum_size.y = 48
 		if item[3].is_valid():
 			button.pressed.connect(item[3])
 		else:
@@ -182,6 +186,13 @@ func _open_credits() -> void:
 	close.size_flags_horizontal = Control.SIZE_SHRINK_END
 	close.pressed.connect(_close_credits)
 	list.add_child(close)
+
+
+func _open_achievements() -> void:
+	if _achievements != null or _credits != null:
+		return
+	_achievements = AchievementsScreen.open(self)
+	_achievements.closed.connect(func() -> void: _achievements = null)
 
 
 func _close_credits() -> void:

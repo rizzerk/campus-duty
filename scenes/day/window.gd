@@ -56,6 +56,8 @@ var _spot_note: String = ""
 func _ready() -> void:
 	_rng.seed = GameState.base_seed + GameState.day
 	_unlocked = GameState.unlocked_actions()
+	# The day report only flags what this shift unlocked.
+	Achievements.fresh.clear()
 	shift = ShiftState.new(GameState.day, GameState.base_seed)
 	_build()
 	shift.student_joined_line.connect(func(_s: Dictionary) -> void: _refresh_line())
@@ -254,6 +256,7 @@ func _call_next() -> void:
 
 func _on_face_clicked(index: int) -> void:
 	if shift.call_out_of_turn(index):
+		Achievements.record_event("priority_call")
 		Sfx.play("bell")
 		_refresh_line()
 		_ismis.show_banner("Called a priority student to the front of the line.", "")
@@ -485,6 +488,7 @@ func _commit(decision: Dictionary) -> void:
 		_fix_sizes.call_deferred()
 		_update_buttons()
 		return
+	Achievements.record_decision(shift, student)
 	var outcome: String = result["outcome"]
 	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1]) + _spot_note
 	if result["bent"]:
@@ -728,6 +732,8 @@ func _on_shift_ended(reason: String) -> void:
 		_menu.queue_free()
 		_menu = null
 	if reason == "patience":
+		# Earned even if the player retries the day instead of carrying on to the report.
+		Achievements.record_event("lorna_takes_over")
 		get_tree().create_timer(0.6).timeout.connect(func() -> void:
 			var failed := ShiftFailed.open(self, shift)
 			failed.retry.connect(GameState.retry_day)
