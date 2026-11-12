@@ -487,3 +487,5 @@ func _test_day_one_onboarding_and_events() -> void:
 			_check(s["year"] == int(regular["year"]) and s["record"]["year"] == str(int(regular["year"])), "%s day %s year" % [regular["id"], day_key])
 			_check(s["record"]["id_number"] == regular["id_number"], "%s day %s fixed id_number" % [regular["id"], day_key])
 			_check(s["portrait"] == expected_portrait, "%s day %s portrait matches portrait_seed" % [regular["id"], day_key])
+	for sound_id: String in Sfx.SOUND_IDS:
+		_check(Sfx.has_sound(sound_id) and Sfx.stream(sound_id) != null, "sfx %s loads" % sound_id)

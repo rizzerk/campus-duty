@@ -103,6 +103,7 @@ func _keep_digits(text: String) -> void:
 ## Only the student's own number finds an account, like the ISMIS search.
 func _look_up(number: String) -> void:
 	_found = number == _student["record"]["id_number"]
+	Sfx.play("scan" if _found else "wrong")
 	if _found:
 		_status.text = "Account found · %s · %s" % [_student["record"]["name"], _student["record"]["account"].to_upper()]
 		_status.add_theme_color_override("font_color", UiKit.INK)

@@ -157,6 +157,7 @@ static func button(text: String, bg: Color = PAPER, fg: Color = INK, size: int =
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color"]:
 		node.add_theme_color_override(state, fg)
 	node.add_theme_color_override("font_disabled_color", MUTED)
+	node.pressed.connect(func() -> void: Sfx.play("click"))
 	return node
 
 

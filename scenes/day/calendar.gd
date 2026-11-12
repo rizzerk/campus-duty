@@ -44,6 +44,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _start() -> void:
 	if not _started:
 		_started = true
+		Sfx.play("paper_slide")
 		GameState.go_to("memo")
 
 
