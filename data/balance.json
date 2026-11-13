@@ -5,7 +5,7 @@
 	"patience_drain_base": 0.05,
 	"patience_drain_per_waiting": 0.025,
 	"patience_correct_bonus": 3,
-	"patience_mistake_penalty": 12,
+	"patience_mistake_penalty": 22,
 	"patience_walkout_penalty": 8,
 	"wrong_return_minutes": 30,
 	"max_returns": 1,

@@ -26,6 +26,8 @@ func _init() -> void:
 	_test_own_section_never_drains()
 	_test_caught_favors_cost_stars()
 	_test_day_one_onboarding_and_events()
+	_test_day_one_mistakes_are_gentler()
+	_test_speed_doesnt_rescue_wrong_calls()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -492,3 +494,62 @@ func _test_day_one_onboarding_and_events() -> void:
 	for bgm_id: String in Sfx.BGM_IDS:
 		var track := Sfx.bgm_stream(bgm_id)
 		_check(Sfx.has_bgm(bgm_id) and track != null and track.loop_mode == AudioStreamWAV.LOOP_FORWARD, "bgm %s loads and loops" % bgm_id)
+
+
+func _test_day_one_mistakes_are_gentler() -> void:
+	var tutorial := ShiftState.new(1, 1)
+	var later := ShiftState.new(4, 1)
+	_check(tutorial.mistake_penalty() < later.mistake_penalty(), "a wrong call costs less patience in the day 1 tutorial (%.0f vs %.0f)" % [tutorial.mistake_penalty(), later.mistake_penalty()])
+	_check(is_equal_approx(later.mistake_penalty(), GameData.balance("patience_mistake_penalty")), "days without their own penalty use balance.json")
+	var shift := ShiftState.new(4, 1)
+	shift.current = _student_with(4, ["unpaid_balance"])
+	shift.current["number"] = 990
+	shift.patience = 50.0
+	shift.act("approve")
+	_check(is_equal_approx(shift.patience, 50.0 - later.mistake_penalty()), "a wrong call costs the day's penalty")
+
+
+## A fast player who gets every 4th call wrong: speed must not make up for the mistakes.
+func _test_speed_doesnt_rescue_wrong_calls() -> void:
+	var count := [0]
+	var fumble := func(shift: ShiftState) -> Array:
+		var choice := _perfect(shift)
+		if choice.is_empty():
+			return choice
+		count[0] += 1
+		if count[0] % 4 == 0:
+			var right: String = choice[0]
+			return ["reject" if right == "approve" else "approve", "", [], "missing_requirement", []]
+		return choice
+	# The tutorial forgives even a beginner who gets every 2nd call wrong.
+	var beginner := func(shift: ShiftState) -> Array:
+		var choice := _perfect(shift)
+		if choice.is_empty():
+			return choice
+		count[0] += 1
+		if count[0] % 2 == 0:
+			var right: String = choice[0]
+			return ["reject" if right == "approve" else "approve", "", [], "missing_requirement", []]
+		return choice
+	var tutorial_clears := 0
+	for seed_value in range(1, 21):
+		count[0] = 0
+		var shift := ShiftState.new(1, seed_value)
+		_play(shift, beginner)
+		if shift.summary()["reason"] != "patience":
+			tutorial_clears += 1
+	_check(tutorial_clears == 20, "a beginner wrong on every 2nd call still finishes the day 1 tutorial (%d of 20)" % tutorial_clears)
+	var lost := 0
+	var best := 0
+	for day in range(4, 9):
+		for seed_value in range(1, 6):
+			count[0] = 0
+			var shift := ShiftState.new(day, seed_value)
+			_play(shift, fumble)
+			var summary := shift.summary()
+			summary["caught_bends"] = 0
+			best = maxi(best, Scoring.stars(summary))
+			if summary["reason"] == "patience":
+				lost += 1
+	_check(best < 3, "a player wrong on every 4th call never earns 3 stars on days 4-8")
+	_check(lost >= 10, "a player wrong on every 4th call loses the line in many shifts on days 4-8 (%d of 25)" % lost)

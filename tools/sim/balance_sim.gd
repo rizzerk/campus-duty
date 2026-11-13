@@ -10,7 +10,9 @@ extends SceneTree
 ##   --seed-base=1              first seed, so a second run can use fresh seeds
 ##   --bots=careful,average     which bots play (see BOTS)
 ##   --set=key=value            override a balance.json key, or dayN.key[.sub] in days.json.
-##                              Repeat for several. Nothing is written to disk.
+##                              Repeat for several. Nothing is written to disk. A day's own
+##                              value wins over balance.json: day 1 sets its own
+##                              patience_mistake_penalty, so change it with day1.patience_mistake_penalty.
 ##   --json                     print machine-readable results instead of a table
 ##   --bench                    time the generator and one shift per day, then stop
 
