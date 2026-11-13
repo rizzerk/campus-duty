@@ -737,7 +737,9 @@ func _on_shift_ended(reason: String) -> void:
 		Achievements.record_event("lorna_takes_over")
 		get_tree().create_timer(0.6).timeout.connect(func() -> void:
 			var failed := ShiftFailed.open(self, shift)
-			failed.retry.connect(GameState.retry_day)
+			failed.retry.connect(func() -> void:
+				GameState.log_failed_attempt(shift.summary(), shift.history)
+				GameState.retry_day())
 			failed.carry_on.connect(func() -> void: GameState.finish_shift(shift.summary(), shift.history)))
 		return
 	get_tree().create_timer(REACT_SECONDS + 0.4).timeout.connect(func() -> void:

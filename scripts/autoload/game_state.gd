@@ -9,6 +9,8 @@ const SCENES := {
 	"report": "res://scenes/day/day_report.tscn",
 	"title": "res://scenes/main/title.tscn",
 }
+## Screens a debug launch may jump to. The report needs a finished shift, so it isn't one.
+const DEBUG_SCENES := ["calendar", "memo", "window"]
 
 var day: int = 1
 var base_seed: int = 1
@@ -36,6 +38,7 @@ func finish_shift(summary: Dictionary, history: Array) -> void:
 		summary["spot_check"] = check["rows"]
 		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
+	PlaytestLog.append(PlaytestLog.entry(summary, history, day, base_seed))
 	last_summary = summary
 	last_history = history
 	results[day] = summary
@@ -87,3 +90,42 @@ func unlocked_reject_reasons() -> Array:
 
 func go_to(scene: String) -> void:
 	get_tree().call_deferred("change_scene_to_file", SCENES[scene])
+
+
+## Debug builds only: `godot --path . -- --day=6 --seed=42 --scene=memo` starts straight at that
+## day for playtesting. Returns true when it took over, so the splash can skip its intro.
+func debug_jump() -> bool:
+	if not OS.is_debug_build():
+		return false
+	var args := debug_args()
+	if not args.has("day") or not String(args["day"]).is_valid_int():
+		return false
+	var days: Dictionary = GameData.json("days")
+	day = clampi(String(args["day"]).to_int(), int(days["first_day"]), int(days["last_day"]))
+	var seed_text := String(args.get("seed", ""))
+	base_seed = maxi(1, seed_text.to_int()) if seed_text.is_valid_int() else 1
+	results.clear()
+	var scene := String(args.get("scene", "window"))
+	if scene not in DEBUG_SCENES:
+		scene = "window"
+	# tests/smoke.sh looks for this line to know the jump really happened.
+	print("debug_jump: day %d seed %d -> %s" % [day, base_seed, scene])
+	go_to(scene)
+	return true
+
+
+## A shift the line gave up on, logged before the player retries it (finish_shift never runs then).
+func log_failed_attempt(summary: Dictionary, history: Array) -> void:
+	summary["stars"] = 0
+	PlaytestLog.append(PlaytestLog.entry(summary, history, day, base_seed, { "retried": true }))
+
+
+## The `--key=value` arguments after `--` on the command line. A bare `--key` reads as "true".
+static func debug_args() -> Dictionary:
+	var args := {}
+	for arg: String in OS.get_cmdline_user_args():
+		if not arg.begins_with("--"):
+			continue
+		var pair := arg.trim_prefix("--").split("=", true, 1)
+		args[pair[0]] = pair[1] if pair.size() > 1 else "true"
+	return args
