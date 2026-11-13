@@ -15,6 +15,7 @@ var _started: bool = false
 
 
 func _ready() -> void:
+	Sfx.play_bgm("menu")
 	var wall := ColorRect.new()
 	wall.color = UiKit.MINT
 	wall.set_anchors_preset(Control.PRESET_FULL_RECT)

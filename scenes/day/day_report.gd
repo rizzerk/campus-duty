@@ -8,6 +8,7 @@ func _ready() -> void:
 	if GameState.last_summary.is_empty():
 		GameState.go_to("memo")
 		return
+	Sfx.play_bgm("menu")
 	var summary: Dictionary = GameState.last_summary
 	var day: int = GameState.day
 	var failed: bool = summary["reason"] == "patience"

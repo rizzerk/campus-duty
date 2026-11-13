@@ -1,4 +1,4 @@
-"""Generates placeholder WAV sound effects into audio/sfx/.
+"""Generates placeholder WAV sound effects into audio/sfx/ and looping BGM into audio/bgm/.
 
 No dependencies beyond the standard library. Run from the repo root:
     python3 tools/audio/make_sfx.py
@@ -11,16 +11,18 @@ import struct
 import wave
 
 SAMPLE_RATE = 22050
+BGM_RATE = 16000
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "audio", "sfx")
+BGM_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "audio", "bgm")
 
 
-def write_wav(name: str, samples: list[float]) -> None:
-    os.makedirs(OUT_DIR, exist_ok=True)
-    path = os.path.join(OUT_DIR, f"{name}.wav")
+def write_wav(folder: str, name: str, samples: list[float], rate: int = SAMPLE_RATE) -> None:
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, f"{name}.wav")
     with wave.open(path, "wb") as wav:
         wav.setnchannels(1)
         wav.setsampwidth(2)
-        wav.setframerate(SAMPLE_RATE)
+        wav.setframerate(rate)
         frames = bytearray()
         for s in samples:
             clamped = max(-1.0, min(1.0, s))
@@ -89,7 +91,6 @@ def make_paper_slide() -> list[float]:
         u = i / n
         env = math.sin(math.pi * u) ** 1.4 * (0.75 + 0.25 * math.sin(2.0 * math.pi * 3.0 * u))
         white = rng.random() * 2.0 - 1.0
-        # Simple band-pass smoothing for a soft paper rustle.
         filtered = 0.45 * white + 0.35 * prev - 0.2 * prev2
         prev2 = prev
         prev = white
@@ -152,7 +153,6 @@ def make_wrong() -> list[float]:
         freq = 220.0 if t < 0.10 else 164.81
         local_t = t if t < 0.10 else t - 0.10
         env = math.exp(-local_t * 12.0)
-        # Soft triangle/saw blend for a retro buzzer feel.
         s = 0.65 * math.sin(2.0 * math.pi * freq * t) + 0.35 * math.sin(2.0 * math.pi * freq * 3.0 * t)
         out.append(s * env * 0.36)
     return out
@@ -174,6 +174,95 @@ def make_alert() -> list[float]:
     return out
 
 
+def _epiano(freq: float, local_t: float, duration: float) -> float:
+    if freq <= 0.0 or local_t < 0.0 or local_t >= duration:
+        return 0.0
+    attack = min(1.0, local_t / 0.015)
+    release = min(1.0, (duration - local_t) / 0.04)
+    decay = math.exp(-local_t * 2.4)
+    fundamental = math.sin(2.0 * math.pi * freq * local_t)
+    overtone = 0.25 * math.sin(2.0 * math.pi * freq * 2.0 * local_t) * math.exp(-local_t * 5.0)
+    tine = 0.08 * math.sin(2.0 * math.pi * freq * 3.0 * local_t) * math.exp(-local_t * 10.0)
+    return attack * release * decay * (fundamental + overtone + tine)
+
+
+def make_menu_bgm() -> list[float]:
+    # Warm 4-bar lo-fi electric piano loop (8.0 seconds, 120 BPM, 2.0s per bar).
+    # Progression: Fmaj7 -> Em7 -> Dm7 -> G13 (in C major).
+    bar_sec = 2.0
+    total_sec = bar_sec * 4
+    n = int(BGM_RATE * total_sec)
+    chords = [
+        (174.61, [261.63, 329.63, 349.23, 440.00]),  # Fmaj7
+        (164.81, [246.94, 293.66, 329.63, 392.00]),  # Em7
+        (146.83, [261.63, 293.66, 349.23, 440.00]),  # Dm7
+        (196.00, [246.94, 329.63, 349.23, 440.00]),  # G13
+    ]
+    melody = [
+        # (start_sec, duration_sec, freq)
+        (0.0, 0.75, 523.25), (0.75, 0.75, 440.00), (1.5, 0.5, 392.00),
+        (2.0, 1.0, 493.88), (3.0, 1.0, 392.00),
+        (4.0, 0.75, 440.00), (4.75, 0.75, 349.23), (5.5, 0.5, 329.63),
+        (6.0, 1.25, 392.00), (7.25, 0.75, 329.63),
+    ]
+    out = []
+    for i in range(n):
+        t = i / BGM_RATE
+        bar_idx = min(3, int(t / bar_sec))
+        bar_t = t - bar_idx * bar_sec
+        bass_freq, notes = chords[bar_idx]
+        sample = 0.0
+        # Warm sub-bass on beats 1 and 3
+        beat_t = bar_t % 1.0
+        sample += _epiano(bass_freq, beat_t, 0.95) * 0.22
+        # Soft rolled chord
+        for k, f in enumerate(notes):
+            sample += _epiano(f, bar_t - k * 0.03, bar_sec - k * 0.03) * 0.10
+        # Gentle top melody
+        for start, dur, mfreq in melody:
+            if start <= t < start + dur:
+                sample += _epiano(mfreq, t - start, dur) * 0.14
+        out.append(sample * 0.65)
+    return out
+
+
+def make_shift_bgm() -> list[float]:
+    # Steady, cozy 4-bar office work loop (8.0 seconds, 120 BPM, 0.25s per eighth note).
+    # Progression: Cmaj7 -> Am7 -> Dm7 -> G7.
+    bar_sec = 2.0
+    step_sec = 0.25
+    total_sec = bar_sec * 4
+    n = int(BGM_RATE * total_sec)
+    chords = [
+        (130.81, [261.63, 329.63, 392.00, 493.88]),  # Cmaj7
+        (110.00, [261.63, 329.63, 392.00, 440.00]),  # Am7
+        (146.83, [261.63, 293.66, 349.23, 440.00]),  # Dm7
+        (98.00,  [246.94, 293.66, 349.23, 392.00]),  # G7
+    ]
+    arp_pattern = [0, 1, 2, 3, 2, 1, 2, 0]
+    out = []
+    for i in range(n):
+        t = i / BGM_RATE
+        bar_idx = min(3, int(t / bar_sec))
+        bar_t = t - bar_idx * bar_sec
+        step_idx = int(bar_t / step_sec) % 8
+        step_t = bar_t - step_idx * step_sec
+        bass_freq, notes = chords[bar_idx]
+        sample = 0.0
+        # Walking pulse bass every half-second
+        half_t = bar_t % 0.5
+        b_mult = 1.0 if int(bar_t / 0.5) % 2 == 0 else 1.5
+        sample += _epiano(bass_freq * b_mult, half_t, 0.48) * 0.20
+        # Sustained pad chord
+        for f in notes:
+            sample += _epiano(f, bar_t, bar_sec) * 0.06
+        # Gentle eighth-note Rhodes arpeggio
+        arp_freq = notes[arp_pattern[step_idx]] * (2.0 if step_idx in (3, 6) else 1.0)
+        sample += _epiano(arp_freq, step_t, step_sec * 0.95) * 0.12
+        out.append(sample * 0.65)
+    return out
+
+
 def main() -> None:
     sounds = {
         "click": make_click(),
@@ -188,10 +277,15 @@ def main() -> None:
         "alert": make_alert(),
     }
     for name, samples in sounds.items():
-        write_wav(name, samples)
-    print(f"Wrote {len(sounds)} WAV files to {os.path.relpath(OUT_DIR)}")
+        write_wav(OUT_DIR, name, samples, SAMPLE_RATE)
+    bgm_tracks = {
+        "menu": make_menu_bgm(),
+        "shift": make_shift_bgm(),
+    }
+    for name, samples in bgm_tracks.items():
+        write_wav(BGM_DIR, name, samples, BGM_RATE)
+    print(f"Wrote {len(sounds)} SFX files and {len(bgm_tracks)} BGM files")
 
 
 if __name__ == "__main__":
     main()
-
