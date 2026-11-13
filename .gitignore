@@ -7,6 +7,7 @@
 
 # Local guidance for Claude Code, not shared
 CLAUDE.md
+.claude/
 
 # Team handover notes with private links, shared directly
 HANDOFF.md

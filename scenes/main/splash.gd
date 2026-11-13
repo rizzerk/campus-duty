@@ -36,6 +36,10 @@ var _portraits: Array[Portrait] = []
 
 
 func _ready() -> void:
+	if GameState.debug_jump():
+		# Mark the splash finished so a key press before the jump lands can't send us to the title.
+		_done = true
+		return
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
 	$Column/Studio.text = data["studio_word"]
 	$Column/Presents.text = data["presents"]
