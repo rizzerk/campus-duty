@@ -54,6 +54,7 @@ var _spot_note: String = ""
 
 
 func _ready() -> void:
+	Sfx.play_bgm("shift")
 	_rng.seed = GameState.base_seed + GameState.day
 	_unlocked = GameState.unlocked_actions()
 	# The day report only flags what this shift unlocked.

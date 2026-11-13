@@ -11,6 +11,7 @@ var _started: bool = false
 
 
 func _ready() -> void:
+	Sfx.play_bgm("menu")
 	var day: int = GameState.day
 	var info := GameData.day(day)
 	var wood := ColorRect.new()

@@ -24,6 +24,7 @@ var _starting: bool = false
 
 
 func _ready() -> void:
+	Sfx.play_bgm("menu")
 	_data = GameData.json("title")
 	_rng.randomize()
 	var wall := ColorRect.new()

@@ -489,3 +489,6 @@ func _test_day_one_onboarding_and_events() -> void:
 			_check(s["portrait"] == expected_portrait, "%s day %s portrait matches portrait_seed" % [regular["id"], day_key])
 	for sound_id: String in Sfx.SOUND_IDS:
 		_check(Sfx.has_sound(sound_id) and Sfx.stream(sound_id) != null, "sfx %s loads" % sound_id)
+	for bgm_id: String in Sfx.BGM_IDS:
+		var track := Sfx.bgm_stream(bgm_id)
+		_check(Sfx.has_bgm(bgm_id) and track != null and track.loop_mode == AudioStreamWAV.LOOP_FORWARD, "bgm %s loads and loops" % bgm_id)
