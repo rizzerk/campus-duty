@@ -1,4 +1,5 @@
 {
+	"_note": "Each day can override patience_mistake_penalty from balance.json (day 1 does, to keep the tutorial forgiving). Memo intros that say 'about N students' must match students; tests check it.",
 	"first_day": 1,
 	"last_day": 8,
 	"days": {
@@ -14,6 +15,7 @@
 				{ "text": "Missing a clearance item? Turn away (5) and tick the exact items they need to bring.", "new": true }
 			],
 			"students": 8,
+			"patience_mistake_penalty": 12,
 			"start_line": 4,
 			"years": [4],
 			"visits": { "graduation_clearance": 1 },
@@ -46,7 +48,7 @@
 				{ "text": "Section full? Fix: move them to an open section with no schedule clash. Their section still has seats? Then there's nothing to fix.", "new": true },
 				{ "text": "Short forms are fine: Ma. for Maria, J. for Juan, BS IT for BSIT. Don't flag them.", "new": true }
 			],
-			"students": 18,
+			"students": 16,
 			"start_line": 6,
 			"years": [3],
 			"visits": { "enroll_subject": 1 },
@@ -65,7 +67,7 @@
 				{ "text": "Unpaid balance in ISMIS? Send the student to the Cashier first.", "new": true },
 				{ "text": "Some students will ask for favors. Ma'am Lorna spot-checks three of your transactions at the end of every day.", "new": true }
 			],
-			"students": 20,
+			"students": 18,
 			"start_line": 7,
 			"years": [2],
 			"visits": { "enrollment_payment": 0.6, "enroll_subject": 0.4 },
@@ -88,7 +90,7 @@
 				{ "text": "Before resetting, the birthday on the admission slip must match ISMIS. If it doesn't, turn them away.", "new": true },
 				{ "text": "Two problems? Turn away beats everything. Otherwise send them to any office they need. Fixes at the window come last.", "new": true }
 			],
-			"students": 20,
+			"students": 14,
 			"start_line": 8,
 			"years": [1],
 			"visits": { "first_year": 1 },
@@ -106,7 +108,7 @@
 			"rules": [
 				{ "text": "Check the Grades tab: a 5.0 in the prerequisite means reject. An INC goes to Consultation.", "new": true }
 			],
-			"students": 16,
+			"students": 15,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "enroll_subject": 0.5, "enrollment_payment": 0.25, "first_year": 0.25 },
@@ -123,13 +125,13 @@
 			"harmless_chance": 0.25,
 			"actions": ["hold"],
 			"phase": "Adjustment, day 1",
-			"intro": "Add/drop starts today. Expect a busy line, about 22 students before noon.",
+			"intro": "Add/drop starts today. Expect a busy line, about 18 students before noon.",
 			"rules": [
 				{ "text": "Adding a subject needs the adviser's signature on the consultation slip. No signature? Send them to Consultation.", "new": true },
 				{ "text": "Check every signature against the adviser specimen sheet. Fakes are rejected.", "new": true },
 				{ "text": "Consultation on break? Put the student on the Hold bench until it reopens.", "new": true }
 			],
-			"students": 22,
+			"students": 18,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "add_subject": 0.7, "enroll_subject": 0.3 },
@@ -150,7 +152,7 @@
 			"rules": [
 				{ "text": "Over 24 units is an overload. Send it to the Dean's office.", "new": true }
 			],
-			"students": 20,
+			"students": 16,
 			"start_line": 8,
 			"years": [1, 2, 3, 4],
 			"visits": { "add_subject": 0.8, "enroll_subject": 0.2 },

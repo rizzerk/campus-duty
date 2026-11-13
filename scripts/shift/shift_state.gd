@@ -165,6 +165,12 @@ func call_out_of_turn(index: int) -> bool:
 	return true
 
 
+## Patience a wrong call costs. A day can set its own (the day 1 tutorial is gentler), otherwise
+## the season-wide value in balance.json applies.
+func mistake_penalty() -> float:
+	return float(GameData.day(day).get("patience_mistake_penalty", GameData.balance("patience_mistake_penalty")))
+
+
 func bench_full() -> bool:
 	return bench.size() >= BENCH_SEATS
 
@@ -222,7 +228,7 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 			outcome = _finish("served")
 	else:
 		mistakes += 1
-		patience -= GameData.balance("patience_mistake_penalty")
+		patience -= mistake_penalty()
 		if action == "approve":
 			outcome = _finish("let_through")
 		elif action == "fix" and result["expected"] != "fix":
