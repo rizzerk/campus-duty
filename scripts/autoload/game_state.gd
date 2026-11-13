@@ -39,6 +39,7 @@ func finish_shift(summary: Dictionary, history: Array) -> void:
 	last_summary = summary
 	last_history = history
 	results[day] = summary
+	Achievements.record_shift(summary, history, day, { "stars": season_stars(), "last_day": is_last_day() })
 	go_to("report")
 
 
