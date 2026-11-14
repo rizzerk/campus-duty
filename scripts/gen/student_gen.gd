@@ -179,6 +179,11 @@ static func _make_record(rng: RandomNumberGenerator, student: Dictionary, progra
 	if student["visit"] == "graduation_clearance":
 		for requirement: Dictionary in data["grad_requirements"]:
 			record[requirement["key"]] = "Attached"
+	if student["visit"] == "tuition_payment":
+		var payment: Dictionary = data["payment"]
+		var step := int(payment["due_step"])
+		@warning_ignore("integer_division")
+		record["amount_due"] = Money.format(rng.randi_range(int(payment["due_min"]) / step, int(payment["due_max"]) / step) * step)
 	return record
 
 
@@ -244,6 +249,10 @@ static func _make_papers(rng: RandomNumberGenerator, student: Dictionary, progra
 			for requirement: Dictionary in GameData.json("students")["grad_requirements"]:
 				fields[requirement["key"]] = "Attached"
 			papers.append({ "form": "grad_checklist", "title": "Graduation clearance", "fields": fields })
+		"tuition_payment":
+			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "amount_due": record["amount_due"] } })
+			# The cash in the tray. Exact unless a payment problem changes it.
+			papers.append({ "form": "cash", "title": "Cash in tray", "fields": { "amount_due": record["amount_due"] } })
 		"enrollment_payment":
 			papers.append({ "form": "assessment", "title": "Assessment slip", "fields": { "id_number": record["id_number"], "balance": "PHP 0.00" } })
 		"first_year":
@@ -399,6 +408,19 @@ static func _apply_problem(rng: RandomNumberGenerator, student: Dictionary, id: 
 			if prereq == "" or not record["grades"].has(prereq):
 				return false
 			record["grades"][prereq] = "5.0" if id == "failed_prereq" else "INC"
+		"short_payment", "overpayment":
+			var cash := _paper(student, "cash")
+			if cash.is_empty():
+				return false
+			var payment: Dictionary = GameData.json("students")["payment"]
+			var due := Money.parse(record["amount_due"])
+			if id == "short_payment":
+				cash["fields"]["amount_due"] = Money.format(due - int(_pick(rng, payment["short_by"])))
+			else:
+				# They hand over whole bills: the due amount rounded up past the next bill.
+				var bill := int(_pick(rng, payment["bills"]))
+				@warning_ignore("integer_division")
+				cash["fields"]["amount_due"] = Money.format((due / bill + 1) * bill)
 		WRONG_DEPARTMENT:
 			# Only there when _pick_program chose a department off today's list.
 			return outside_departments(student)

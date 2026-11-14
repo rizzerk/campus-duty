@@ -275,6 +275,10 @@ func _fill_record() -> void:
 			continue
 		if key == "birthday" and _student["visit"] != "first_year":
 			continue
+		# At the payment window the screen shows what's due now instead of the balance.
+		var paying: bool = _student["visit"] == "tuition_payment"
+		if (key == "amount_due" and not paying) or (key == "balance" and paying):
+			continue
 		_row(key, StudentPanel._caption(key), str(record[key]), true)
 	var requirements: Array = GameData.json("students")["grad_requirements"]
 	if record.has(requirements[0]["key"]):

@@ -2,6 +2,10 @@ extends SceneTree
 ## Run: godot --headless --path . --script res://tests/test_shift_state.gd
 
 const STEP := 0.25
+## The last day the "fumbler loses the line" guard covers. Day 10, the season's quiet last day
+## (classes begin), winds down toward the ending, so a fast fumbler can outlast it, but still
+## never earns 3 stars there.
+const PRESSURE_LAST_DAY := 9
 
 var _failures: int = 0
 
@@ -38,7 +42,8 @@ func _check(ok: bool, what: String) -> void:
 		print("FAIL: ", what)
 
 
-## Plays a whole shift. The policy returns [action, section] or [] to wait.
+## Plays a whole shift. The policy returns [action, section, flags, reason, items, change] (all but
+## the action optional) or [] to wait.
 func _play(shift: ShiftState, policy: Callable) -> void:
 	for i in 100000:
 		if shift.ended:
@@ -54,6 +59,7 @@ func _play(shift: ShiftState, policy: Callable) -> void:
 					"flags": choice[2] if choice.size() > 2 else [],
 					"reason": choice[3] if choice.size() > 3 else "",
 					"items": choice[4] if choice.size() > 4 else [],
+					"change": choice[5] if choice.size() > 5 else -1,
 				})
 
 
@@ -64,7 +70,7 @@ func _perfect(shift: ShiftState) -> Array:
 	var section := ""
 	if want["problem"] == "closed_section":
 		section = Timetable.fitting_sections(shift.current)[0]
-	return [want["action"], section, [], want["reason_id"], want["items"]]
+	return [want["action"], section, [], want["reason_id"], want["items"], RulesCheck.change_due(shift.current)]
 
 
 func _test_perfect_player_never_fails() -> void:
@@ -350,7 +356,7 @@ func _test_careful_player_never_fails() -> void:
 			var section := ""
 			if want["problem"] == "closed_section":
 				section = Timetable.fitting_sections(shift.current)[0]
-			shift.act(action, { "section": section, "reason": want["reason_id"], "items": want["items"] })
+			shift.act(action, { "section": section, "reason": want["reason_id"], "items": want["items"], "change": RulesCheck.change_due(shift.current) })
 		var summary := shift.summary()
 		_check(summary["reason"] != "patience", "careful player keeps the line on day %d" % day)
 		_check(Scoring.stars(summary) >= 2, "careful player earns 2+ stars on day %d (got %d)" % [day, Scoring.stars(summary)])
@@ -542,19 +548,30 @@ func _test_speed_doesnt_rescue_wrong_calls() -> void:
 	var lost := 0
 	var best := 0
 	var played := 0
+	var calm_patience := 0.0
+	var calm_played := 0
+	# Losing the line is checked up to PRESSURE_LAST_DAY; stars are checked on every day. On the
+	# calmer days after it, the mistakes must still cost: the fumbler ends well short of full patience.
 	for day in range(4, _last_day() + 1):
 		for seed_value in range(1, 6):
 			count[0] = 0
-			played += 1
 			var shift := ShiftState.new(day, seed_value)
 			_play(shift, fumble)
 			var summary := shift.summary()
 			summary["caught_bends"] = 0
 			best = maxi(best, Scoring.stars(summary))
+			if day > PRESSURE_LAST_DAY:
+				calm_patience += maxf(shift.patience, 0.0)
+				calm_played += 1
+				continue
+			played += 1
 			if summary["reason"] == "patience":
 				lost += 1
 	_check(best < 3, "a player wrong on every 4th call never earns 3 stars on days 4-%d" % _last_day())
-	_check(lost * 5 >= played * 2, "a player wrong on every 4th call loses the line in many shifts on days 4-%d (%d of %d)" % [_last_day(), lost, played])
+	_check(lost * 5 >= played * 2, "a player wrong on every 4th call loses the line in many shifts on days 4-%d (%d of %d)" % [PRESSURE_LAST_DAY, lost, played])
+	if calm_played > 0:
+		var mean := calm_patience / calm_played
+		_check(mean < 50.0, "a player wrong on every 4th call ends days %d-%d with under half the patience (%.0f)" % [PRESSURE_LAST_DAY + 1, _last_day(), mean])
 
 
 func _last_day() -> int:

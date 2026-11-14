@@ -199,7 +199,7 @@ func _story(text: String, good: bool) -> Control:
 
 func _tomorrow_text() -> String:
 	if GameState.is_last_day():
-		return "That's the last day built so far. The rest of the season comes later."
+		return "That was the last day of enrollment season. Classes have begun."
 	var next := GameData.day(GameState.day + 1)
 	return "TOMORROW · Day %d, %s. %s" % [GameState.day + 1, next["phase"], next["rules"][0]["text"]]
 

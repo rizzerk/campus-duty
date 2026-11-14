@@ -36,6 +36,15 @@
 		"excludes": [],
 		"reason": "Their department isn't on today's extension list. Only listed departments may adjust."
 	},
+	"short_payment": {
+		"label": "Short payment",
+		"action": "reject",
+		"priority": 88,
+		"tier": 1,
+		"visits": ["tuition_payment"],
+		"excludes": ["overpayment"],
+		"reason": "The cash is less than the amount due. Send them back to complete it."
+	},
 	"missing_requirement": {
 		"label": "Missing requirement",
 		"action": "reject",
@@ -89,6 +98,15 @@
 		"visits": ["first_year"],
 		"excludes": [],
 		"reason": "Their ISMIS account is locked. Reset it at the window."
+	},
+	"overpayment": {
+		"label": "Overpayment",
+		"action": "fix",
+		"priority": 35,
+		"tier": 3,
+		"visits": ["tuition_payment"],
+		"excludes": ["short_payment"],
+		"reason": "The cash is more than the amount due. Take the payment and give the exact change."
 	},
 	"closed_section": {
 		"label": "Closed section",

@@ -93,6 +93,17 @@ static func _office_name(action: String) -> String:
 	return GameData.json("offices")[action.trim_prefix("route:")]["name"]
 
 
+## What the student should get back at the payment window: the cash in the tray minus the amount
+## due in ISMIS. 0 when there's no cash or nothing over.
+static func change_due(student: Dictionary) -> int:
+	if not student["record"].has("amount_due"):
+		return 0
+	for paper: Dictionary in student["papers"]:
+		if paper["form"] == "cash":
+			return maxi(0, Money.parse(paper["fields"]["amount_due"]) - Money.parse(student["record"]["amount_due"]))
+	return 0
+
+
 ## Clearance items the student didn't bring, as requirement keys.
 static func missing_items(student: Dictionary) -> Array:
 	var items: Array = []
@@ -105,8 +116,8 @@ static func missing_items(student: Dictionary) -> Array:
 	return items
 
 
-## details can carry what the decision needs: "section" for the section picker, "reason" and
-## "items" for a Reject. The right call with the wrong reason or list still counts as wrong.
+## details can carry what the decision needs: "section" for the section picker, "change" (whole
+## pesos) for an overpayment, "reason" and "items" for a Reject. The right call with the wrong reason or list still counts as wrong.
 static func judge(student: Dictionary, action: String, offices: Dictionary, details: Dictionary = {}) -> Dictionary:
 	var options := accepted(student, offices)
 	var want: Dictionary = options[0]
@@ -125,6 +136,13 @@ static func judge(student: Dictionary, action: String, offices: Dictionary, deta
 	if correct and want["problem"] == "closed_section" and not Timetable.section_fits(student, details.get("section", "")):
 		correct = false
 		reason = "That section is full or clashes with their schedule."
+	if correct and want["problem"] == "overpayment":
+		var owed := change_due(student)
+		var gave := int(details.get("change", -1))
+		if gave != owed:
+			correct = false
+			var told := "You gave %s, but it's" % Money.format(gave) if gave >= 0 else "It's"
+			reason = "Right call, wrong change. %s the cash minus the amount due: %s." % [told, Money.format(owed)]
 	if correct and action == "reject":
 		var given: String = details.get("reason", "")
 		if given != want["reason_id"]:

@@ -4,5 +4,6 @@
 	"failed_prereq": { "label": "Failed prerequisite (5.0)", "stamp": "REJECTED" },
 	"fake_signature": { "label": "Fake signature", "stamp": "REJECTED" },
 	"wrong_department": { "label": "Wrong department, not on today's list", "stamp": "RETURNED" },
+	"short_payment": { "label": "Short payment, complete the amount first", "stamp": "RETURNED" },
 	"office_closed": { "label": "Office closed today, come back tomorrow", "stamp": "RETURNED" }
 }
