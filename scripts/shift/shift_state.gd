@@ -203,6 +203,8 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	if action == "hold" and bench_full():
 		return { "error": "bench_full" }
 	var student := current
+	# Taken before a fix clears one, so the score knows what the call was really about.
+	var problems_before: Array = student["problems"].duplicate()
 	var favor := action == "favor"
 	var result := RulesCheck.judge(student, "approve" if favor else action, offices(), details)
 	var bent: bool = favor and not result["correct"]
@@ -267,6 +269,8 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		"favor": student.get("favor", "") if favor else "",
 		"expected": result["expected"],
 		"problem": result["problem"],
+		"problem_count": problems_before.size(),
+		"problems": problems_before,
 		"reason": result["reason"],
 		"outcome": outcome,
 		"reason_id": details.get("reason", ""),
@@ -305,7 +309,7 @@ func summary() -> Dictionary:
 	for entry: Dictionary in history:
 		if entry["correct"]:
 			correct += 1
-	return {
+	var totals := {
 		"reason": end_reason,
 		"served": served,
 		"decisions": history.size(),
@@ -323,6 +327,9 @@ func summary() -> Dictionary:
 		# Favors aren't judged here; Ma'am Lorna's spot check deals with them.
 		"accuracy": float(correct) / (history.size() - bends) if history.size() > bends else (1.0 if bends > 0 else 0.0),
 	}
+	# Hard calls weigh more and a run of right calls earns a little; stars use weighted_accuracy.
+	totals.merge(Evaluation.shift(history, day))
+	return totals
 
 
 ## Open market: other windows keep enrolling students, so while the player has the section picker

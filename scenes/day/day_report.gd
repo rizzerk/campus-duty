@@ -80,11 +80,12 @@ func _today_card(summary: Dictionary) -> Control:
 	list.add_child(UiKit.label("Today", 24 if compact else 28))
 	for row: Array in [
 		["Students served", "%d / %d" % [summary["served"], summary["total"]]],
-		["Correct calls", summary["correct"]],
-		["Wrong calls", summary["mistakes"]],
+		["Calls", "%d right · %d wrong" % [summary["correct"], summary["mistakes"]]],
+	] + ([["Hard calls right", "%d / %d" % [summary["hard_right"], summary["hard_calls"]]]] if summary.get("hard_calls", 0) > 0 else []) + [
+		["Weighted accuracy", _weighted_text(summary)],
+		["Integrity", "%d / %d" % [summary.get("integrity", Evaluation.integrity(summary)), Evaluation.integrity_max()]],
 		["Walked out angry", summary["walked_out"]],
-		["Mismatches caught", summary["caught"]],
-		["False alarms", summary["false_alarms"]],
+		["Flags", "%d caught · %d false alarm%s" % [summary["caught"], summary["false_alarms"], "" if summary["false_alarms"] == 1 else "s"]],
 	] + ([["Favors done", summary["bends"]]] if summary.get("bends", 0) > 0 else []):
 		var line := HBoxContainer.new()
 		var caption := UiKit.label(row[0], 19 if compact else 22, Color("#3a463e"))
@@ -95,8 +96,15 @@ func _today_card(summary: Dictionary) -> Control:
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	list.add_child(spacer)
-	list.add_child(UiKit.wrapped("3 stars needs 90% correct, 90% of the line served and no walkouts.", 15 if compact else 17, UiKit.MUTED))
+	list.add_child(UiKit.wrapped("3 stars: 90% weighted accuracy, 90% served, no walkouts. Hard calls (several problems, today's new problem, turn-aways) count extra.", 15 if compact else 17, UiKit.MUTED))
 	return card
+
+
+## "88%", or "88% (incl. +2% streak)" when a run of right calls added a bonus.
+static func _weighted_text(summary: Dictionary) -> String:
+	var text := "%d%%" % roundi(float(summary.get("weighted_accuracy", summary["accuracy"])) * 100.0)
+	var bonus := roundi(float(summary.get("streak_bonus", 0.0)) * 100.0)
+	return text + (" (incl. +%d%% streak)" % bonus if bonus > 0 else "")
 
 
 ## Ma'am Lorna's spot check: three of today's transactions, looked at again. Each favor she
@@ -161,6 +169,10 @@ func _because_card() -> Control:
 		list.add_child(_story("%d student%s still waiting when the window closed." % [unserved, " was" if unserved == 1 else "s were"], false))
 	if elsewhere > 0:
 		list.add_child(_story("%d student%s you sent to another office %s still there at closing. That counts as handled." % [elsewhere, "" if elsewhere == 1 else "s", "was" if elsewhere == 1 else "were"], true))
+	var integrity_line := Evaluation.integrity_story(summary)
+	if integrity_line != "":
+		var kept_bar := int(GameData.json("endings")["endings"]["kept"].get("min_integrity", 0))
+		list.add_child(_story(integrity_line, Evaluation.integrity(summary) >= kept_bar))
 	var stories := Consequences.build(GameState.last_history, 6)
 	for story: Dictionary in stories:
 		list.add_child(_story(story["text"], story["good"]))

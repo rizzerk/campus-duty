@@ -85,7 +85,7 @@ There are 24 in all. Unlocks and lifetime counters are kept across seasons and r
 | 9 | Extension | Only listed departments may adjust; turn the rest away |
 | 10 | Classes begin | Payment window: match cash to the assessment |
 
-After day 10, the supervisor's evaluation gives one of three endings based on accuracy and integrity: **kept the post**, **on probation**, or **not renewed**.
+After day 10, the supervisor's evaluation gives one of three endings based on weighted accuracy, integrity and how many shifts the line gave up on: **kept the post**, **on probation**, or **not renewed**.
 
 ## Problem types
 

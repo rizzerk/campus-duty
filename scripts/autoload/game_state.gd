@@ -38,6 +38,7 @@ func finish_shift(summary: Dictionary, history: Array) -> void:
 		summary["spot_check"] = check["rows"]
 		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
+	summary["integrity"] = Evaluation.integrity(summary)
 	PlaytestLog.append(PlaytestLog.entry(summary, history, day, base_seed))
 	last_summary = summary
 	last_history = history
@@ -117,6 +118,7 @@ func debug_jump() -> bool:
 ## A shift the line gave up on, logged before the player retries it (finish_shift never runs then).
 func log_failed_attempt(summary: Dictionary, history: Array) -> void:
 	summary["stars"] = 0
+	summary["integrity"] = Evaluation.integrity(summary)
 	PlaytestLog.append(PlaytestLog.entry(summary, history, day, base_seed, { "retried": true }))
 
 

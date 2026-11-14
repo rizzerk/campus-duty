@@ -49,7 +49,7 @@ func _build(shift: ShiftState) -> void:
 	stats.add_child(info)
 	info.add_child(UiKit.label("Day %d so far" % shift.day, 26))
 	var summary := shift.summary()
-	for line: Array in [["Served", "%d / %d" % [summary["served"], summary["total"]]], ["Correct calls", str(summary["correct"])], ["Wrong calls", str(summary["mistakes"])]]:
+	for line: Array in [["Served", "%d / %d" % [summary["served"], summary["total"]]], ["Correct calls", str(summary["correct"])], ["Wrong calls", str(summary["mistakes"])], ["Weighted accuracy", "%d%%" % roundi(summary["weighted_accuracy"] * 100.0) if summary["decisions"] > 0 else "—"]]:
 		var entry := HBoxContainer.new()
 		var caption := UiKit.label(line[0], 20, Color("#3a463e"))
 		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
