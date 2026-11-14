@@ -65,10 +65,18 @@ func _init(day_number: int, base_seed: int) -> void:
 			times.append(float(rush["at"]))
 	times.sort()
 	total_students = times.size()
+	var students: Array = []
+	var rush_slots: Array = []
 	for i in times.size():
-		var student := StudentGen.make(base_seed * 100000 + day * 1000 + i, day)
+		students.append(StudentGen.make(base_seed * 100000 + day * 1000 + i, day))
+		rush_slots.append(rush_times.has(times[i]))
+	# The director paces the line (day 1 keeps its scripted tutorial order).
+	if not ShiftEvents.is_onboarding(day):
+		students = LineDirector.order(students, day, base_seed, rush_slots)
+	for i in times.size():
+		var student: Dictionary = students[i]
 		student["number"] = number + i
-		_arrivals.append({ "student": student, "at": times[i], "rush": rush_times.has(times[i]) })
+		_arrivals.append({ "student": student, "at": times[i], "rush": rush_slots[i] })
 	if ShiftEvents.is_onboarding(day):
 		ShiftEvents.prepare_day_one_line(_arrivals)
 	else:
