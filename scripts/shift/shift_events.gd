@@ -87,18 +87,24 @@ static func onboarding_banner(student: Dictionary, stage: String) -> String:
 
 
 ## Weaves recurring regulars (#112 Jericho, #104 Carlo, #118 Mae) and special customer moments
-## into the Day 2+ queue without altering any underlying problem or paper validity.
+## into the Day 2+ queue. A regular whose beat names a problem gets a student who has it (moved
+## or generated); otherwise problems and paper validity are left as they are.
 static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> void:
 	if day <= 1 or arrivals.is_empty():
 		return
 	var events_data: Dictionary = GameData.json("events")
 	var used_slots := {}
-	for regular: Dictionary in events_data["regulars"]:
+	var regulars: Array = events_data["regulars"]
+	for r in regulars.size():
+		var regular: Dictionary = regulars[r]
 		var day_key := str(day)
 		if not regular["appearances"].has(day_key):
 			continue
 		var appearance: Dictionary = regular["appearances"][day_key]
 		var slot: int = clampi(int(appearance["slot"]), 0, arrivals.size() - 1)
+		var problems := regular_problems(appearance, day, base_seed, int(regular["number"]))
+		var search := { "seed": base_seed, "range": LineDirector.REGULAR_RANGE + r }
+		_bring_problem_to(arrivals, slot, problems, day, used_slots, search)
 		var student: Dictionary = arrivals[slot]["student"]
 		used_slots[slot] = true
 		_apply_regular(student, regular, appearance)
@@ -123,6 +129,88 @@ static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> voi
 		var line := { "ceb": str(special["ceb"]), "en": str(special["en"]) }
 		_format_student_line(line, student)
 		student["line"] = line
+
+
+## The problems a regular's slot should have today: the appearance's "problem" list, or [] for
+## no pin. With "problem_chance" the line can go either way: on that share of seeds they have the
+## problem (the twist), otherwise they are clean ([""]). Seeded, so a replay is the same.
+static func regular_problems(appearance: Dictionary, day: int, base_seed: int, number: int) -> Array:
+	var problems: Array = appearance.get("problem", [])
+	if problems.is_empty() or not appearance.has("problem_chance"):
+		return problems
+	var roll := RandomNumberGenerator.new()
+	roll.seed = base_seed * 7919 + day * 131 + number
+	return problems if roll.randf() < float(appearance["problem_chance"]) else [""]
+
+
+## Makes sure the student in a regular's slot has one of these problems ("" means clean): swap in
+## the nearest student who does, or, when the line has none, a generated one. The opening (warm-up
+## and the day's new problem) and slots already taken stay put, queue numbers stay in order, and
+## no swap makes a run of the same problem longer than the director's cap. Regular slots belong
+## after the opening; one inside it is left alone. search holds the seed and seed range to use.
+## Rarely the pin can't land (a generated student would break the cap, or a clean pin finds no
+## clean student after the opening); the regular then keeps the slot's student as is.
+static func _bring_problem_to(arrivals: Array, slot: int, problems: Array, day: int, used_slots: Dictionary, search: Dictionary) -> void:
+	if problems.is_empty() or problems.has(LineDirector.problem_class(arrivals[slot]["student"])):
+		return
+	var opening := 1 + LineDirector.new_problems(day).size()
+	if slot < opening:
+		return
+	var cap := int(LineDirector.settings_for(day).get("max_streak", 2))
+	var best := -1
+	for i in range(opening, arrivals.size()):
+		if i == slot or used_slots.has(i):
+			continue
+		if not problems.has(LineDirector.problem_class(arrivals[i]["student"])):
+			continue
+		if best != -1 and absi(i - slot) >= absi(best - slot):
+			continue
+		_swap_students(arrivals, slot, i)
+		var fits := cap < 1 or (_run_through(arrivals, slot) <= cap and _run_through(arrivals, i) <= cap)
+		_swap_students(arrivals, slot, i)
+		if fits:
+			best = i
+	if best != -1:
+		_swap_students(arrivals, slot, best)
+		return
+	if problems.has(""):
+		return
+	var found := LineDirector.search_student(String(problems[0]), day, int(search["seed"]), int(search["range"]))
+	if found.is_empty():
+		return
+	var replaced: Dictionary = arrivals[slot]["student"]
+	found["number"] = replaced["number"]
+	arrivals[slot]["student"] = found
+	if cap >= 1 and _run_through(arrivals, slot) > cap:
+		arrivals[slot]["student"] = replaced
+
+
+## Swaps two arrivals' students; queue numbers stay with the slots.
+static func _swap_students(arrivals: Array, a: int, b: int) -> void:
+	var first: Dictionary = arrivals[a]["student"]
+	var second: Dictionary = arrivals[b]["student"]
+	var number: Variant = first["number"]
+	first["number"] = second["number"]
+	second["number"] = number
+	arrivals[a]["student"] = second
+	arrivals[b]["student"] = first
+
+
+## Length of the run of one problem through this slot (0 for a student with nothing wrong).
+static func _run_through(arrivals: Array, slot: int) -> int:
+	var key := LineDirector.problem_class(arrivals[slot]["student"])
+	if key == "":
+		return 0
+	var run := 1
+	var k := slot - 1
+	while k >= 0 and LineDirector.problem_class(arrivals[k]["student"]) == key:
+		run += 1
+		k -= 1
+	k = slot + 1
+	while k < arrivals.size() and LineDirector.problem_class(arrivals[k]["student"]) == key:
+		run += 1
+		k += 1
+	return run
 
 
 static func _apply_regular(student: Dictionary, regular: Dictionary, appearance: Dictionary) -> void:

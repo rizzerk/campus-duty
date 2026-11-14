@@ -10,11 +10,14 @@ const WORRIED_CHANCE := 0.2
 const RANDOM_FAVORS := ["sob_story", "merienda"]
 
 
-static func make(seed_value: int, day_number: int) -> Dictionary:
+## forced, when given, replaces the problem roll with exactly these problems (the line director
+## uses it to find a student who shows a new problem on its own). The visit is picked among the
+## day's visits those problems allow. Without it, nothing changes from the plain roll.
+static func make(seed_value: int, day_number: int, forced: Array = []) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var day := GameData.day(day_number)
-	var visit: String = _pick_weighted(rng, day["visits"])
+	var visit: String = _pick_weighted(rng, day["visits"] if forced.is_empty() else _visits_for(day["visits"], forced))
 	var year: int = 1 if visit == "first_year" else int(_pick(rng, day["years"]))
 	var program: Dictionary = _pick(rng, GameData.json("students")["programs"])
 	var portrait := PortraitGen.roll(seed_value, false, year)
@@ -41,7 +44,10 @@ static func make(seed_value: int, day_number: int) -> Dictionary:
 	if visit in ["enroll_subject", "add_subject"]:
 		_add_course_request(rng, student, program)
 	student["papers"] = _make_papers(rng, student, program)
-	_roll_problems(rng, student, day)
+	if forced.is_empty():
+		_roll_problems(rng, student, day)
+	else:
+		_force_problems(rng, student, forced)
 	# Some students come without their ID card; the player searches ISMIS by number instead.
 	if rng.randf() < float(day.get("no_id_chance", 0.0)):
 		student["papers"].remove_at(0)
@@ -242,6 +248,25 @@ static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day:
 		if not info.get("requires", []).all(func(other: String) -> bool: return student["problems"].has(other)):
 			continue
 		if rng.randf() < float(day["problems"][id]) and _apply_problem(rng, student, id):
+			student["problems"].append(id)
+
+
+## The day's visit weights, narrowed to visits where every forced problem can happen.
+static func _visits_for(visits: Dictionary, forced: Array) -> Dictionary:
+	var allowed := {}
+	for visit: String in visits:
+		if forced.all(func(id: String) -> bool: return GameData.problem(id)["visits"].has(visit)):
+			allowed[visit] = visits[visit]
+	return allowed if not allowed.is_empty() else visits
+
+
+## Applies exactly these problems, the ones others build on first. One that can't apply to this
+## student is left out, so callers check the result.
+static func _force_problems(rng: RandomNumberGenerator, student: Dictionary, forced: Array) -> void:
+	var ordered := forced.duplicate()
+	ordered.sort_custom(func(a: String, b: String) -> bool: return GameData.problem(a).get("requires", []).size() < GameData.problem(b).get("requires", []).size())
+	for id: String in ordered:
+		if _apply_problem(rng, student, id):
 			student["problems"].append(id)
 
 

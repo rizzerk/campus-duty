@@ -17,5 +17,6 @@
 	"ask_patience": 2,
 	"bend_patience": 8,
 	"parent_argue_minutes": 4,
-	"spot_check": { "from_day": 4, "count": 3, "bend_weight": 3 }
+	"spot_check": { "from_day": 4, "count": 3, "bend_weight": 3 },
+	"director": { "enabled": true, "max_streak": 2, "peak_at": 0.7, "jitter": 0.35, "rush_boost": 0.5 }
 }

@@ -187,11 +187,13 @@
 			"appearances": {
 				"3": {
 					"slot": 2,
-					"ceb": "Ate/Kuya! Ako tong nag-atang sa IT 312 ganinang kadlawon. Palihug ingna ko nga naa pay bakante!",
-					"en": "Hey! I've been camping out for IT 312 since dawn. Please tell me there's still a slot open!"
+					"problem": ["closed_section"],
+					"ceb": "Ate/Kuya! Ako tong nag-atang sa {course} ganinang kadlawon. Palihug ingna ko nga naa pay bakante!",
+					"en": "Hey! I've been camping out for {course} since dawn. Please tell me there's still a slot open!"
 				},
 				"4": {
 					"slot": 4,
+					"problem": ["unpaid_balance"],
 					"ceb": "Ako na pud, si Jericho (#112). Nagdali ko gahapon mao nga nakalimot ko sa akong balance sa Cashier...",
 					"en": "It's me again, Jericho (#112). I was in such a rush yesterday I forgot about my balance..."
 				},
@@ -230,6 +232,7 @@
 				},
 				"7": {
 					"slot": 4,
+					"problem": ["missing_signature"],
 					"ceb": "Carlo (#104) na pud! Naa na koy ID karon, ha, bantay lang kon ang pirma na pud ni Engr. ang kulang.",
 					"en": "Carlo (#104) again! I actually brought my ID today—watch it be the adviser's signature that's off."
 				}
@@ -252,6 +255,8 @@
 				},
 				"6": {
 					"slot": 5,
+					"problem": ["inc_prereq"],
+					"problem_chance": 0.5,
 					"ceb": "Mae (#118) balik! Gi-double check na nako akong prereqs sa Grades tab, kompleto gyud unta ni.",
 					"en": "Mae (#118) again! I double-checked my prereqs for the Grades tab—this should be in order."
 				},
