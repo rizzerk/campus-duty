@@ -58,6 +58,13 @@
 			"announcement": "The Dean's Office is open for overload approvals until 11:30 AM only. After 11:30 AM, it closes for the day.",
 			"policy": "Loads exceeding 24 units must be routed to the Dean's Office while open, or turned away ('Office closed today') once shut.",
 			"event_preview": "Expected today: Final-day overload cramming and Dean's Office cutoff at 11:30 AM."
+		},
+		"9": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · Extension Day (last adjustments).",
+			"announcement": "Extension is open for Accountancy and Civil Engineering only; every other department's adjustment period has closed. The Dean's Office takes overloads all morning, for listed departments only.",
+			"policy": "Check the Department on the ISMIS record before anything else. Not on the list? Turn away: Wrong department, even if their papers are perfect.",
+			"event_preview": "Expected today: Students from other departments hoping to squeeze in one last change."
 		}
 	},
 	"day_events": {
@@ -172,6 +179,22 @@
 				"flash": "LAST CALL · Dean's Office closes in 5 minutes (11:30 AM)!",
 				"banner": "Ma'am Lorna: “Hapita na mag-11:30! Once the Dean's Office closes for the day, turn overload students away to come back tomorrow.”"
 			}
+		],
+		"9": [
+			{
+				"at": 45,
+				"id": "extension_list_reminder",
+				"kind": "announcement",
+				"flash": "EXTENSION · Accountancy and Civil Engineering only. Check the Department in ISMIS first!",
+				"banner": "Ma'am Lorna: “Bisan kompleto ang papeles, kon wala sa lista ang department, dili gyud pwede. Be kind, but turn them away.”"
+			},
+			{
+				"at": 150,
+				"id": "extension_last_stretch",
+				"kind": "event",
+				"flash": "LAST STRETCH · Students from other departments are hoping you won't check.",
+				"banner": "Ma'am Lorna: “Daghan pa ang mangayo og 'usa na lang.' Ang listahan mao gihapon. Same list all day.”"
+			}
 		]
 	},
 	"regulars": [
@@ -206,6 +229,12 @@
 					"slot": 5,
 					"ceb": "Last adjustment na gyud ni nako, promise! Kon ma-okay ni, librehon tika og banana cue sa gawas.",
 					"en": "This is my very last adjustment, I promise! If this goes through, I owe you banana cue outside."
+				},
+				"9": {
+					"slot": 4,
+					"problem": ["wrong_department"],
+					"ceb": "Ingon ko gahapon last na to... pero extension man karon, di ba? Usa na lang gyud, palihug!",
+					"en": "I said yesterday was my last one... but it's extension day, right? Just one more, please!"
 				}
 			}
 		},

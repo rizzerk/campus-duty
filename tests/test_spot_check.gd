@@ -9,6 +9,7 @@ func _init() -> void:
 	_test_bends_are_likelier()
 	_test_run()
 	_test_mid_shift_inspections()
+	_test_every_problem_has_a_reminder()
 	print("spot_check: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -27,6 +28,13 @@ func _history(size: int, bent_at: int = -1) -> Array:
 			"bent": bent, "reason": "ISMIS shows an unpaid balance.", "expected": "route:cashier" if bent else "approve",
 			"outcome": "bent" if bent else "served", "problem": "unpaid_balance" if bent else "", "false_alarms": 0 })
 	return history
+
+
+## A wrong call on any problem gets Lorna's reminder for that problem, never the "clean" one.
+func _test_every_problem_has_a_reminder() -> void:
+	var reminders: Dictionary = GameData.json("dialogue")["spot_check"]["rule_reminders"]
+	for id: String in GameData.json("problems"):
+		_check(reminders.has(id), "spot check has a rule reminder for %s" % id)
 
 
 func _test_picks() -> void:

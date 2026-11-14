@@ -68,7 +68,7 @@ func _perfect(shift: ShiftState) -> Array:
 
 
 func _test_perfect_player_never_fails() -> void:
-	for day in range(1, 9):
+	for day in range(1, _last_day() + 1):
 		var shift := ShiftState.new(day, 42)
 		_play(shift, _perfect)
 		var summary := shift.summary()
@@ -324,7 +324,7 @@ func _test_routed_late_counts_as_handled() -> void:
 ## Balance guard: a careful player who takes 15 seconds per student (half that for someone back
 ## from an office) and gets 1 call in 10 wrong never loses the line, and earns 2 stars or more.
 func _test_careful_player_never_fails() -> void:
-	for day in range(2, 9):
+	for day in range(2, _last_day() + 1):
 		var shift := ShiftState.new(day, 7)
 		var rng := RandomNumberGenerator.new()
 		rng.seed = 7
@@ -456,7 +456,7 @@ func _test_caught_favors_cost_stars() -> void:
 
 func _test_day_one_onboarding_and_events() -> void:
 	_check(ShiftEvents.is_onboarding(1), "day 1 is onboarding")
-	for day in range(2, 9):
+	for day in range(2, _last_day() + 1):
 		_check(not ShiftEvents.is_onboarding(day), "day %d never repeats the tutorial" % day)
 		var bulletin := ShiftEvents.bulletin_for_day(day)
 		_check(bulletin.has("schedule") and bulletin.has("announcement") and bulletin.has("policy") and bulletin.has("event_preview"),
@@ -541,9 +541,11 @@ func _test_speed_doesnt_rescue_wrong_calls() -> void:
 	_check(tutorial_clears == 20, "a beginner wrong on every 2nd call still finishes the day 1 tutorial (%d of 20)" % tutorial_clears)
 	var lost := 0
 	var best := 0
-	for day in range(4, 9):
+	var played := 0
+	for day in range(4, _last_day() + 1):
 		for seed_value in range(1, 6):
 			count[0] = 0
+			played += 1
 			var shift := ShiftState.new(day, seed_value)
 			_play(shift, fumble)
 			var summary := shift.summary()
@@ -551,5 +553,9 @@ func _test_speed_doesnt_rescue_wrong_calls() -> void:
 			best = maxi(best, Scoring.stars(summary))
 			if summary["reason"] == "patience":
 				lost += 1
-	_check(best < 3, "a player wrong on every 4th call never earns 3 stars on days 4-8")
-	_check(lost >= 10, "a player wrong on every 4th call loses the line in many shifts on days 4-8 (%d of 25)" % lost)
+	_check(best < 3, "a player wrong on every 4th call never earns 3 stars on days 4-%d" % _last_day())
+	_check(lost * 5 >= played * 2, "a player wrong on every 4th call loses the line in many shifts on days 4-%d (%d of %d)" % [_last_day(), lost, played])
+
+
+func _last_day() -> int:
+	return int(GameData.json("days")["last_day"])

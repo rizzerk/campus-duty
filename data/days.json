@@ -1,7 +1,7 @@
 {
 	"_note": "Each day can override patience_mistake_penalty from balance.json (day 1 does, to keep the tutorial forgiving). Memo intros that say 'about N students' must match students; tests check it.",
 	"first_day": 1,
-	"last_day": 8,
+	"last_day": 9,
 	"days": {
 		"1": {
 			"onboarding": true,
@@ -160,6 +160,28 @@
 			"max_problems": 2,
 			"offices": {
 				"dean": { "default": "open", "windows": [{ "from": 210, "to": 240, "status": "closed" }] }
+			}
+		},
+		"9": {
+			"traits": { "impatient": 0.08, "palusot": 0.12, "with_parent": 0.1, "kapit": 0.1 },
+			"favor_chance": 0.12,
+			"no_id_chance": 0.1,
+			"reject_reasons": ["wrong_department"],
+			"harmless_chance": 0.25,
+			"phase": "Extension",
+			"intro": "Extension day, the last chance to adjust. Only two departments are on the list. Expect about 14 students.",
+			"departments": ["Dept. of Accountancy", "Dept. of Civil Engineering"],
+			"rules": [
+				{ "text": "Only Accountancy and Civil Engineering may add or enroll today. Check the Department in ISMIS. Anyone else? Turn away (5), then pick Wrong department.", "new": true }
+			],
+			"students": 14,
+			"start_line": 6,
+			"years": [1, 2, 3, 4],
+			"visits": { "add_subject": 0.8, "enroll_subject": 0.2 },
+			"problems": { "wrong_department": 0.3, "overload": 0.1, "missing_signature": 0.12, "fake_signature": 0.08, "unpaid_balance": 0.08, "closed_section": 0.1, "failed_prereq": 0.05, "inc_prereq": 0.05 },
+			"max_problems": 2,
+			"offices": {
+				"dean": { "default": "open" }
 			}
 		}
 	}

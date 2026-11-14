@@ -234,6 +234,7 @@ static func _apply_regular(student: Dictionary, regular: Dictionary, appearance:
 	student["record"]["year"] = str(year)
 	if not program_info.is_empty():
 		student["record"]["department"] = program_info["department"]
+	StudentGen.sync_department(student)
 	if bool(appearance.get("force_no_id", false)):
 		student["no_id"] = true
 		if not student["papers"].is_empty() and student["papers"][0]["form"] == "id_card":

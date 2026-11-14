@@ -62,6 +62,12 @@
 			]
 		},
 		{
+			"name": "Extension",
+			"entries": [
+				{ "day": 9, "title": "Wrong department", "problems": ["wrong_department"], "text": "Only the departments on today's memo may adjust. Check the Department in ISMIS first. Not on the list? Turn away: Wrong department, even if the papers are perfect." }
+			]
+		},
+		{
 			"name": "People",
 			"entries": [
 				{ "day": 2, "title": "Sweaty and scowling", "text": "Impatient. While they wait, the line loses patience twice as fast. Serve them quickly. The right call doesn't change." },
