@@ -99,7 +99,7 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 | Overload (over 24 units) | Send to Dean's office |
 | Fake signature | Reject |
 | Failed prerequisite (5.0) | Reject (INC goes to Consultation) |
-| Wrong department on extension day | Turn away politely |
+| Wrong department on extension day | Turn away: Wrong department (check the ISMIS Department against the memo) |
 | Payment doesn't match assessment | Send back to recheck, or give change |
 
 ## Screens
@@ -120,9 +120,9 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 
 ## Status
 
-**Playable now:** days 1–8, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
+**Playable now:** days 1–9, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
 
-**Still to come:** days 9 and 10; title screen, saves and settings; desk upgrades; endings; audio and final art.
+**Still to come:** day 10; title screen, saves and settings; desk upgrades; endings; audio and final art.
 
 ## Running it
 

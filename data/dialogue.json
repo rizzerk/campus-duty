@@ -275,6 +275,7 @@
 			"missing_signature": "Lorna's spot check on #{number}: “Adding a subject requires an adviser's signature on the slip. Send unsigned slips to Consultation (or Hold if on break).”",
 			"fake_signature": "Lorna's spot check on #{number}: “Compare the signature against the Advisers tab specimen! Forged signatures must be rejected.”",
 			"overload": "Lorna's spot check on #{number}: “Over 24 units is an overload. Route them to the Dean's Office (or turn away if the Dean is closed for the day).”",
+			"wrong_department": "Lorna's spot check on #{number}: “Check the Department in ISMIS against today's list. Not on it? Turn away (5), then pick Wrong department.”",
 			"office_closed": "Lorna's spot check on #{number}: “Watch the office clock! Never route a student to an office that is closed or on break.”",
 			"clean": "Lorna's spot check on #{number}: “Nothing was wrong with #{number}'s papers—don't turn away or route a clean application!”"
 		}

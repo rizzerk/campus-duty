@@ -10,18 +10,19 @@ func _init() -> void:
 	_check(StudentGen.make(5, 7) == StudentGen.make(5, 7), "same seed gives the same student")
 	_check(StudentGen.make(5, 7)["name"] != StudentGen.make(6, 7)["name"] or StudentGen.make(5, 7)["record"]["id_number"] != StudentGen.make(6, 7)["record"]["id_number"], "different seeds differ")
 	var seen := {}
-	for day in range(1, 9):
+	for day in range(1, _last_day() + 1):
 		for seed_value in SEEDS:
 			var student := StudentGen.make(seed_value, day)
 			_check_student(student, day)
 			for id: String in student["problems"]:
 				seen[id] = true
 	for id: String in GameData.json("problems"):
-		_check(seen.has(id), "problem %s shows up somewhere in days 1-8" % id)
+		_check(seen.has(id), "problem %s shows up somewhere in the season" % id)
 	_test_traits()
 	_test_traits_dont_change_problems()
 	_test_favors()
 	_test_personalities()
+	_test_department_list()
 	print("student_gen: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -67,6 +68,9 @@ func _check_student(s: Dictionary, day: int) -> void:
 	if problems.has("identity_mismatch"):
 		_check(problems.has("ismis_login"), "%s impostors only come for a reset" % tag)
 	_check(problems.has("unpaid_balance") == (record["balance"] != "PHP 0.00"), "%s balance" % tag)
+	_check(problems.has("wrong_department") == StudentGen.outside_departments(s), "%s wrong department exactly when off today's list" % tag)
+	if not info.get("departments", []).is_empty():
+		_check(info["departments"].has(record["department"]) != problems.has("wrong_department"), "%s department decides the turn-away" % tag)
 	if problems.has("unpaid_balance") and not _paper(s, "assessment").is_empty():
 		_check(Mismatch.differs(s, _paper(s, "assessment"), "balance"), "%s balance mismatch flaggable" % tag)
 	var slip := _paper(s, "consultation_slip")
@@ -92,10 +96,46 @@ func _check_student(s: Dictionary, day: int) -> void:
 		_check(not Mismatch.real_differs(s, _paper(s, "id_card"), key), "%s harmless %s isn't real" % [tag, key])
 
 
+## Extension day: both sides of the list show up, roughly at the day's rate, and days without a
+## list pick programs exactly as before (wrong_department never appears there).
+func _test_department_list() -> void:
+	var day := -1
+	var plain := -1
+	for number in range(int(GameData.json("days")["first_day"]), _last_day() + 1):
+		if GameData.day(number).get("departments", []).is_empty():
+			plain = number
+		elif day == -1:
+			day = number
+	_check(day != -1 and plain != -1, "the season has a day with a department list and one without")
+	if day == -1 or plain == -1:
+		return
+	var outside := 0
+	for seed_value in SEEDS:
+		if StudentGen.make(seed_value, day)["problems"].has("wrong_department"):
+			outside += 1
+	var rate := float(GameData.day(day)["problems"]["wrong_department"])
+	_check(absf(float(outside) / SEEDS - rate) < 0.1, "day %d turn-aways near %.2f (got %d of %d)" % [day, rate, outside, SEEDS])
+	var forced := StudentGen.make(11, day, ["wrong_department"])
+	_check(forced["problems"] == ["wrong_department"], "forced wrong_department lands on its own")
+	var clean := StudentGen.make(11, day, ["overload"])
+	_check(not clean["problems"].has("wrong_department"), "forcing another problem keeps the department on the list")
+	var student := StudentGen.make(3, day)
+	student["record"]["department"] = GameData.day(day)["departments"][0]
+	StudentGen.sync_department(student)
+	_check(not student["problems"].has("wrong_department"), "sync removes it for a listed department")
+	student["record"]["department"] = "Dept. of Nowhere"
+	StudentGen.sync_department(student)
+	_check(student["problems"].count("wrong_department") == 1, "sync adds it once for an unlisted department")
+	var other := StudentGen.make(3, plain)
+	other["record"]["department"] = "Dept. of Nowhere"
+	StudentGen.sync_department(other)
+	_check(not other["problems"].has("wrong_department"), "no department rule on a day without a list")
+
+
 func _test_traits() -> void:
 	var traits: Dictionary = GameData.json("traits")
 	var seen := {}
-	for day in range(2, 9):
+	for day in range(2, _last_day() + 1):
 		var allowed: Dictionary = GameData.day(day).get("traits", {})
 		for id: String in allowed:
 			_check(traits.has(id), "day %d trait %s exists" % [day, id])
@@ -187,3 +227,7 @@ func _test_personalities() -> void:
 	_check(routine_count > 150, "most normal transactions use concise routine dialogue (%d/400)" % routine_count)
 	for p: String in personalities:
 		_check(seen_personalities.has(p), "personality %s appears" % p)
+
+
+func _last_day() -> int:
+	return int(GameData.json("days")["last_day"])

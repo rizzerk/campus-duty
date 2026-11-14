@@ -8,6 +8,8 @@ const SEASON_YEAR := 2026
 ## Some students come in worried about an ISMIS error, problem or not.
 const WORRIED_CHANCE := 0.2
 const RANDOM_FAVORS := ["sob_story", "merienda"]
+## Decided by the student's program, not by a roll among the other problems (see _pick_program).
+const WRONG_DEPARTMENT := "wrong_department"
 
 
 ## forced, when given, replaces the problem roll with exactly these problems (the line director
@@ -19,7 +21,7 @@ static func make(seed_value: int, day_number: int, forced: Array = []) -> Dictio
 	var day := GameData.day(day_number)
 	var visit: String = _pick_weighted(rng, day["visits"] if forced.is_empty() else _visits_for(day["visits"], forced))
 	var year: int = 1 if visit == "first_year" else int(_pick(rng, day["years"]))
-	var program: Dictionary = _pick(rng, GameData.json("students")["programs"])
+	var program := _pick_program(rng, day, visit, forced)
 	var portrait := PortraitGen.roll(seed_value, false, year)
 	var student := {
 		"seed": seed_value,
@@ -102,6 +104,39 @@ static func _roll_favor(rng: RandomNumberGenerator, student: Dictionary, day: Di
 		student["favor"] = from_trait
 	elif rng.randf() < float(day.get("favor_chance", 0.0)):
 		student["favor"] = _pick(rng, RANDOM_FAVORS)
+
+
+## On a day with a department list (extension day), the program decides wrong_department: the
+## problem's roll happens here and picks a program from outside the list, otherwise from inside it.
+## Other days pick from every program, exactly as before.
+static func _pick_program(rng: RandomNumberGenerator, day: Dictionary, visit: String, forced: Array) -> Dictionary:
+	var programs: Array = GameData.json("students")["programs"]
+	var allowed: Array = day.get("departments", [])
+	if allowed.is_empty():
+		return _pick(rng, programs)
+	var outside := forced.has(WRONG_DEPARTMENT)
+	if forced.is_empty() and GameData.problem(WRONG_DEPARTMENT)["visits"].has(visit):
+		outside = rng.randf() < float(day.get("problems", {}).get(WRONG_DEPARTMENT, 0.0))
+	var pool := programs.filter(func(program: Dictionary) -> bool: return allowed.has(program["department"]) != outside)
+	return _pick(rng, pool if not pool.is_empty() else programs)
+
+
+## Is this student's department missing from today's list? Always false on days without one.
+static func outside_departments(student: Dictionary) -> bool:
+	var allowed: Array = GameData.day(int(student["day"])).get("departments", [])
+	return not allowed.is_empty() and not allowed.has(student["record"]["department"])
+
+
+## Keeps wrong_department in step with the student's department after something changes it (a
+## regular brings their own program into the slot they take). Adding it can put a student one
+## over max_problems; the call stays right, because a turn-away outranks everything else.
+static func sync_department(student: Dictionary) -> void:
+	var outside := outside_departments(student)
+	var has: bool = student["problems"].has(WRONG_DEPARTMENT)
+	if outside and not has:
+		student["problems"].append(WRONG_DEPARTMENT)
+	elif has and not outside:
+		student["problems"].erase(WRONG_DEPARTMENT)
 
 
 static func _make_name(rng: RandomNumberGenerator, gender: String) -> String:
@@ -237,7 +272,12 @@ static func _roll_problems(rng: RandomNumberGenerator, student: Dictionary, day:
 	_shuffle(rng, candidates)
 	# Problems that build on another one (an impostor needs a locked account to reset) go last.
 	candidates.sort_custom(func(a: String, b: String) -> bool: return GameData.problem(a).get("requires", []).size() < GameData.problem(b).get("requires", []).size())
+	# The program was already picked inside or outside today's list, so this one is settled first.
+	if outside_departments(student):
+		student["problems"].append(WRONG_DEPARTMENT)
 	for id: String in candidates:
+		if id == WRONG_DEPARTMENT:
+			continue
 		if student["problems"].size() >= int(day["max_problems"]):
 			break
 		var info := GameData.problem(id)
@@ -359,6 +399,9 @@ static func _apply_problem(rng: RandomNumberGenerator, student: Dictionary, id: 
 			if prereq == "" or not record["grades"].has(prereq):
 				return false
 			record["grades"][prereq] = "5.0" if id == "failed_prereq" else "INC"
+		WRONG_DEPARTMENT:
+			# Only there when _pick_program chose a department off today's list.
+			return outside_departments(student)
 		_:
 			return false
 	return true

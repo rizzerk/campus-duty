@@ -19,6 +19,7 @@ func _init() -> void:
 	_test_shift_uses_director()
 	_test_no_student_twice()
 	_test_regulars_get_their_problem()
+	_test_regular_brings_their_department()
 	_test_shift_line_keeps_streak_cap()
 	print("line_director: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
@@ -81,7 +82,7 @@ func _test_same_seed_same_order() -> void:
 func _test_only_reorders_when_teacher_exists() -> void:
 	var reordered := 0
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(2, 9):
+		for day in range(2, _last_day() + 1):
 			var raw := _raw(day, seed_value)
 			var line := LineDirector.order(raw["students"], day, seed_value, raw["rush"])
 			_check(line.size() == raw["students"].size(), "day %d seed %d keeps the line length" % [day, seed_value])
@@ -97,7 +98,7 @@ func _test_only_reorders_when_teacher_exists() -> void:
 
 func _test_new_problem_comes_early_and_alone() -> void:
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(3, 9):
+		for day in range(3, _last_day() + 1):
 			var line := _ordered(day, seed_value)
 			var problems := LineDirector.new_problems(day)
 			var window := 1 + problems.size()
@@ -113,7 +114,7 @@ func _test_new_problem_comes_early_and_alone() -> void:
 func _test_warmup_is_easy() -> void:
 	var easy := 0
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(2, 9):
+		for day in range(2, _last_day() + 1):
 			var line := _ordered(day, seed_value)
 			var first: Dictionary = line[0]
 			_check(not LineDirector.new_problems(day).has(LineDirector.problem_class(first)), "day %d seed %d: the first student isn't the new problem" % [day, seed_value])
@@ -137,7 +138,7 @@ func _longest_run(line: Array) -> int:
 func _test_no_long_streaks() -> void:
 	var possible := 0
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(2, 9):
+		for day in range(2, _last_day() + 1):
 			var raw := _raw(day, seed_value)
 			var line := LineDirector.order(raw["students"], day, seed_value, raw["rush"])
 			var counts := {}
@@ -177,7 +178,7 @@ func _test_pressure_builds() -> void:
 	var early := 0.0
 	var peak := 0.0
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(4, 9):
+		for day in range(4, _last_day() + 1):
 			var line := _ordered(day, seed_value)
 			var n := line.size()
 			var opening := 1 + LineDirector.new_problems(day).size()
@@ -222,7 +223,7 @@ func _test_shift_uses_director() -> void:
 ## two new problems both need a search.
 func _test_no_student_twice() -> void:
 	for seed_value in range(1, SEEDS + 1):
-		for day in range(2, 9):
+		for day in range(2, _last_day() + 1):
 			var shift := ShiftState.new(day, seed_value)
 			var everyone: Array = shift.line.duplicate()
 			for arrival: Dictionary in shift._arrivals:
@@ -271,6 +272,48 @@ func _test_regulars_get_their_problem() -> void:
 	for day in range(int(days["first_day"]), int(days["last_day"]) + 1):
 		_check(LineDirector.new_problems(day).size() <= LineDirector.REGULAR_RANGE, "day %d's new-problem searches stay clear of the regulars' seeds" % day)
 	_check(total > 0 and matched >= total * 0.97, "regulars arrive with the problem their line is about (%d of %d)" % [matched, total])
+	# A regular brings their own department: on a day with a list, the turn-away follows it.
+	for day in range(int(days["first_day"]), _last_day() + 1):
+		if GameData.day(day).get("departments", []).is_empty():
+			continue
+		for seed_value in range(1, SEEDS + 1):
+			var shift := ShiftState.new(day, seed_value)
+			var everyone: Array = shift.line.duplicate()
+			for arrival: Dictionary in shift._arrivals:
+				everyone.append(arrival["student"])
+			for student: Dictionary in everyone:
+				_check(student["problems"].has("wrong_department") == StudentGen.outside_departments(student), "day %d seed %d #%s department and turn-away agree" % [day, seed_value, student.get("number", "?")])
+
+
+## A regular brings their own program into the slot, so on a day with a department list the
+## turn-away follows the regular, not the student they replaced.
+func _test_regular_brings_their_department() -> void:
+	var day := -1
+	for number in range(int(GameData.json("days")["first_day"]), _last_day() + 1):
+		if not GameData.day(number).get("departments", []).is_empty():
+			day = number
+			break
+	if day == -1:
+		return
+	var allowed: Array = GameData.day(day)["departments"]
+	var listed := {}
+	var unlisted := {}
+	for regular: Dictionary in GameData.json("events")["regulars"]:
+		var department: String = ShiftEvents._program_info(regular["program"])["department"]
+		if allowed.has(department):
+			listed = regular
+		else:
+			unlisted = regular
+	_check(not listed.is_empty() and not unlisted.is_empty(), "day %d has regulars on both sides of the list" % day)
+	var appearance := { "slot": 3, "ceb": "x", "en": "x" }
+	var outsider := StudentGen.make(21, day, ["wrong_department"])
+	_check(outsider["problems"].has("wrong_department"), "the outsider starts with the turn-away")
+	ShiftEvents._apply_regular(outsider, listed, appearance)
+	_check(not outsider["problems"].has("wrong_department"), "%s on the list clears the turn-away" % listed["name"])
+	var insider := StudentGen.make(21, day, ["overload"])
+	_check(not insider["problems"].has("wrong_department"), "the insider starts without the turn-away")
+	ShiftEvents._apply_regular(insider, unlisted, appearance)
+	_check(insider["problems"].has("wrong_department"), "%s off the list brings the turn-away" % unlisted["name"])
 
 
 ## The line the player meets (after regulars are placed) still keeps runs at two whenever the mix
@@ -292,3 +335,7 @@ func _test_shift_line_keeps_streak_cap() -> void:
 				most = maxi(most, int(counts[key]))
 			if most <= 2 * (everyone.size() - most):
 				_check(_longest_run(everyone) <= 2, "day %d seed %d: the shift's line has no problem three times in a row (longest %d)" % [day, seed_value, _longest_run(everyone)])
+
+
+func _last_day() -> int:
+	return int(GameData.json("days")["last_day"])

@@ -3,6 +3,7 @@
 		"fake_signature": "You caught #{number} {name}'s fake signature. They'll have to come back with their real adviser.",
 		"identity_mismatch": "You stopped someone from resetting #{number}'s account. It wasn't theirs to reset.",
 		"failed_prereq": "You caught the 5.0 in #{number} {name}'s prerequisite before it became a bigger mess.",
+		"wrong_department": "You turned #{number} {name} away. Their department wasn't on today's list.",
 		"missing_requirement": "You sent #{number} {name} home with the exact list of what to bring.",
 		"unpaid_balance": "You sent #{number} {name} to the Cashier first. They came back with a receipt.",
 		"missing_signature": "You sent #{number} {name} to get their adviser's signature.",

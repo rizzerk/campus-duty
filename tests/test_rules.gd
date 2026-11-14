@@ -14,10 +14,12 @@ const TABLE := {
 	"fake_signature": "reject",
 	"failed_prereq": "reject",
 	"inc_prereq": "route:consultation",
+	"wrong_department": "reject",
 }
 const DAY_FOR := {
 	"identity_mismatch": 5, "missing_requirement": 2, "closed_section": 3, "unpaid_balance": 4, "ismis_login": 5,
 	"failed_prereq": 6, "inc_prereq": 6, "missing_signature": 7, "fake_signature": 7, "overload": 8,
+	"wrong_department": 9,
 }
 const ACTIONS := ["approve", "fix", "hold", "reject", "route:cashier", "route:consultation", "route:dean"]
 
@@ -41,6 +43,7 @@ func _init() -> void:
 	_test_reject_needs_reason()
 	_test_days_teach_what_they_need()
 	_test_rulebook_covers_problems()
+	_test_memo_names_departments()
 	_test_memo_counts_match()
 	print("rules: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
@@ -97,7 +100,7 @@ func _test_each_problem_has_one_right_action() -> void:
 
 
 func _test_clean_student_is_approved() -> void:
-	for day in range(2, 9):
+	for day in range(2, _last_day() + 1):
 		var student := _find(day, [])
 		_check(RulesCheck.judge(student, "approve", _offices(true))["correct"], "clean approve day %d" % day)
 		_check(not RulesCheck.judge(student, "reject", _offices(true))["correct"], "clean reject is wrong day %d" % day)
@@ -331,7 +334,23 @@ func _test_rulebook_covers_problems() -> void:
 		for problem: String in GameData.day(day)["problems"]:
 			_check(covered.has(problem) and covered[problem] <= day, "rulebook explains %s by day %d" % [problem, day])
 	_check(Rulebook.unlocked_topics(2).size() >= 2, "day 2 already has topics")
-	_check(Rulebook.unlocked_topics(8).size() == GameData.json("rulebook")["topics"].size(), "every topic open by day 8")
+	_check(Rulebook.unlocked_topics(_last_day()).size() == GameData.json("rulebook")["topics"].size(), "every topic open by the last day")
+
+
+## A day with a department list names every listed department in its memo, so the player can
+## check the ISMIS Department against it.
+func _test_memo_names_departments() -> void:
+	var days: Dictionary = GameData.json("days")
+	var known: Array = GameData.json("students")["programs"].map(func(program: Dictionary) -> String: return program["department"])
+	for day in range(int(days["first_day"]), _last_day() + 1):
+		var info := GameData.day(day)
+		var memo := " ".join(info.get("rules", []).map(func(rule: Dictionary) -> String: return rule["text"]))
+		for department: String in info.get("departments", []):
+			_check(known.has(department), "day %d department %s is a real program's department" % [day, department])
+			_check(memo.contains(department.trim_prefix("Dept. of ")), "day %d memo names %s" % [day, department])
+		if info.get("problems", {}).has("wrong_department"):
+			var allowed: Array = info.get("departments", [])
+			_check(not allowed.is_empty() and allowed.size() < known.size(), "day %d lists some departments but not all" % day)
 
 
 ## A memo that says "about N" students must match the day's line, rush waves included.
@@ -346,3 +365,7 @@ func _test_memo_counts_match() -> void:
 		for rush: Dictionary in info.get("rush", []):
 			total += int(rush["count"])
 		_check(int(found.get_string(1)) == total, "day %d memo says about %s, line has %d" % [day, found.get_string(1), total])
+
+
+func _last_day() -> int:
+	return int(GameData.json("days")["last_day"])

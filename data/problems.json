@@ -27,6 +27,15 @@
 		"excludes": ["inc_prereq"],
 		"reason": "A 5.0 in the prerequisite means they can't take this subject yet."
 	},
+	"wrong_department": {
+		"label": "Wrong department today",
+		"action": "reject",
+		"priority": 92,
+		"tier": 1,
+		"visits": ["add_subject", "enroll_subject"],
+		"excludes": [],
+		"reason": "Their department isn't on today's extension list. Only listed departments may adjust."
+	},
 	"missing_requirement": {
 		"label": "Missing requirement",
 		"action": "reject",
