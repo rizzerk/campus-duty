@@ -2,7 +2,7 @@
 	"onboarding": {
 		"welcome": "Ma'am Lorna: “Maayong buntag! Welcome to Window 3. Start by pressing S (or dragging the Student ID onto the reader) to open ISMIS.”",
 		"after_scan_clean": "Ma'am Lorna: “Compare the paper checklist with the ISMIS Record tab. Every item is Attached and matches—press 1 (Approve), then Space to hand the papers back.”",
-		"missing_intro": "Ma'am Lorna: “Next student. Remember our goal: 90% accuracy, 90% of the line served, and zero walkouts for 3 stars. Scan their ID (S) and check carefully.”",
+		"missing_intro": "Ma'am Lorna: “Next student. Remember our goal: 90% weighted accuracy (hard calls like turn-aways count extra), 90% of the line served, and zero walkouts for 3 stars. Scan their ID (S) and check carefully.”",
 		"missing_after_scan": "Ma'am Lorna: “Look at Library clearance: 'Missing' on the paper, 'Required' in ISMIS. Click Library clearance on both sides to flag the mismatch. (Real flags boost patience; false alarms cost patience!)”",
 		"missing_after_flag": "Ma'am Lorna: “Good catch! You can press A to ask the student about a flag, or press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space.”",
 		"missing_after_ask": "Ma'am Lorna: “They admitted they forgot it. Now press 5 (Turn away) › Missing requirement, tick Library clearance, and press Space. Wrong calls bring students back angry—twice and they walk out!”",

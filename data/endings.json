@@ -1,0 +1,25 @@
+{
+	"_note": "End-of-season result. Endings are tried in order; the first whose bars are all met wins, and the last one (no bars) catches the rest. A bar left out is open. Accuracy is the mean weighted accuracy over the days played (0 to 1), integrity the mean integrity (0 to the max in balance.json scoring.integrity.start), failed_days the shifts the line gave up on. Reason text can use {accuracy}, {min_accuracy}, {integrity}, {min_integrity}, {max_integrity}, {failed_days} and {max_failed_days}. integrity_story is the day report's line explaining today's integrity ({points} is signed).",
+	"order": ["kept", "probation", "not_renewed"],
+	"endings": {
+		"kept": { "title": "Kept the post", "min_accuracy": 0.9, "min_integrity": 95, "max_failed_days": 1 },
+		"probation": { "title": "On probation", "min_accuracy": 0.75, "min_integrity": 50, "max_failed_days": 3 },
+		"not_renewed": { "title": "Not renewed" }
+	},
+	"reasons": {
+		"accuracy_ok": "You scored {accuracy}% on your calls, with hard calls counting extra. The bar was {min_accuracy}%.",
+		"accuracy_low": "You scored {accuracy}% on your calls, with hard calls counting extra. That's under the bar of {min_accuracy}%.",
+		"integrity_ok": "Integrity {integrity} out of {max_integrity}. The bar was {min_integrity}.",
+		"integrity_low": "Integrity {integrity} out of {max_integrity}, under the bar of {min_integrity}. Favors and false alarms cost you.",
+		"failed_days_ok": "Shifts the line gave up on: {failed_days}. Allowed: {max_failed_days}.",
+		"failed_days_low": "Shifts the line gave up on: {failed_days}. Allowed: {max_failed_days}."
+	},
+	"integrity_story": {
+		"intro": "Integrity {integrity} / {max_integrity}:",
+		"favor": "favors done {points}",
+		"caught_favor": "caught by Ma'am Lorna {points}",
+		"false_alarm": "false alarms {points}",
+		"flag": "honest flags {points}",
+		"outro": "Integrity counts toward whether you keep the post."
+	}
+}

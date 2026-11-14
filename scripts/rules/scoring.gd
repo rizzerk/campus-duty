@@ -3,12 +3,13 @@ extends RefCounted
 ## Stars for a shift. Pure, so the day report, the pause menu and the tests all agree.
 
 
-## 3 stars needs 90% correct, 90% of the line served and no walkouts. A failed shift gets none.
+## 3 stars needs 90% weighted accuracy (Evaluation.shift: hard calls count extra, streaks add a
+## little), 90% of the line served and no walkouts. A failed shift gets none.
 ## Each favor Ma'am Lorna caught in the spot check costs a star.
 static func stars(summary: Dictionary) -> int:
 	if summary["reason"] == "patience":
 		return 0
-	var score := minf(summary["accuracy"], summary["served_ratio"])
+	var score := minf(summary.get("weighted_accuracy", summary["accuracy"]), summary["served_ratio"])
 	var earned := 0
 	for threshold: float in GameData.json("balance")["star_thresholds"]:
 		if score >= threshold:

@@ -30,6 +30,8 @@ static func entry(summary: Dictionary, history: Array, day: int, seed_value: int
 		"stars": int(summary.get("stars", 0)),
 		"reason": String(summary.get("reason", "")),
 		"accuracy": snappedf(float(summary.get("accuracy", 0.0)), 0.01),
+		"weighted_accuracy": snappedf(float(summary.get("weighted_accuracy", 0.0)), 0.01),
+		"integrity": int(summary.get("integrity", 0)),
 		"served": int(summary.get("served", 0)),
 		"total": int(summary.get("total", 0)),
 		"mistakes": int(summary.get("mistakes", 0)),

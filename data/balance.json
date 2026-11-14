@@ -18,5 +18,10 @@
 	"bend_patience": 8,
 	"parent_argue_minutes": 4,
 	"spot_check": { "from_day": 4, "count": 3, "bend_weight": 3 },
+	"scoring": {
+		"weights": { "multi_problem": 0.5, "new_today": 0.5, "turn_away": 0.5 },
+		"streak_every": 5, "streak_bonus": 0.01, "streak_cap": 0.03,
+		"integrity": { "start": 100, "per_favor": 20, "per_caught_favor": 10, "per_false_alarm": 4, "per_flag": 2 }
+	},
 	"director": { "enabled": true, "max_streak": 2, "peak_at": 0.7, "jitter": 0.35, "rush_boost": 0.5 }
 }

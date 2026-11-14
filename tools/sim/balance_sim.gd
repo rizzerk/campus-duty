@@ -64,11 +64,19 @@ func _init() -> void:
 		return
 	var results: Array = []
 	var mistakes: Dictionary = {}
+	# bot -> seed -> { day: summary }: each seed played across the days is one season.
+	var seasons: Dictionary = {}
 	for day: int in options["days"]:
 		for bot: String in options["bots"]:
 			var runs: Array = []
 			for n in int(options["seeds"]):
-				runs.append(_play_shift(day, int(options["seed_base"]) + n, bot))
+				var run := _play_shift(day, int(options["seed_base"]) + n, bot)
+				runs.append(run)
+				var by_seed: Dictionary = seasons.get(bot, {})
+				var season: Dictionary = by_seed.get(n, {})
+				season[day] = run
+				by_seed[n] = season
+				seasons[bot] = by_seed
 			results.append(_aggregate(day, bot, runs))
 			for run: Dictionary in runs:
 				var by_bot: Dictionary = mistakes.get(bot, {})
@@ -84,9 +92,11 @@ func _init() -> void:
 			"set": options["set"],
 			"results": results,
 			"mistakes_by_problem": mistakes,
+			"endings": _endings(seasons),
 		}, "\t"))
 	else:
 		_print_table(results, mistakes, options)
+		_print_endings(_endings(seasons), options)
 	quit(0)
 
 
@@ -155,6 +165,7 @@ func _play_shift(day: int, seed_value: int, bot_name: String) -> Dictionary:
 		var check := SpotCheck.run(shift.history, seed_value * 1000 + day, day)
 		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
+	summary["integrity"] = Evaluation.integrity(summary)
 	summary["patience_left"] = maxf(shift.patience, 0.0)
 	summary["minute"] = shift.minute
 	summary["mistakes_by_problem"] = mistakes_by_problem
@@ -175,7 +186,7 @@ func _decide(bot: Dictionary, student: Dictionary, want: Dictionary, choices: Ar
 		"items": want.get("items", []),
 	}
 	var clean: bool = want["problem"] == ""
-	var new_today: bool = not clean and GameData.day(day)["problems"].has(want["problem"]) and _first_day_of(want["problem"]) == day
+	var new_today: bool = not clean and GameData.day(day)["problems"].has(want["problem"]) and Evaluation.first_day_of(want["problem"]) == day
 	var error_chance: float = bot["clean_error"] if clean else (bot["new_error"] if new_today else bot["error"])
 	if rng.randf() < error_chance:
 		var wrong: Array = choices.filter(func(choice: String) -> bool: return choice != action)
@@ -236,18 +247,32 @@ func _unlocked_reject_reasons(day: int) -> Array:
 	return reasons
 
 
-func _first_day_of(problem: String) -> int:
-	var days: Dictionary = GameData.json("days")
-	for number in range(int(days["first_day"]), int(days["last_day"]) + 1):
-		if GameData.day(number).get("problems", {}).has(problem):
-			return number
-	return -1
+## How many of each bot's seasons ended each way (Evaluation.ending over the days played).
+func _endings(seasons: Dictionary) -> Dictionary:
+	var counts := {}
+	for bot: String in seasons:
+		var by_ending := {}
+		for id: String in GameData.json("endings")["order"]:
+			by_ending[id] = 0
+		for n: int in seasons[bot]:
+			var id: String = Evaluation.ending(seasons[bot][n])["id"]
+			by_ending[id] = int(by_ending[id]) + 1
+		counts[bot] = by_ending
+	return counts
+
+
+func _print_endings(counts: Dictionary, options: Dictionary) -> void:
+	print("")
+	print("Season endings over days %s (one season per seed):" % [options["days"]])
+	for bot: String in counts:
+		var parts: Array = counts[bot].keys().map(func(id: String) -> String: return "%s %d" % [id, counts[bot][id]])
+		print("  %-8s %s" % [bot, ", ".join(parts)])
 
 
 func _aggregate(day: int, bot: String, runs: Array) -> Dictionary:
 	var count := float(maxi(runs.size(), 1))
 	var histogram := [0, 0, 0, 0]
-	var totals := { "stars": 0.0, "accuracy": 0.0, "served_ratio": 0.0, "patience_left": 0.0, "mistakes": 0.0, "bends": 0.0, "caught_bends": 0.0, "walked_out": 0.0, "minute": 0.0 }
+	var totals := { "stars": 0.0, "accuracy": 0.0, "weighted_accuracy": 0.0, "integrity": 0.0, "served_ratio": 0.0, "patience_left": 0.0, "mistakes": 0.0, "bends": 0.0, "caught_bends": 0.0, "walked_out": 0.0, "minute": 0.0 }
 	var fails := 0
 	var unfinished := 0
 	for run: Dictionary in runs:
@@ -269,12 +294,12 @@ func _print_table(results: Array, mistakes: Dictionary, options: Dictionary) -> 
 	if not options["set"].is_empty():
 		print("Overrides: %s" % ", ".join(options["set"]))
 	print("")
-	print("%-4s %-8s %6s %-13s %6s %6s %7s %6s %6s %6s" % ["day", "bot", "stars", "0/1/2/3", "fail", "acc", "served", "pat", "mist", "favor"])
+	print("%-4s %-8s %6s %-13s %6s %6s %6s %6s %7s %6s %6s %6s" % ["day", "bot", "stars", "0/1/2/3", "fail", "acc", "wacc", "integ", "served", "pat", "mist", "favor"])
 	for row: Dictionary in results:
 		var histogram: Array = row["stars_histogram"]
-		print("%-4d %-8s %6.2f %-13s %5.0f%% %5.0f%% %6.0f%% %6.0f %6.1f %6.1f" % [
+		print("%-4d %-8s %6.2f %-13s %5.0f%% %5.0f%% %5.0f%% %6.0f %6.0f%% %6.0f %6.1f %6.1f" % [
 			row["day"], row["bot"], row["stars"], "/".join(histogram.map(func(n: int) -> String: return str(n))),
-			row["fail_rate"] * 100.0, row["accuracy"] * 100.0, row["served_ratio"] * 100.0,
+			row["fail_rate"] * 100.0, row["accuracy"] * 100.0, row["weighted_accuracy"] * 100.0, row["integrity"], row["served_ratio"] * 100.0,
 			row["patience_left"], row["mistakes"], row["bends"],
 		])
 	var unfinished: Array = results.filter(func(row: Dictionary) -> bool: return row["unfinished"] > 0)
