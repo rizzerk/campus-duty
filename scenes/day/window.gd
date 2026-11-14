@@ -306,6 +306,12 @@ func _on_action(action: String) -> void:
 	if action == "fix" and shift.current["visit"] == "first_year":
 		_open_reset_tool()
 		return
+	if action == "fix" and shift.current["visit"] == "tuition_payment":
+		_open_change_tool()
+		return
+	if action == "approve" and shift.current["visit"] == "tuition_payment":
+		_set_pending({ "action": "approve", "reason": "", "items": [] }, "PAID", UiKit.OK)
+		return
 	if action == "route":
 		_open_route_menu()
 		return
@@ -352,6 +358,17 @@ func _open_reset_tool() -> void:
 	tool.printed.connect(func() -> void:
 		_menu = null
 		_set_pending({ "action": "fix", "reason": "", "items": [] }, "RESET", UiKit.BLUE))
+	tool.cancelled.connect(_on_menu_cancelled)
+	_update_buttons()
+
+
+## S17: the change drawer at the payment window, for a student who paid more than they owe.
+func _open_change_tool() -> void:
+	var tool := ChangeTool.open(self, shift.current)
+	_menu = tool
+	tool.given.connect(func(change: int) -> void:
+		_menu = null
+		_set_pending({ "action": "fix", "reason": "", "items": [], "change": change }, "CHANGE · %s" % Money.format(change), UiKit.BLUE))
 	tool.cancelled.connect(_on_menu_cancelled)
 	_update_buttons()
 
@@ -482,6 +499,7 @@ func _commit(decision: Dictionary) -> void:
 		"reason": decision["reason"],
 		"items": decision["items"],
 		"section": decision.get("section", ""),
+		"change": decision.get("change", -1),
 	})
 	if result.is_empty() or result.has("error"):
 		# Nothing happened, so put the papers back on the desk.
@@ -616,7 +634,7 @@ func _select(picked: Dictionary) -> void:
 		Sfx.play("wrong")
 		_ismis.show_banner("Those aren't the same field. Pick matching fields to flag.", "")
 		return
-	var caption := StudentPanel._caption(paper["key"])
+	var caption := _paper_caption(paper)
 	for flag: Dictionary in _flags:
 		if _mark_key(flag["paper"]) == _mark_key(paper) and _mark_key(flag["record"]) == _mark_key(record):
 			Sfx.play("stamp_lift")
@@ -648,7 +666,7 @@ func _ask() -> void:
 	shift.ask()
 	_student_panel.say(_ask_line(shift.current, flag))
 	var onboarding_ask := ShiftEvents.onboarding_banner(shift.current, "asked")
-	_ismis.show_banner(onboarding_ask if onboarding_ask != "" else "You asked about %s. That took a few minutes." % StudentPanel._caption(flag["paper"]["key"]), "")
+	_ismis.show_banner(onboarding_ask if onboarding_ask != "" else "You asked about %s. That took a few minutes." % _paper_caption(flag["paper"]), "")
 
 
 func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:
@@ -669,6 +687,9 @@ func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:
 			kind = "balance"
 		elif key == "birthday":
 			kind = "birthday"
+		elif key == "amount_due":
+			var short := Money.parse(value) < Money.parse(str(student["record"].get("amount_due", "")))
+			kind = "payment_short" if short else "payment_over"
 	elif student["harmless"].has(key):
 		kind = "harmless_" + key
 	var options: Array = GameData.json("dialogue")["ask"][kind]
@@ -676,6 +697,11 @@ func _ask_line(student: Dictionary, flag: Dictionary) -> Dictionary:
 	for lang: String in ["ceb", "en"]:
 		line[lang] = line[lang].format({ "item": item })
 	return line
+
+
+## The field's caption as the paper shows it (the cash reads "Cash handed over", not "Amount due").
+func _paper_caption(pick: Dictionary) -> String:
+	return StudentPanel._form_caption(shift.current["papers"][pick["form"]]["form"], pick["key"])
 
 
 func _flag_data(flag: Dictionary) -> Dictionary:

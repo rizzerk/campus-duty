@@ -31,7 +31,7 @@ If the line's patience hits zero, Ma'am Lorna takes over and the shift ends earl
 
 ## Key mechanics
 
-**Papers vs record.** Students hand over forms (add/drop form, consultation slip, receipt, assessment slip, ID). You click a field on the paper and the matching field on screen to flag a mismatch: a fake signature, a failed prerequisite, a wrong amount, a mismatched ID number.
+**Papers vs record.** Students hand over forms (add/drop form, consultation slip, receipt, assessment slip, cash in the tray, ID). You click a field on the paper and the matching field on screen to flag a mismatch: a fake signature, a failed prerequisite, a wrong amount, a mismatched ID number.
 
 **Section picker puzzle.** When a section is full, a weekly timetable opens. Pick an open section that doesn't clash with the student's other classes. On open market day, slots drain in real time while you choose.
 
@@ -83,7 +83,7 @@ There are 24 in all. Unlocks and lifetime counters are kept across seasons and r
 | 7 | Adjustment, day 1 | Adviser signatures, fake signatures, the Hold bench |
 | 8 | Adjustment, day 2 | Overloads (over 24 units) go to the Dean before 11:30 AM |
 | 9 | Extension | Only listed departments may adjust; turn the rest away |
-| 10 | Classes begin | Payment window: match cash to the assessment |
+| 10 | Classes begin | Payment window: match the cash to the Amount due |
 
 After day 10, the supervisor's evaluation gives one of three endings based on weighted accuracy, integrity and how many shifts the line gave up on: **kept the post**, **on probation**, or **not renewed**.
 
@@ -100,13 +100,14 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 | Fake signature | Reject |
 | Failed prerequisite (5.0) | Reject (INC goes to Consultation) |
 | Wrong department on extension day | Turn away: Wrong department (check the ISMIS Department against the memo) |
-| Payment doesn't match assessment | Send back to recheck, or give change |
+| Short payment (cash under the Amount due) | Turn away: Short payment |
+| Overpayment (cash over the Amount due) | Fix: give the exact change |
 
 ## Screens
 
 - **Menus:** splash, title, save slots, SA creator, settings, pause, credits
 - **Daily loop:** season calendar, morning memo, the window (the shift), day report, desk upgrades
-- **Inside a shift:** section picker, route menu, ISMIS reset, rulebook, Hold bench, shift failed
+- **Inside a shift:** section picker, route menu, ISMIS reset, change drawer, rulebook, Hold bench, shift failed
 - **Story and endings:** thank-you notes, regulars logbook, the end-of-season evaluation
 - **Achievements:** the unlock toast, and the achievements list on the title screen and the day report
 
@@ -120,9 +121,9 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 
 ## Status
 
-**Playable now:** days 1–9, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
+**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
 
-**Still to come:** day 10; title screen, saves and settings; desk upgrades; endings; audio and final art.
+**Still to come:** title screen, saves and settings; desk upgrades; the end-of-season endings screen; audio and final art.
 
 ## Running it
 

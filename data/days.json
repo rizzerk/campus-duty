@@ -1,7 +1,7 @@
 {
 	"_note": "Each day can override patience_mistake_penalty from balance.json (day 1 does, to keep the tutorial forgiving). Memo intros that say 'about N students' must match students; tests check it.",
 	"first_day": 1,
-	"last_day": 9,
+	"last_day": 10,
 	"days": {
 		"1": {
 			"onboarding": true,
@@ -183,6 +183,25 @@
 			"offices": {
 				"dean": { "default": "open" }
 			}
+		},
+		"10": {
+			"traits": { "impatient": 0.1, "palusot": 0.12, "with_parent": 0.12, "kapit": 0.1 },
+			"favor_chance": 0.12,
+			"no_id_chance": 0.1,
+			"reject_reasons": ["short_payment"],
+			"harmless_chance": 0.25,
+			"phase": "Classes begin",
+			"intro": "Classes begin, and Window 3 takes tuition payments today. Count every peso. Expect about 14 students.",
+			"rules": [
+				{ "text": "Check the cash in the tray against the Amount due in ISMIS. Exact? Approve (1). Short? Turn away (5), then pick Short payment.", "new": true },
+				{ "text": "Paid too much? Fix (2) and give the exact change: the cash minus the Amount due.", "new": true }
+			],
+			"students": 14,
+			"start_line": 6,
+			"years": [1, 2, 3, 4],
+			"visits": { "tuition_payment": 0.8, "first_year": 0.2 },
+			"problems": { "short_payment": 0.25, "overpayment": 0.3, "ismis_login": 0.45, "identity_mismatch": 0.15 },
+			"max_problems": 2
 		}
 	}
 }

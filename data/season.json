@@ -12,6 +12,6 @@
 		{ "day": 7, "date": 12, "phase": "Adjustment, day 1", "teaser": "Adviser signatures, fake signatures and the Hold bench." },
 		{ "day": 8, "date": 13, "phase": "Adjustment, day 2", "teaser": "Overloads over 24 units go to the Dean's office." },
 		{ "day": 9, "date": 14, "phase": "Extension", "teaser": "Only listed departments may adjust. Turn the rest away politely." },
-		{ "day": 10, "date": 15, "phase": "Classes begin", "teaser": "The payment window: match the cash to the assessment." }
+		{ "day": 10, "date": 15, "phase": "Classes begin", "teaser": "The payment window: match the cash to the Amount due." }
 	]
 }

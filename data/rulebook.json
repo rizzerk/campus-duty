@@ -28,7 +28,9 @@
 		{
 			"name": "Payments",
 			"entries": [
-				{ "day": 4, "title": "Unpaid balance", "problems": ["unpaid_balance"], "text": "Any balance in ISMIS? Route: Cashier first. They come back with a receipt." }
+				{ "day": 4, "title": "Unpaid balance", "problems": ["unpaid_balance"], "text": "Any balance in ISMIS? Route: Cashier first. They come back with a receipt." },
+				{ "day": 10, "title": "Short payment", "problems": ["short_payment"], "text": "Payment window: the cash in the tray must cover the Amount due in ISMIS. Less? Turn away: Short payment. Exact? Approve." },
+				{ "day": 10, "title": "Give change", "problems": ["overpayment"], "text": "More cash than the Amount due? Fix: take it and type the exact change, the cash minus the Amount due." }
 			]
 		},
 		{

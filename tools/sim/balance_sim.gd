@@ -149,6 +149,8 @@ func _play_shift(day: int, seed_value: int, bot_name: String) -> Dictionary:
 		if decision["action"] == "fix" and want["problem"] == "closed_section":
 			var fitting := Timetable.fitting_sections(student)
 			decision["details"]["section"] = fitting[0] if not fitting.is_empty() else ""
+		if decision["action"] == "fix" and want["problem"] == "overpayment":
+			decision["details"]["change"] = RulesCheck.change_due(student)
 		var result := shift.act(decision["action"], decision["details"])
 		if result.is_empty() or result.has("error"):
 			continue
@@ -213,7 +215,7 @@ func _flags(bot: Dictionary, student: Dictionary, rng: RandomNumberGenerator) ->
 func _think_time(bot: Dictionary, student: Dictionary, rng: RandomNumberGenerator) -> float:
 	var seconds: float = bot["think"] + bot["per_paper"] * student["papers"].size()
 	for problem: String in student["problems"]:
-		if problem in ["closed_section", "ismis_login"]:
+		if problem in ["closed_section", "ismis_login", "overpayment"]:
 			seconds += bot["tool"]
 	var spread: float = bot["jitter"]
 	return maxf(0.0, seconds * rng.randf_range(1.0 - spread, 1.0 + spread))

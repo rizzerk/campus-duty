@@ -65,6 +65,13 @@
 			"announcement": "Extension is open for Accountancy and Civil Engineering only; every other department's adjustment period has closed. The Dean's Office takes overloads all morning, for listed departments only.",
 			"policy": "Check the Department on the ISMIS record before anything else. Not on the list? Turn away: Wrong department, even if their papers are perfect.",
 			"event_preview": "Expected today: Students from other departments hoping to squeeze in one last change."
+		},
+		"10": {
+			"title": "Today's office bulletin",
+			"schedule": "8:00 AM–12:00 PM · Classes begin. Window 3 doubles as a payment window.",
+			"announcement": "The Cashier's line is out the door, so Window 3 takes tuition payments this morning. Late freshmen locked out of ISMIS still come to us too.",
+			"policy": "Count the cash against the Amount due in ISMIS. Exact: Approve. Short: Turn away: Short payment. Over: Fix and give the exact change.",
+			"event_preview": "Expected today: Big bills, small bills, and a few students hoping you won't count."
 		}
 	},
 	"day_events": {
@@ -194,6 +201,22 @@
 				"kind": "event",
 				"flash": "LAST STRETCH · Students from other departments are hoping you won't check.",
 				"banner": "Ma'am Lorna: “Daghan pa ang mangayo og 'usa na lang.' Ang listahan mao gihapon. Same list all day.”"
+			}
+		],
+		"10": [
+			{
+				"at": 40,
+				"id": "payment_count_reminder",
+				"kind": "announcement",
+				"flash": "PAYMENT WINDOW · Count the cash against the Amount due in ISMIS before you stamp!",
+				"banner": "Ma'am Lorna: “Ihapa ang kwarta. Kulang? Pabalika. Sobra? Hatagi og sakto nga sukli. Count first, then stamp.”"
+			},
+			{
+				"at": 160,
+				"id": "payment_last_stretch",
+				"kind": "event",
+				"flash": "LAST STRETCH · The last payers of the season. Don't let a single peso slip.",
+				"banner": "Ma'am Lorna: “Last day na ni sa season. Ayaw pagdali-dali. Ihapa gyud, ug ayaw kalimti ang sukli.”"
 			}
 		]
 	},

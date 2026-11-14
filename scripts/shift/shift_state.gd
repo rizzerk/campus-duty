@@ -192,9 +192,10 @@ func ask() -> void:
 	tick(0.0)
 
 
-## The player's decision on the student at the window. details holds "section" (section picker)
-## and "flags" (the player's flagged mismatches, judged now). Returns the rules result plus an
-## outcome: served, stays, routed, held, let_through, wrong_fix, bent, sent_back_wrong or walked_out.
+## The player's decision on the student at the window. details holds "section" (section picker),
+## "change" (the change tool, in whole pesos) and "flags" (the player's flagged mismatches, judged
+## now). Returns the rules result plus an outcome: served, stays, routed, held, let_through,
+## wrong_fix, bent, sent_back_wrong or walked_out.
 ## "favor" waves the student through without the checks: fine if nothing was wrong, rule bending
 ## if something was.
 func act(action: String, details: Dictionary = {}) -> Dictionary:
@@ -275,6 +276,7 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 		"outcome": outcome,
 		"reason_id": details.get("reason", ""),
 		"section": details.get("section", ""),
+		"change": int(details.get("change", -1)),
 		"items": details.get("items", []),
 		"office_open": OfficeSchedule.is_open(day, action.trim_prefix("route:"), minute) if action.begins_with("route:") else true,
 		"caught": flag_score["caught"],

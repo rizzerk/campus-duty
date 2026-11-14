@@ -153,12 +153,19 @@ func _make_form(index: int, form: Dictionary) -> Control:
 	rows.add_child(UiKit.label(form["title"], 19))
 	for key: String in form["fields"]:
 		var kind := "check" if key.begins_with("req_") else "signature" if key == "signature" else "text"
-		var row := FieldRow.make(key, _caption(key), str(form["fields"][key]), false, "", kind)
+		var row := FieldRow.make(key, _form_caption(form["form"], key), str(form["fields"][key]), false, "", kind)
 		row.drag_card = card
 		row.clicked.connect(func() -> void: paper_field_clicked.emit(index, key))
 		_rows["%d:%s" % [index, key]] = row
 		rows.add_child(row)
 	return card
+
+
+## A paper's own caption for a field, if it has one (the cash in the tray shares the Amount due key
+## so it can be flagged against ISMIS, but reads as the cash handed over).
+static func _form_caption(form: String, key: String) -> String:
+	var own: Dictionary = GameData.json("fields").get("form_labels", {}).get(form, {})
+	return own.get(key, _caption(key))
 
 
 static func _caption(key: String) -> String:

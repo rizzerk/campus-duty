@@ -62,6 +62,24 @@
 				"en": "My enrollment is still pending on ISMIS. Here's my slip."
 			}
 		],
+		"tuition_payment": [
+			{
+				"ceb": "Mobayad ko sa akong tuition. Ania ang kwarta ug ang assessment.",
+				"en": "I'm here to pay my tuition. Here's the cash and my assessment."
+			},
+			{
+				"ceb": "Kompleto na ni. Giihap nako sa balay.",
+				"en": "It's all there. I counted it at home."
+			},
+			{
+				"ceb": "Mobayad ko sa downpayment. Para maka-klase na ko.",
+				"en": "I'm paying my downpayment. So I can attend class."
+			},
+			{
+				"ceb": "Gihatag ni Mama ang kwarta ganina. Mao na ni tanan.",
+				"en": "Mom gave me the money this morning. That's all of it."
+			}
+		],
 		"first_year": [
 			{
 				"ceb": "Bag-o pa ko diri. Ingon sa Admissions diri daw ko moadto para sa akong ISMIS account.",
@@ -115,6 +133,10 @@
 		"enrollment_payment": [
 			{ "ceb": "Ania akong assessment slip.", "en": "Here's my assessment slip." },
 			{ "ceb": "Pa-validate lang ko.", "en": "Just for validation." }
+		],
+		"tuition_payment": [
+			{ "ceb": "Bayad sa tuition.", "en": "Tuition payment." },
+			{ "ceb": "Ania akong bayad.", "en": "Here's my payment." }
 		],
 		"first_year": [
 			{ "ceb": "Ania akong admission slip.", "en": "Here's my admission slip." },
@@ -276,6 +298,8 @@
 			"fake_signature": "Lorna's spot check on #{number}: “Compare the signature against the Advisers tab specimen! Forged signatures must be rejected.”",
 			"overload": "Lorna's spot check on #{number}: “Over 24 units is an overload. Route them to the Dean's Office (or turn away if the Dean is closed for the day).”",
 			"wrong_department": "Lorna's spot check on #{number}: “Check the Department in ISMIS against today's list. Not on it? Turn away (5), then pick Wrong department.”",
+			"short_payment": "Lorna's spot check on #{number}: “Count the cash against the Amount due in ISMIS. Short? Turn away (5), then pick Short payment.”",
+			"overpayment": "Lorna's spot check on #{number}: “More cash than the Amount due? Fix (2) and give the exact change: cash minus amount due.”",
 			"office_closed": "Lorna's spot check on #{number}: “Watch the office clock! Never route a student to an office that is closed or on break.”",
 			"clean": "Lorna's spot check on #{number}: “Nothing was wrong with #{number}'s papers—don't turn away or route a clean application!”"
 		}
@@ -572,6 +596,26 @@
 			{
 				"ceb": "Sa sunod semana pa unta mobayad akong papa.",
 				"en": "My dad was going to pay next week."
+			}
+		],
+		"payment_short": [
+			{
+				"ceb": "Ha? Kulang diay? Giihap man nako to ganina...",
+				"en": "Huh? It's short? I counted it earlier..."
+			},
+			{
+				"ceb": "Ay, nagamit diay nako ang uban pang-pamahaw ug pamasahe. Sorry.",
+				"en": "Oh, I used some of it for breakfast and fare. Sorry."
+			}
+		],
+		"payment_over": [
+			{
+				"ceb": "Wala koy barya, puro dagko ni. Naa ba moy sukli?",
+				"en": "I don't have small bills, it's all big ones. Do you have change?"
+			},
+			{
+				"ceb": "Puro dagko man ang gihatag ni Papa. Pa-sukli na lang.",
+				"en": "Dad gave me nothing but big bills. Just the change, please."
 			}
 		],
 		"birthday": [

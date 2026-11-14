@@ -12,6 +12,8 @@
 	],
 	"passing_grades": ["1.0", "1.2", "1.5", "1.7", "2.0", "2.2", "2.5", "2.7", "3.0"],
 	"unit_loads": [15, 18, 21],
+	"_payment_note": "Day 10 payment window. The amount due is a whole-peso figure between due_min and due_max in due_step steps. A short payment is due minus one of short_by. An overpayment rounds the due amount up past the next bill (so the change is never zero).",
+	"payment": { "due_min": 6000, "due_max": 22000, "due_step": 50, "short_by": [50, 100, 500, 1000], "bills": [500, 1000] },
 	"balances": ["PHP 1,250.00", "PHP 2,480.00", "PHP 3,450.00", "PHP 5,900.00", "PHP 8,125.00"],
 	"programs": [
 		{

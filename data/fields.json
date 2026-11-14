@@ -17,7 +17,12 @@
 		"amount_paid": "Amount paid",
 		"note": "Note",
 		"approved_units": "Approved units",
-		"birthday": "Birthday"
+		"birthday": "Birthday",
+		"amount_due": "Amount due"
 	},
-	"record_order": ["id_number", "name", "program", "year", "birthday", "department", "balance", "account", "units_enrolled", "max_units"]
+	"_form_labels_note": "A paper can show a field under its own caption while sharing the record's key, so a flag still compares the same field. The cash in the tray is checked against the Amount due.",
+	"form_labels": {
+		"cash": { "amount_due": "Cash handed over" }
+	},
+	"record_order": ["id_number", "name", "program", "year", "birthday", "department", "balance", "amount_due", "account", "units_enrolled", "max_units"]
 }

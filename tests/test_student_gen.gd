@@ -73,6 +73,16 @@ func _check_student(s: Dictionary, day: int) -> void:
 		_check(info["departments"].has(record["department"]) != problems.has("wrong_department"), "%s department decides the turn-away" % tag)
 	if problems.has("unpaid_balance") and not _paper(s, "assessment").is_empty():
 		_check(Mismatch.differs(s, _paper(s, "assessment"), "balance"), "%s balance mismatch flaggable" % tag)
+	var cash := _paper(s, "cash")
+	_check((s["visit"] == "tuition_payment") == not cash.is_empty(), "%s cash only at the payment window" % tag)
+	_check((s["visit"] == "tuition_payment") == record.has("amount_due"), "%s amount due only at the payment window" % tag)
+	if not cash.is_empty():
+		var paid := Money.parse(cash["fields"]["amount_due"])
+		var due := Money.parse(record["amount_due"])
+		_check(Money.parse(_paper(s, "assessment")["fields"]["amount_due"]) == due, "%s assessment slip matches ISMIS" % tag)
+		_check(problems.has("short_payment") == (paid < due), "%s short exactly when the cash is less" % tag)
+		_check(problems.has("overpayment") == (paid > due), "%s over exactly when the cash is more" % tag)
+		_check(paid > 0 and due > 0, "%s amounts are positive" % tag)
 	var slip := _paper(s, "consultation_slip")
 	if not slip.is_empty():
 		var bad_signature: bool = problems.has("fake_signature") or problems.has("missing_signature")

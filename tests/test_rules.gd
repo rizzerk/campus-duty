@@ -15,11 +15,13 @@ const TABLE := {
 	"failed_prereq": "reject",
 	"inc_prereq": "route:consultation",
 	"wrong_department": "reject",
+	"short_payment": "reject",
+	"overpayment": "fix",
 }
 const DAY_FOR := {
 	"identity_mismatch": 5, "missing_requirement": 2, "closed_section": 3, "unpaid_balance": 4, "ismis_login": 5,
 	"failed_prereq": 6, "inc_prereq": 6, "missing_signature": 7, "fake_signature": 7, "overload": 8,
-	"wrong_department": 9,
+	"wrong_department": 9, "short_payment": 10, "overpayment": 10,
 }
 const ACTIONS := ["approve", "fix", "hold", "reject", "route:cashier", "route:consultation", "route:dean"]
 
@@ -45,6 +47,8 @@ func _init() -> void:
 	_test_rulebook_covers_problems()
 	_test_memo_names_departments()
 	_test_memo_counts_match()
+	_test_money()
+	_test_payment_window()
 	print("rules: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -94,7 +98,8 @@ func _test_each_problem_has_one_right_action() -> void:
 			section = Timetable.fitting_sections(student)[0]
 		var want := RulesCheck.expected(student, _offices(true))
 		for action: String in ACTIONS:
-			var result := RulesCheck.judge(student, action, _offices(true), { "section": section, "reason": want["reason_id"], "items": want["items"] })
+			var details := { "section": section, "reason": want["reason_id"], "items": want["items"], "change": RulesCheck.change_due(student) }
+			var result := RulesCheck.judge(student, action, _offices(true), details)
 			_check(result["correct"] == (action == TABLE[id]), "%s with %s" % [id, action])
 			_check(result["reason"] != "", "%s has a reason" % id)
 
@@ -365,6 +370,60 @@ func _test_memo_counts_match() -> void:
 		for rush: Dictionary in info.get("rush", []):
 			total += int(rush["count"])
 		_check(int(found.get_string(1)) == total, "day %d memo says about %s, line has %d" % [day, found.get_string(1), total])
+
+
+func _test_money() -> void:
+	_check(Money.format(18450) == "PHP 18,450.00", "format groups thousands")
+	_check(Money.format(50) == "PHP 50.00", "format small amounts")
+	_check(Money.format(1250000) == "PHP 1,250,000.00", "format millions")
+	_check(Money.parse("PHP 18,450.00") == 18450, "parse drops the currency, commas and centavos")
+	_check(Money.parse("") == 0, "parse empty is 0")
+	for pesos: int in [0, 7, 999, 1000, 22050]:
+		_check(Money.parse(Money.format(pesos)) == pesos, "format and parse round-trip %d" % pesos)
+
+
+## Day 10: the cash in the tray against the Amount due. Exact is approved, short is sent back with
+## its reason, over is a fix that only counts with the exact change.
+func _test_payment_window() -> void:
+	var clean := _find(10, [])
+	for seed_value in 20000:
+		if not clean.is_empty() and clean["visit"] == "tuition_payment":
+			break
+		clean = StudentGen.make(seed_value, 10)
+		if not clean["problems"].is_empty() or clean["no_id"]:
+			clean = {}
+	_check(not clean.is_empty() and clean["visit"] == "tuition_payment", "a clean payer on day 10")
+	if not clean.is_empty():
+		_check(RulesCheck.judge(clean, "approve", _offices(true))["correct"], "exact cash is approved")
+		_check(RulesCheck.change_due(clean) == 0, "exact cash has no change")
+		_check(Mismatch.real_differences(clean).is_empty(), "exact cash has nothing to flag")
+	var short := _find(10, ["short_payment"])
+	_check(not short.is_empty(), "a short payer on day 10")
+	if not short.is_empty():
+		_check(not RulesCheck.judge(short, "approve", _offices(true))["correct"], "short cash can't be approved")
+		_check(RulesCheck.judge(short, "reject", _offices(true), { "reason": "short_payment" })["correct"], "short cash is sent back")
+		_check(not RulesCheck.judge(short, "reject", _offices(true), { "reason": "wrong_department" })["correct"], "short cash needs its own reason")
+		_check(not RulesCheck.judge(short, "fix", _offices(true), { "change": 0 })["correct"], "short cash isn't a fix")
+		_check(_cash_flag_is_real(short), "short cash is a real mismatch to flag")
+	var over := _find(10, ["overpayment"])
+	_check(not over.is_empty(), "an overpayer on day 10")
+	if not over.is_empty():
+		var change := RulesCheck.change_due(over)
+		_check(change > 0, "overpayment leaves change")
+		_check(RulesCheck.judge(over, "fix", _offices(true), { "change": change })["correct"], "exact change is right")
+		_check(not RulesCheck.judge(over, "fix", _offices(true), { "change": change + 50 })["correct"], "too much change is wrong")
+		_check(not RulesCheck.judge(over, "fix", _offices(true))["correct"], "a fix without change is wrong")
+		var wrong := RulesCheck.judge(over, "fix", _offices(true), { "change": change - 50 })
+		_check(wrong["reason"].contains(Money.format(change)), "wrong change says the right amount")
+		_check(not RulesCheck.judge(over, "approve", _offices(true))["correct"], "overpayment can't just be approved")
+		_check(_cash_flag_is_real(over), "overpaid cash is a real mismatch to flag")
+
+
+func _cash_flag_is_real(student: Dictionary) -> bool:
+	for i in student["papers"].size():
+		if student["papers"][i]["form"] == "cash":
+			return Mismatch.flag_is_real(student, { "form": i, "key": "amount_due", "context": "" })
+	return false
 
 
 func _last_day() -> int:
