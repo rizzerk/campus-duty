@@ -167,7 +167,7 @@ func _test_forced_problems() -> void:
 		_check(student["problems"].size() <= 1, "a forced student gets nothing else")
 		for problem: String in ["failed_prereq", "inc_prereq", "fake_signature", "identity_mismatch"]:
 			var day := 7 if problem == "fake_signature" else (5 if problem == "identity_mismatch" else 6)
-			_check(not LineDirector._search_teacher(problem, day, seed_value).is_empty(), "the director always finds a %s student (seed %d)" % [problem, seed_value])
+			_check(not LineDirector.search_student(problem, day, seed_value).is_empty(), "the director always finds a %s student (seed %d)" % [problem, seed_value])
 	var both := StudentGen.make(3, 5, ["identity_mismatch", "ismis_login"])
 	_check(both["problems"].has("identity_mismatch") and both["problems"].has("ismis_login"), "a problem and what it requires can be forced together")
 	_check(both["visit"] == "first_year", "the visit fits the forced problems")
@@ -235,30 +235,42 @@ func _test_no_student_twice() -> void:
 			_check(not twice, "day %d seed %d: no student appears twice" % [day, seed_value])
 
 
-## A regular whose line is about a problem arrives with that problem whenever the day has one.
+## A regular whose line is about a problem arrives with it. With "problem_chance" the line goes
+## either way by seed (Mae on day 6: sometimes right, sometimes an INC twist), and both happen.
 func _test_regulars_get_their_problem() -> void:
 	var matched := 0
 	var total := 0
 	for regular: Dictionary in GameData.json("events")["regulars"]:
 		for day_key: String in regular["appearances"]:
-			var problems: Array = regular["appearances"][day_key].get("problem", [])
+			var appearance: Dictionary = regular["appearances"][day_key]
+			var problems: Array = appearance.get("problem", [])
 			if problems.is_empty():
 				continue
 			var day := int(day_key)
 			for problem: String in problems:
 				_check(GameData.day(day).get("problems", {}).has(problem), "%s's day %d problem %s is in that day's mix" % [regular["name"], day, problem])
-			_check(int(regular["appearances"][day_key]["slot"]) >= 1 + LineDirector.new_problems(day).size(), "%s's day %d slot comes after the opening" % [regular["name"], day])
+			_check(int(appearance["slot"]) >= 1 + LineDirector.new_problems(day).size(), "%s's day %d slot comes after the opening" % [regular["name"], day])
+			var outcomes := {}
 			for seed_value in range(1, SEEDS + 1):
-				var shift := ShiftState.new(int(day_key), seed_value)
+				var wanted := ShiftEvents.regular_problems(appearance, day, seed_value, int(regular["number"]))
+				outcomes[wanted == [""]] = true
+				var shift := ShiftState.new(day, seed_value)
 				var everyone: Array = shift.line.duplicate()
 				for arrival: Dictionary in shift._arrivals:
 					everyone.append(arrival["student"])
 				for student: Dictionary in everyone:
 					if student.get("regular_id", "") == regular["id"]:
 						total += 1
-						if problems.has(LineDirector.problem_class(student)):
+						if wanted.has(LineDirector.problem_class(student)):
 							matched += 1
-	_check(total > 0 and matched >= total * 0.9, "regulars arrive with the problem their line is about (%d of %d)" % [matched, total])
+			if appearance.has("problem_chance"):
+				_check(outcomes.size() == 2, "%s's day %d line goes both ways across seeds" % [regular["name"], day])
+	var regulars: Array = GameData.json("events")["regulars"]
+	_check(LineDirector.REGULAR_RANGE + regulars.size() <= (1000 - LineDirector.SEARCH_OFFSET) / LineDirector.SEARCH_LIMIT, "every regular has its own block of search seeds under 1000")
+	var days: Dictionary = GameData.json("days")
+	for day in range(int(days["first_day"]), int(days["last_day"]) + 1):
+		_check(LineDirector.new_problems(day).size() <= LineDirector.REGULAR_RANGE, "day %d's new-problem searches stay clear of the regulars' seeds" % day)
+	_check(total > 0 and matched >= total * 0.97, "regulars arrive with the problem their line is about (%d of %d)" % [matched, total])
 
 
 ## The line the player meets (after regulars are placed) still keeps runs at two whenever the mix

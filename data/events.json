@@ -255,6 +255,8 @@
 				},
 				"6": {
 					"slot": 5,
+					"problem": ["inc_prereq"],
+					"problem_chance": 0.5,
 					"ceb": "Mae (#118) balik! Gi-double check na nako akong prereqs sa Grades tab, kompleto gyud unta ni.",
 					"en": "Mae (#118) again! I double-checked my prereqs for the Grades tab—this should be in order."
 				},

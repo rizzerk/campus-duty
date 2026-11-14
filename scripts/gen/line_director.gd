@@ -4,16 +4,19 @@ extends RefCounted
 ## an easy first student, then the day's new problem on its own so it can be learned, pressure
 ## that builds toward the busy part of the morning and eases after, and never a long run of the
 ## same problem. It only reorders the students it is given, so the day's mix stays the same, except
-## when the new problem is missing: then one student who has it alone is swapped in.
+## when the new problem is missing: then one student who has it alone is swapped in. (Regulars can
+## also bring in a generated student for their story beat: see ShiftEvents._bring_problem_to.)
 ##
 ## Settings: data/balance.json "director", overridable per day with a "director" key in days.json.
 
 ## Seeds for the extra students searched when the new problem is missing. Each new problem gets
 ## its own range, so two searches never make the same student. Far from the shift's own seeds
 ## (base * 100000 + day * 1000 + i, with i under 100): 500 + k * 30 stays under 1000 while a day
-## introduces at most 16 new problems (the season has at most 2 per day).
+## introduces at most 10 new problems (the season has at most 2 per day). Ranges from
+## REGULAR_RANGE up are for regulars whose problem is missing from the line (one per regular).
 const SEARCH_OFFSET := 500
 const SEARCH_LIMIT := 30
+const REGULAR_RANGE := 10
 
 
 ## The students in the order they should arrive. arrivals_rush[i] is true when slot i is part of a
@@ -32,7 +35,7 @@ static func order(students: Array, day: int, seed_value: int, arrivals_rush: Arr
 		var problem: String = problems[k]
 		var index := _find_teacher(pool, problem)
 		if index == -1:
-			var found := _search_teacher(problem, day, seed_value, k)
+			var found := search_student(problem, day, seed_value, k)
 			if found.is_empty():
 				continue
 			index = _most_replaceable(pool, problems)
@@ -141,7 +144,7 @@ static func _plain(student: Dictionary) -> bool:
 ## A student generated with exactly this problem (and what it requires), preferring a plain one.
 ## Usually the first seed works; a few problems need a fitting course request, so a handful of
 ## seeds are tried. range_index picks this problem's own block of seeds.
-static func _search_teacher(problem: String, day: int, seed_value: int, range_index: int = 0) -> Dictionary:
+static func search_student(problem: String, day: int, seed_value: int, range_index: int = 0) -> Dictionary:
 	var forced: Array = [problem] + GameData.problem(problem).get("requires", [])
 	var first := seed_value * 100000 + day * 1000 + SEARCH_OFFSET + range_index * SEARCH_LIMIT
 	var fallback := {}
