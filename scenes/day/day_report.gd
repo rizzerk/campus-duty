@@ -1,6 +1,10 @@
 extends Control
 ## F7: end of shift. Stars, the day's numbers and what went wrong, then on to tomorrow.
-## A failed shift (patience ran out) shows the S18 version of the title.
+## A failed shift (patience ran out) shows the S18 version of the title. Enter or Space presses
+## the gold button (next day, or the season's evaluation after the last day).
+
+var _next_button: Button = null
+var _achievements_open: bool = false
 
 
 func _ready() -> void:
@@ -55,18 +59,35 @@ func _ready() -> void:
 	var trophies := UiKit.button("Achievements (%d new)" % fresh if fresh > 0 else "Achievements", UiKit.PAPER, UiKit.INK, 22)
 	trophies.custom_minimum_size = Vector2(0, 64)
 	trophies.pressed.connect(func() -> void:
+		_achievements_open = true
 		var screen := AchievementsScreen.open(self)
-		screen.closed.connect(func() -> void: trophies.text = "Achievements"))
+		screen.closed.connect(func() -> void:
+			_achievements_open = false
+			trophies.text = "Achievements"))
 	foot.add_child(trophies)
-	var next := UiKit.button("Play again from day %d" % int(GameData.json("days")["first_day"]) if GameState.is_last_day() else "Next day", UiKit.GOLD, UiKit.INK, 26)
+	var last := GameState.is_last_day()
+	var next := UiKit.button("See your evaluation" if last else "Next day", UiKit.GOLD, UiKit.INK, 26)
 	next.custom_minimum_size = Vector2(300, 64)
-	# Only once: a double click must not skip a day.
+	# Only once: a double click must not skip a day. After the last day, Ma'am Lorna's
+	# end-of-season evaluation comes next.
 	next.pressed.connect(func() -> void:
 		if next.disabled:
 			return
 		next.disabled = true
-		GameState.next_day())
+		if last:
+			GameState.go_to("evaluation")
+		else:
+			GameState.next_day())
 	foot.add_child(next)
+	_next_button = next
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	# Ignore key repeats, so a key held from the shift can't skip the report.
+	if not (event is InputEventKey) or not event.pressed or event.echo or _achievements_open:
+		return
+	if event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and _next_button != null and not _next_button.disabled:
+		_next_button.pressed.emit()
 
 
 func _today_card(summary: Dictionary) -> Control:

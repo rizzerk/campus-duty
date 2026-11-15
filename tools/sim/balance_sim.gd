@@ -93,10 +93,12 @@ func _init() -> void:
 			"results": results,
 			"mistakes_by_problem": mistakes,
 			"endings": _endings(seasons),
+			"regulars": _regular_outcomes(seasons),
 		}, "\t"))
 	else:
 		_print_table(results, mistakes, options)
 		_print_endings(_endings(seasons), options)
+		_print_regulars(_regular_outcomes(seasons))
 	quit(0)
 
 
@@ -168,6 +170,7 @@ func _play_shift(day: int, seed_value: int, bot_name: String) -> Dictionary:
 		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
 	summary["integrity"] = Evaluation.integrity(summary)
+	summary["regulars"] = Evaluation.regular_calls(shift.history)
 	summary["patience_left"] = maxf(shift.patience, 0.0)
 	summary["minute"] = shift.minute
 	summary["mistakes_by_problem"] = mistakes_by_problem
@@ -266,6 +269,26 @@ func _endings(seasons: Dictionary) -> Dictionary:
 func _print_endings(counts: Dictionary, options: Dictionary) -> void:
 	print("")
 	print("Season endings over days %s (one season per seed):" % [options["days"]])
+	for bot: String in counts:
+		var parts: Array = counts[bot].keys().map(func(id: String) -> String: return "%s %d" % [id, counts[bot][id]])
+		print("  %-8s %s" % [bot, ", ".join(parts)])
+
+
+## bot -> outcome -> how many regulars got it, over every season (see Evaluation.regulars).
+func _regular_outcomes(seasons: Dictionary) -> Dictionary:
+	var counts := {}
+	for bot: String in seasons:
+		var by_outcome := { "good": 0, "mixed": 0, "bad": 0, "missed": 0 }
+		for n: int in seasons[bot]:
+			for regular: Dictionary in Evaluation.regulars(seasons[bot][n]):
+				by_outcome[regular["outcome"]] = int(by_outcome[regular["outcome"]]) + 1
+		counts[bot] = by_outcome
+	return counts
+
+
+func _print_regulars(counts: Dictionary) -> void:
+	print("")
+	print("Regulars' outcomes (every regular, every season):")
 	for bot: String in counts:
 		var parts: Array = counts[bot].keys().map(func(id: String) -> String: return "%s %d" % [id, counts[bot][id]])
 		print("  %-8s %s" % [bot, ", ".join(parts)])

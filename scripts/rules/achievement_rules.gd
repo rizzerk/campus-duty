@@ -18,8 +18,8 @@ static func find(id: String) -> Dictionary:
 	return {}
 
 
-## Lifetime counters a call adds to. Regulars are tracked by the Achievements autoload, since the
-## history entry doesn't say who was a regular.
+## Lifetime counters a call adds to. Regulars are tracked by the Achievements autoload, which
+## sees the student; history entries also carry regular_id now (for the season evaluation).
 static func stat_deltas(entry: Dictionary) -> Dictionary:
 	var deltas := {}
 	if int(entry.get("caught", 0)) > 0:

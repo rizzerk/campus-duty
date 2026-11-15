@@ -7,10 +7,12 @@ const SCENES := {
 	"memo": "res://scenes/day/memo.tscn",
 	"window": "res://scenes/day/window.tscn",
 	"report": "res://scenes/day/day_report.tscn",
+	"evaluation": "res://scenes/day/evaluation.tscn",
 	"title": "res://scenes/main/title.tscn",
 }
-## Screens a debug launch may jump to. The report needs a finished shift, so it isn't one.
-const DEBUG_SCENES := ["calendar", "memo", "window"]
+## Screens a debug launch may jump to. The report needs a finished shift, so it isn't one. The
+## evaluation gets a made-up season (see DebugSeason).
+const DEBUG_SCENES := ["calendar", "memo", "window", "evaluation"]
 
 var day: int = 1
 var base_seed: int = 1
@@ -39,6 +41,7 @@ func finish_shift(summary: Dictionary, history: Array) -> void:
 		summary["caught_bends"] = check["caught_bends"]
 	summary["stars"] = Scoring.stars(summary)
 	summary["integrity"] = Evaluation.integrity(summary)
+	summary["regulars"] = Evaluation.regular_calls(history)
 	PlaytestLog.append(PlaytestLog.entry(summary, history, day, base_seed))
 	last_summary = summary
 	last_history = history
@@ -59,13 +62,10 @@ func season_stars() -> int:
 	return total
 
 
+## After the last day the report opens the evaluation instead, and a new season goes through
+## start_new_game, so this never runs past the last day.
 func next_day() -> void:
-	if is_last_day():
-		# A new season: the old season's stars don't carry over.
-		results.clear()
-		day = int(GameData.json("days")["first_day"])
-	else:
-		day += 1
+	day = mini(day + 1, int(GameData.json("days")["last_day"]))
 	go_to("calendar")
 
 
@@ -95,6 +95,8 @@ func go_to(scene: String) -> void:
 
 ## Debug builds only: `godot --path . -- --day=6 --seed=42 --scene=memo` starts straight at that
 ## day for playtesting. Returns true when it took over, so the splash can skip its intro.
+## --day is required, even with --scene=evaluation (which plays out a made-up season, see
+## DebugSeason, and opens the end-of-season evaluation).
 func debug_jump() -> bool:
 	if not OS.is_debug_build():
 		return false
@@ -109,6 +111,9 @@ func debug_jump() -> bool:
 	var scene := String(args.get("scene", "window"))
 	if scene not in DEBUG_SCENES:
 		scene = "window"
+	if scene == "evaluation":
+		day = int(days["last_day"])
+		results = DebugSeason.make(args)
 	# tests/smoke.sh looks for this line to know the jump really happened.
 	print("debug_jump: day %d seed %d -> %s" % [day, base_seed, scene])
 	go_to(scene)

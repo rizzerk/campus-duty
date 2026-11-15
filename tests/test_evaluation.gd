@@ -17,6 +17,13 @@ func _init() -> void:
 	_test_reasons_match_numbers()
 	_test_stars_use_weighted_accuracy()
 	_test_shift_state_records_it()
+	_test_regular_calls()
+	_test_regular_outcomes()
+	_test_regulars_over_the_season()
+	_test_ending_target()
+	_test_ending_screen_data()
+	_test_season_totals()
+	_test_debug_season_reaches_every_ending()
 	print("evaluation: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -184,6 +191,14 @@ func _test_reasons_match_numbers() -> void:
 	_check(shady["reasons"].size() == 1 and String(shady["reasons"][0]).contains(str(low_integrity)), "probation says which bar was missed")
 	var bad := Evaluation.ending(_results(0.3, 100, 0))
 	_check(bad["id"] == "not_renewed" and bad["reasons"].size() == 1 and String(bad["reasons"][0]).contains("30%"), "not renewed names the probation bar missed")
+	# Just under the bar must not show as the bar: 89.7% against 90% reads 89%, on the screen and in the reason.
+	var under := float(kept["min_accuracy"]) - 0.003
+	var close := Evaluation.ending(_results(under, 100, 0))
+	_check(close["id"] != "kept", "just under the accuracy bar doesn't keep the post")
+	_check(Evaluation.percent(under) < roundi(float(kept["min_accuracy"]) * 100.0), "the shown percent is under the bar (%d%%)" % Evaluation.percent(under))
+	_check(String(close["reasons"][0]).contains("%d%%" % Evaluation.percent(under)), "the reason shows the same rounded-down number")
+	_check(Evaluation.percent(float(kept["min_accuracy"])) == roundi(float(kept["min_accuracy"]) * 100.0), "exactly on the bar shows the bar")
+	_check(Evaluation.percent(0.95) == 95 and Evaluation.percent(1.0) == 100 and Evaluation.percent(0.0) == 0, "whole percents stay whole")
 	for reason: String in good["reasons"] + shady["reasons"] + bad["reasons"]:
 		_check(not reason.contains("{"), "no unfilled placeholder in '%s'" % reason)
 
@@ -202,6 +217,140 @@ func _test_shift_state_records_it() -> void:
 	var count: int = student["problems"].size()
 	shift.act("approve")
 	_check(int(shift.history[0].get("problem_count", -1)) == count, "history records how many problems the student had")
+	_check(shift.history[0].has("regular_id"), "history says whether the student was a regular")
+	# Day 3: Jericho (#112) comes to the window. His call is filed under his regular id.
+	var day3 := ShiftState.new(3, 42)
+	var seen := ""
+	for i in 40:
+		var at_window := day3.call_next()
+		if at_window.is_empty():
+			break
+		day3.act("approve")
+		if at_window.get("regular_id", "") != "":
+			seen = String(day3.history.back()["regular_id"])
+			break
+	_check(seen == "jericho_112", "a regular's call is filed under their id (got '%s')" % seen)
+	_check(Evaluation.regular_calls(day3.history).has("jericho_112"), "the day's regular calls include them")
 	var summary := shift.summary()
 	for key: String in ["weighted_accuracy", "hard_calls", "best_streak", "streak_bonus"]:
 		_check(summary.has(key), "summary has %s" % key)
+
+
+func _regular_entry(id: String, correct: bool, bent: bool = false) -> Dictionary:
+	return { "regular_id": id, "correct": correct and not bent, "bent": bent }
+
+
+func _test_regular_calls() -> void:
+	var history: Array = [
+		_entry(true),
+		_regular_entry("jericho_112", true),
+		_regular_entry("jericho_112", false),
+		_regular_entry("mae_118", false, true),
+		{ "correct": true },
+	]
+	var calls := Evaluation.regular_calls(history)
+	_check(calls.size() == 2, "only regulars who reached the window are listed")
+	_check(calls["jericho_112"] == { "right": 1, "wrong": 1, "bent": 0 }, "right and wrong calls counted per regular")
+	_check(calls["mae_118"] == { "right": 0, "wrong": 0, "bent": 1 }, "a favor counts as bent, not wrong")
+	_check(Evaluation.regular_calls([]).is_empty(), "no history, no regulars")
+
+
+func _test_regular_outcomes() -> void:
+	_check(Evaluation.regular_outcome({}) == "missed", "never at the window is missed")
+	_check(Evaluation.regular_outcome({ "right": 3 }) == "good", "every call right is good")
+	_check(Evaluation.regular_outcome({ "right": 2, "wrong": 1 }) == "mixed", "more right than wrong is mixed")
+	_check(Evaluation.regular_outcome({ "right": 1, "wrong": 1 }) == "mixed", "as many right as wrong is mixed")
+	_check(Evaluation.regular_outcome({ "right": 1, "wrong": 1, "bent": 1 }) == "bad", "favors count against them")
+	_check(Evaluation.regular_outcome({ "wrong": 2 }) == "bad", "only wrong calls is bad")
+	_check(Evaluation.regular_outcome({ "bent": 1 }) == "bad", "only a favor is bad")
+
+
+func _test_regulars_over_the_season() -> void:
+	var results := {
+		3: { "regulars": { "jericho_112": { "right": 1, "wrong": 0, "bent": 0 } } },
+		4: { "regulars": { "jericho_112": { "right": 0, "wrong": 2, "bent": 0 }, "mae_118": { "right": 1, "wrong": 0, "bent": 0 } } },
+		5: {},
+	}
+	var list := Evaluation.regulars(results)
+	var events: Array = GameData.json("events")["regulars"]
+	_check(list.size() == events.size(), "every regular is listed")
+	_check(list.map(func(r: Dictionary) -> String: return r["id"]) == events.map(func(r: Dictionary) -> String: return r["id"]), "in events.json order")
+	var by_id := {}
+	for regular: Dictionary in list:
+		by_id[regular["id"]] = regular
+	_check(by_id["jericho_112"]["visits"] == { "right": 1, "wrong": 1, "bent": 0 }, "each day is one visit, wrong if any call was wrong")
+	_check(by_id["jericho_112"]["outcome"] == "mixed", "one good visit and one botched one is mixed")
+	# A wrong call fixed when they came back still botches that visit.
+	var bounced := Evaluation.regulars({
+		3: { "regulars": { "jericho_112": { "right": 1, "wrong": 1, "bent": 0 } } },
+		4: { "regulars": { "jericho_112": { "right": 1, "wrong": 1, "bent": 0 } } },
+		6: { "regulars": { "jericho_112": { "right": 1, "wrong": 0, "bent": 0 } } },
+	})
+	_check(bounced[0]["visits"] == { "right": 1, "wrong": 2, "bent": 0 } and bounced[0]["outcome"] == "bad",
+			"two botched visits out of three is bad, even when the calls balance out")
+	_check(by_id["mae_118"]["outcome"] == "good", "one right visit is good")
+	_check(by_id["carlo_104"]["outcome"] == "missed", "a regular never seen is missed")
+	_check(by_id["carlo_104"]["number"] == 104 and by_id["carlo_104"]["name"] == "Carlo Bacalso", "number and name from events.json")
+	for regular: Dictionary in list:
+		_check(String(regular["text"]) != "" and not String(regular["text"]).contains("{"), "%s has a filled outcome line" % regular["id"])
+	_check(Evaluation.regulars({}).all(func(r: Dictionary) -> bool: return r["outcome"] == "missed"), "an empty season misses everyone")
+
+
+func _test_ending_target() -> void:
+	var endings: Dictionary = GameData.json("endings")["endings"]
+	_check(Evaluation.ending(_results(1.0, 100, 0))["target"] == "kept", "kept is measured against its own bars")
+	var probation := Evaluation.ending(_results(float(endings["probation"]["min_accuracy"]), int(endings["probation"]["min_integrity"]), 0))
+	_check(probation["id"] == "probation" and probation["target"] == "kept", "probation is measured against the kept bars it missed")
+	_check(Evaluation.ending(_results(0.1, 0, 9))["target"] == "probation", "not renewed is measured against the probation bars")
+
+
+func _test_ending_screen_data() -> void:
+	var data: Dictionary = GameData.json("endings")
+	var expressions: Dictionary = GameData.json("portrait_parts")["expressions"]
+	for id: String in data["order"]:
+		var ending_data: Dictionary = data["endings"][id]
+		for key: String in ["title", "stamp", "stamp_note", "rank", "look", "lorna_expression"]:
+			_check(String(ending_data.get(key, "")) != "", "%s has %s" % [id, key])
+		_check(expressions.has(ending_data.get("lorna_expression", "")), "%s uses a real expression" % id)
+		var verdict: Dictionary = ending_data.get("verdict", {})
+		_check(String(verdict.get("ceb", "")) != "" and String(verdict.get("en", "")) != "", "%s has Lorna's verdict in Bisaya and English" % id)
+	for key: String in ["office", "heading", "intro", "accuracy", "integrity", "failed_days", "stars", "bars_for", "met", "not_met", "signature",
+			"regulars_title", "served", "correct", "star_total", "favors", "endings_note", "main_menu", "new_season"]:
+		_check(String(data["screen"].get(key, "")) != "", "screen text has %s" % key)
+	for outcome: String in ["good", "mixed", "bad", "missed"]:
+		_check(String(data["regular_default"].get(outcome, "")) != "", "a fallback line for %s" % outcome)
+		_check(expressions.has(data["regular_expressions"].get(outcome, "")), "a real face for %s" % outcome)
+		for regular: Dictionary in GameData.json("events")["regulars"]:
+			_check(String(data["regulars"].get(regular["id"], {}).get(outcome, "")) != "", "%s has a %s line" % [regular["id"], outcome])
+
+
+func _test_season_totals() -> void:
+	var per_day: int = GameData.json("balance")["star_thresholds"].size()
+	var totals := Evaluation.season_totals({
+		1: { "served": 10, "total": 12, "stars": 3, "bends": 1, "caught_bends": 1 },
+		2: { "served": 5, "total": 14, "stars": 0 },
+	})
+	_check(totals["served"] == 15 and totals["students"] == 26, "served and students add up")
+	_check(totals["stars"] == 3 and totals["max_stars"] == per_day * 2, "stars out of the most two days can earn")
+	_check(totals["bends"] == 1 and totals["caught_bends"] == 1, "favors and caught favors add up")
+	_check(Evaluation.season_totals({})["max_stars"] == 0, "an empty season has no stars to earn")
+
+
+## The debug launch (`--scene=evaluation`) must be able to show all three endings.
+func _test_debug_season_reaches_every_ending() -> void:
+	var days: Dictionary = GameData.json("days")
+	var cases := [
+		[{ "accuracy": "0.95", "integrity": "99" }, "kept", "good"],
+		[{ "accuracy": "0.8", "integrity": "70", "failed": "2", "regulars": "mixed" }, "probation", "mixed"],
+		[{ "accuracy": "0.5", "integrity": "40", "failed": "4", "regulars": "bad" }, "not_renewed", "bad"],
+		[{ "regulars": "missed" }, "kept", "missed"],
+	]
+	for case: Array in cases:
+		var season: Dictionary = DebugSeason.make(case[0])
+		_check(season.size() == int(days["last_day"]) - int(days["first_day"]) + 1, "a debug season has every day")
+		_check(Evaluation.ending(season)["id"] == case[1], "%s reaches %s" % [case[0], case[1]])
+		_check(Evaluation.regulars(season).all(func(r: Dictionary) -> bool: return r["outcome"] == case[2]), "%s gives every regular %s" % [case[0], case[2]])
+	var junk: Dictionary = DebugSeason.make({ "accuracy": "lots", "integrity": "-5", "failed": "99", "regulars": "../x" })
+	var numbers := Evaluation.season(junk)
+	_check(numbers["integrity"] == 0 and numbers["failed_days"] == junk.size(), "bad debug numbers are clamped")
+	_check(_near(numbers["accuracy"], 0.93), "a debug accuracy that isn't a number falls back")

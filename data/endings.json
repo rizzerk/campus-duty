@@ -1,11 +1,84 @@
 {
-	"_note": "End-of-season result. Endings are tried in order; the first whose bars are all met wins, and the last one (no bars) catches the rest. A bar left out is open. Accuracy is the mean weighted accuracy over the days played (0 to 1), integrity the mean integrity (0 to the max in balance.json scoring.integrity.start), failed_days the shifts the line gave up on. Reason text can use {accuracy}, {min_accuracy}, {integrity}, {min_integrity}, {max_integrity}, {failed_days} and {max_failed_days}. integrity_story is the day report's line explaining today's integrity ({points} is signed).",
+	"_note": "End-of-season result. Endings are tried in order; the first whose bars are all met wins, and the last one (no bars) catches the rest. A bar left out is open. Accuracy is the mean weighted accuracy over the days played (0 to 1), integrity the mean integrity (0 to the max in balance.json scoring.integrity.start), failed_days the shifts the line gave up on. Reason text can use {accuracy}, {min_accuracy}, {integrity}, {min_integrity}, {max_integrity}, {failed_days} and {max_failed_days}. integrity_story is the day report's line explaining today's integrity ({points} is signed). For the evaluation screen, each ending also has: stamp and stamp_note (the rubber stamp), look (the screen's colors: kept, probation or not_renewed), lorna_expression (a portrait_parts.json expression), rank (keep it in step with the title and order) and verdict (Lorna's line, ceb and en). In screen, intro can use {served} and {days}, bars_for can use {title}.",
 	"order": ["kept", "probation", "not_renewed"],
 	"endings": {
-		"kept": { "title": "Kept the post", "min_accuracy": 0.9, "min_integrity": 95, "max_failed_days": 1 },
-		"probation": { "title": "On probation", "min_accuracy": 0.75, "min_integrity": 50, "max_failed_days": 3 },
-		"not_renewed": { "title": "Not renewed" }
+		"kept": {
+			"title": "Kept the post", "min_accuracy": 0.9, "min_integrity": 95, "max_failed_days": 1,
+			"stamp": "POST KEPT", "stamp_note": "see you next semester", "look": "kept", "lorna_expression": "happy",
+			"rank": "This is the best of three endings: Kept the post.",
+			"verdict": {
+				"ceb": "Maayo kaayo ang imong trabaho karong enrollment. Imo gihapon ang Window 3 sunod semester.",
+				"en": "You did very well this enrollment. Window 3 is still yours next semester."
+			}
+		},
+		"probation": {
+			"title": "On probation", "min_accuracy": 0.75, "min_integrity": 50, "max_failed_days": 3,
+			"stamp": "ON PROBATION", "stamp_note": "one more chance", "look": "probation", "lorna_expression": "neutral",
+			"rank": "This is the middle of three endings: On probation.",
+			"verdict": {
+				"ceb": "Pwede na, pero daghan pa ta'g ayuhon. Sunod semester, bantayan tika.",
+				"en": "It'll do, but we still have a lot to fix. Next semester, I'm keeping an eye on you."
+			}
+		},
+		"not_renewed": {
+			"title": "Not renewed",
+			"stamp": "NOT RENEWED", "stamp_note": "thank you for your service", "look": "not_renewed", "lorna_expression": "neutral",
+			"rank": "This is the worst of three endings: Not renewed.",
+			"verdict": {
+				"ceb": "Pasensya, pero kinahanglan namo og laing SA sa Window 3 sunod semester. Salamat gihapon sa kakugi.",
+				"en": "I'm sorry, but we need someone else at Window 3 next semester. Thank you for your hard work, though."
+			}
+		}
 	},
+	"screen": {
+		"office": "OFFICE OF THE REGISTRAR",
+		"heading": "Student Assistant evaluation",
+		"intro": "Enrollment season is over. You served {served} students across {days} days.",
+		"accuracy": "Accuracy (hard calls count extra)",
+		"integrity": "Integrity",
+		"failed_days": "Shifts the line gave up on",
+		"stars": "Season stars",
+		"bars_for": "Measured against the bars for {title}",
+		"met": "MET",
+		"not_met": "NOT MET",
+		"signature": "L. Abellana",
+		"regulars_title": "What happened to your regulars",
+		"served": "served",
+		"correct": "accuracy",
+		"star_total": "stars",
+		"favors": "favors / caught",
+		"endings_note": "Accuracy, integrity and lost shifts decide which one you get.",
+		"main_menu": "Esc  Main menu",
+		"new_season": "Enter  New season"
+	},
+	"_regulars_note": "What happened to each regular (events.json id) by how their visits went. Each day they came is one visit, right only if every call on them that day was right: good (every visit right), mixed (at least as many right visits as botched ones), bad (more botched visits than right ones) or missed (never reached the window). regular_default covers a regular with no lines yet; {name} is their first name and {number} their queue number. regular_expressions sets their portrait's face for each outcome.",
+	"regulars": {
+		"jericho_112": {
+			"good": "Jericho got every subject he camped out for. He's graduating on time, and he still owes you banana cue.",
+			"mixed": "Jericho got most of his subjects, but one fell through. He's taking it over the summer.",
+			"bad": "Jericho's load fell apart by the end of adjustment. He's graduating a semester late.",
+			"missed": "Jericho never made it to your window. Someone at another window sorted out his load."
+		},
+		"carlo_104": {
+			"good": "Carlo is enrolled, adviser's signature and all. He bought an ID lace so it never falls out on the 13C again.",
+			"mixed": "Carlo got enrolled after a few extra trips. He finally bought an ID lace, then lost it, ID and all, on day 2 of classes.",
+			"bad": "Carlo spent the first week of classes still chasing his adviser's signature. His ID is still somewhere on the 13C jeepney.",
+			"missed": "Carlo never made it to your window. He got sorted at Window 2. ID found, lace still pending."
+		},
+		"mae_118": {
+			"good": "Mae kept her full load and her scholarship. Her color-coded slips are now the department's template.",
+			"mixed": "Mae kept her scholarship, barely. She added a new color to her slips: \"double-check the SA.\"",
+			"bad": "Mae dropped below her maintaining load. She's appealing to keep her scholarship.",
+			"missed": "Mae never made it to your window. She got her load sorted at Window 2."
+		}
+	},
+	"regular_default": {
+		"good": "#{number} {name} got everything sorted, thanks to you.",
+		"mixed": "#{number} {name} got there in the end, after a few extra trips.",
+		"bad": "#{number} {name} is still sorting out their enrollment.",
+		"missed": "#{number} {name} never made it to your window."
+	},
+	"regular_expressions": { "good": "happy", "mixed": "neutral", "bad": "nervous", "missed": "neutral" },
 	"reasons": {
 		"accuracy_ok": "You scored {accuracy}% on your calls, with hard calls counting extra. The bar was {min_accuracy}%.",
 		"accuracy_low": "You scored {accuracy}% on your calls, with hard calls counting extra. That's under the bar of {min_accuracy}%.",

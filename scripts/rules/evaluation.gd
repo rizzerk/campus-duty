@@ -163,6 +163,12 @@ static func season(results: Dictionary) -> Dictionary:
 	}
 
 
+## A season accuracy as the whole percent the player sees. Rounded down, with the same tolerance
+## checks() uses, so a number shown equal to the bar always clears it: 0.897 shows 89%, not 90%.
+static func percent(accuracy: float) -> int:
+	return floori(accuracy * 100.0 + 0.001)
+
+
 ## One ending's bars, with missing ones open: an ending can set just the bars it cares about.
 static func bars(ending_data: Dictionary) -> Dictionary:
 	return {
@@ -187,9 +193,10 @@ static func meets(numbers: Dictionary, ending_data: Dictionary) -> bool:
 	return checks(numbers, ending_data).values().all(func(ok: bool) -> bool: return ok)
 
 
-## The end-of-season result: { id, title, reasons, numbers }. id is kept, probation or
-## not_renewed. Endings are tried in order and the first whose bars are all met wins; the last
-## one catches the rest. Reasons compare the numbers with the bars of the ending they got (the
+## The end-of-season result: { id, title, reasons, numbers, target }. id is kept, probation or
+## not_renewed; target is the ending whose bars the reasons are measured against. Endings are
+## tried in order and the first whose bars are all met wins; the last one catches the rest.
+## Reasons compare the numbers with the bars of the ending they got (the
 ## best one) or of the one just above it that they missed, so they always match the numbers.
 static func ending(results: Dictionary) -> Dictionary:
 	var data: Dictionary = GameData.json("endings")
@@ -201,9 +208,9 @@ static func ending(results: Dictionary) -> Dictionary:
 			index = i
 			break
 	var chosen: String = order[index]
-	var reasons := reasons_against(numbers, data["endings"][chosen], true) if index == 0 \
-			else reasons_against(numbers, data["endings"][order[index - 1]], false)
-	return { "id": chosen, "title": String(data["endings"][chosen].get("title", chosen)), "reasons": reasons, "numbers": numbers }
+	var target: String = order[maxi(index - 1, 0)]
+	var reasons := reasons_against(numbers, data["endings"][target], index == 0)
+	return { "id": chosen, "title": String(data["endings"][chosen].get("title", chosen)), "reasons": reasons, "numbers": numbers, "target": target }
 
 
 ## Player-facing lines comparing the numbers with one ending's bars. met lists the bars that were
@@ -212,7 +219,7 @@ static func reasons_against(numbers: Dictionary, ending_data: Dictionary, met: b
 	var text: Dictionary = GameData.json("endings").get("reasons", {})
 	var bar := bars(ending_data)
 	var values := {
-		"accuracy": roundi(numbers["accuracy"] * 100.0),
+		"accuracy": percent(numbers["accuracy"]),
 		"min_accuracy": roundi(bar["min_accuracy"] * 100.0),
 		"integrity": numbers["integrity"],
 		"min_integrity": bar["min_integrity"],
@@ -228,3 +235,89 @@ static func reasons_against(numbers: Dictionary, ending_data: Dictionary, met: b
 		if results[key] == met and template != "" and ending_data.has("max_failed_days" if key == "failed_days" else "min_" + key):
 			lines.append(template.format(values))
 	return lines
+
+
+## How each regular's visits went in one shift's history: regular id -> { right, wrong, bent }.
+## Only regulars who reached the window are listed.
+static func regular_calls(history: Array) -> Dictionary:
+	var calls := {}
+	for entry: Dictionary in history:
+		var id := String(entry.get("regular_id", ""))
+		if id == "":
+			continue
+		var counts: Dictionary = calls.get(id, { "right": 0, "wrong": 0, "bent": 0 })
+		if entry.get("bent", false):
+			counts["bent"] += 1
+		elif entry.get("correct", false):
+			counts["right"] += 1
+		else:
+			counts["wrong"] += 1
+		calls[id] = counts
+	return calls
+
+
+## One regular's season from their visit counts { right, wrong, bent } (see regulars): good (every
+## visit right), mixed (at least as many right as not), bad (more botched visits than right ones)
+## or missed (never at the window). Regulars don't ask favors yet, so bent stays 0 in play.
+static func regular_outcome(calls: Dictionary) -> String:
+	var right := int(calls.get("right", 0))
+	var not_right := int(calls.get("wrong", 0)) + int(calls.get("bent", 0))
+	if right + not_right == 0:
+		return "missed"
+	if not_right == 0:
+		return "good"
+	return "mixed" if right >= not_right else "bad"
+
+
+## What happened to each regular (events.json "regulars", in that order) over the season in
+## GameState.results: [{ id, number, name, outcome, text, visits, regular }]. Each day a regular
+## came is one visit: right only if every call on them that day was right, so a wrong call fixed
+## when they came back still counts against that visit. The text comes from endings.json
+## "regulars", falling back to "regular_default" for a regular with no lines yet.
+static func regulars(results: Dictionary) -> Array:
+	var totals := {}
+	for number: int in results:
+		var day_calls: Dictionary = results[number].get("regulars", {})
+		for id: String in day_calls:
+			var calls: Dictionary = day_calls[id]
+			var visits: Dictionary = totals.get(id, { "right": 0, "wrong": 0, "bent": 0 })
+			if int(calls.get("bent", 0)) > 0:
+				visits["bent"] += 1
+			elif int(calls.get("wrong", 0)) > 0:
+				visits["wrong"] += 1
+			elif int(calls.get("right", 0)) > 0:
+				visits["right"] += 1
+			totals[id] = visits
+	var text: Dictionary = GameData.json("endings")
+	var lines: Dictionary = text.get("regulars", {})
+	var fallback: Dictionary = text.get("regular_default", {})
+	var list: Array = []
+	for regular: Dictionary in GameData.json("events")["regulars"]:
+		var id := String(regular["id"])
+		var visits: Dictionary = totals.get(id, { "right": 0, "wrong": 0, "bent": 0 })
+		var outcome := regular_outcome(visits)
+		var template := String(lines.get(id, {}).get(outcome, fallback.get(outcome, "")))
+		list.append({
+			"id": id,
+			"number": int(regular["number"]),
+			"name": String(regular["name"]),
+			"outcome": outcome,
+			"text": template.format({ "name": String(regular["name"]).get_slice(" ", 0), "number": int(regular["number"]) }),
+			"visits": visits,
+			"regular": regular,
+		})
+	return list
+
+
+## The season's totals for the evaluation sheet: served, students, stars, favors done and caught.
+static func season_totals(results: Dictionary) -> Dictionary:
+	var per_day: int = GameData.json("balance")["star_thresholds"].size()
+	var totals := { "served": 0, "students": 0, "stars": 0, "max_stars": per_day * results.size(), "bends": 0, "caught_bends": 0 }
+	for number: int in results:
+		var summary: Dictionary = results[number]
+		totals["served"] += int(summary.get("served", 0))
+		totals["students"] += int(summary.get("total", 0))
+		totals["stars"] += int(summary.get("stars", 0))
+		totals["bends"] += int(summary.get("bends", 0))
+		totals["caught_bends"] += int(summary.get("caught_bends", 0))
+	return totals
