@@ -445,6 +445,9 @@ func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 	var area := _student_panel.stamp_rect()
 	_stamp.pivot_offset = _stamp.size / 2.0
 	_stamp.position = area.get_center() - _stamp.size / 2.0
+	# The stamp lands: it slams in a little big and jolts. Only the stamp moves, never the paper.
+	Juice.punch(_stamp, 1.15, 0.12)
+	Juice.shake(_stamp, 4.0, 0.12)
 	_ismis.show_banner("Stamped %s. Hand the papers back (Space), or click the stamp to lift it off." % text, "")
 	_update_buttons()
 
@@ -478,6 +481,7 @@ func _hand_back() -> void:
 	_update_buttons()
 	_student_panel.slide_out(HAND_BACK_SECONDS)
 	if _stamp != null:
+		Juice.settle(_stamp)
 		var tween := create_tween().set_parallel()
 		tween.tween_property(_stamp, "position:y", _stamp.position.y - 60.0, HAND_BACK_SECONDS)
 		tween.tween_property(_stamp, "modulate:a", 0.0, HAND_BACK_SECONDS)
@@ -513,12 +517,15 @@ func _commit(decision: Dictionary) -> void:
 	if result["bent"]:
 		Sfx.play("alert")
 		_ismis.show_banner("FAVOR DONE · %s The line saw it.%s" % [shift.history[-1]["reason"], flag_note], "flag")
+		_verdict_juice("Favor done", UiKit.GOLD, false)
 	elif result["correct"]:
 		Sfx.play("correct")
 		_ismis.show_banner("CORRECT · %s%s" % [_outcome_text(outcome), flag_note], "right")
+		_verdict_juice("Right call", UiKit.OK_BRIGHT, false)
 	else:
 		Sfx.play("wrong")
 		_ismis.show_banner("WRONG CALL · %s%s" % [result["reason"], flag_note], "wrong")
+		_verdict_juice("Wrong call", UiKit.RED, true)
 	if outcome == "stays":
 		_selection = {}
 		_marks.clear()
@@ -533,6 +540,18 @@ func _commit(decision: Dictionary) -> void:
 	_refresh_line()
 	_refresh_offices()
 	_update_buttons()
+
+
+## How a call lands: a wash of its color over the window and its word popping up where the stamp
+## was, which is where the player is looking (and clear of the student's name).
+## A wrong call also shakes the top bar, where the patience it cost is shown (the papers stay put).
+func _verdict_juice(word: String, color: Color, wrong: bool) -> void:
+	Juice.screen_flash(self, Color(color, 0.22 if wrong else 0.16), 0.3 if wrong else 0.25)
+	var spot := _student_panel.stamp_rect().get_center()
+	Juice.pop_text(self, word, UiKit.RED_BRIGHT if wrong else color, spot, 38)
+	if wrong:
+		# Up and down only: the bar spans the screen, so a sideways jolt would show the wall.
+		Juice.shake(_top_bar, 6.0, 0.3, Vector2(0.0, 1.0))
 
 
 ## With parent: any routing gets an argument from the parent, which costs the window a few minutes.

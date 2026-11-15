@@ -16,6 +16,9 @@ const MUTED := Color("#55604f")
 const SOFT := Color("#9fb0aa")
 const RED := Color("#b8382a")
 const RED_PALE := Color("#fbe3df")
+## Brighter green and red for words and fills on dark green or ink, where OK and RED are too dim.
+const OK_BRIGHT := Color("#6fbf73")
+const RED_BRIGHT := Color("#ff8a7a")
 ## The "not renewed" ending (mockup S21): a dim maroon room and its cards.
 const MAROON := Color("#3a2a2a")
 const MAROON_LIGHT := Color("#4a3636")
