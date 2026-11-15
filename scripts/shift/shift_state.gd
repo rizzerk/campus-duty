@@ -264,6 +264,7 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	history.append({
 		"number": student["number"],
 		"name": student["name"],
+		"regular_id": student.get("regular_id", ""),
 		"action": action,
 		"correct": result["correct"] and not bent,
 		"bent": bent,

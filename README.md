@@ -121,9 +121,9 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 
 ## Status
 
-**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, and achievements.
+**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, achievements, and Ma'am Lorna's end-of-season evaluation with its three endings (kept the post, on probation, not renewed) and what happened to each regular.
 
-**Still to come:** title screen, saves and settings; desk upgrades; the end-of-season endings screen; audio and final art.
+**Still to come:** title screen, saves and settings; desk upgrades; audio and final art.
 
 ## Running it
 
