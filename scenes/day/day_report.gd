@@ -1,7 +1,7 @@
 extends Control
 ## F7: end of shift. Stars, the day's numbers and what went wrong, then on to tomorrow.
 ## A failed shift (patience ran out) shows the S18 version of the title. Enter or Space presses
-## the gold button (next day, or the season's evaluation after the last day).
+## the gold button, which goes on to the Freedom Wall.
 
 var _next_button: Button = null
 var _achievements_open: bool = false
@@ -70,19 +70,15 @@ func _ready() -> void:
 			_achievements_open = false
 			trophies.text = "Achievements"))
 	foot.add_child(trophies)
-	var last := GameState.is_last_day()
-	var next := UiKit.button("See your evaluation" if last else "Next day", UiKit.GOLD, UiKit.INK, 26)
+	var next := UiKit.button("Enter  Continue", UiKit.GOLD, UiKit.INK, 26)
 	next.custom_minimum_size = Vector2(300, 64)
-	# Only once: a double click must not skip a day. After the last day, Ma'am Lorna's
-	# end-of-season evaluation comes next.
+	# Only once: a double click must not skip a day. The Freedom Wall comes next, then the next
+	# day (or Ma'am Lorna's end-of-season evaluation after the last one).
 	next.pressed.connect(func() -> void:
 		if next.disabled:
 			return
 		next.disabled = true
-		if last:
-			GameState.go_to("evaluation")
-		else:
-			GameState.next_day())
+		GameState.go_to("freedom_wall"))
 	foot.add_child(next)
 	_next_button = next
 

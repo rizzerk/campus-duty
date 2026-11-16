@@ -55,9 +55,19 @@ for day in $days; do
 	fi
 done
 
-# The end-of-season evaluation, once per ending, from a made-up season (DebugSeason). Skipped
-# when only some days were asked for.
+# The end-of-season evaluation, once per ending, and the Freedom Wall, from a made-up season
+# (DebugSeason). Skipped when only some days were asked for.
 if [ "$#" -eq 0 ]; then
+	output=$("$GODOT" --headless --path . --quit-after 120 -- --day=6 --seed=42 --scene=freedom_wall 2>&1)
+	# The wall says how many of its notes landed inside the board; all of them must have.
+	if [ $? -ne 0 ] || echo "$output" | grep -Eq "$ERRORS" || ! echo "$output" | grep -q -- "-> freedom_wall" \
+		|| ! echo "$output" | grep -Eq "freedom_wall: ([1-9][0-9]*)/\1 notes on the board"; then
+		echo "smoke freedom wall: FAIL"
+		echo "$output" | grep -E -A3 "$ERRORS" | head -40
+		status=1
+	else
+		echo "smoke freedom wall: PASS"
+	fi
 	for ending in "kept:--accuracy=0.95 --integrity=99" \
 		"probation:--accuracy=0.8 --integrity=70 --failed=2 --regulars=mixed" \
 		"not_renewed:--accuracy=0.5 --integrity=40 --failed=4 --regulars=bad"; do
