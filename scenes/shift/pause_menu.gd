@@ -7,6 +7,8 @@ signal resumed
 
 var _shift: ShiftState
 var _book: Rulebook
+var _motion_button: Button
+var _shake_button: Button
 
 
 static func open(parent: Control, shift: ShiftState) -> PauseMenu:
@@ -41,6 +43,15 @@ func _build(shift: ShiftState) -> void:
 		var button := UiKit.button(item[0], item[2], item[3], 22)
 		button.pressed.connect(item[1])
 		list.add_child(button)
+	# Comfort settings, until the settings screen exists. They take effect at once and are saved.
+	Settings.ensure_loaded()
+	_motion_button = UiKit.button("", UiKit.PAPER, UiKit.INK, 20)
+	_motion_button.pressed.connect(_toggle_motion)
+	list.add_child(_motion_button)
+	_shake_button = UiKit.button("", UiKit.PAPER, UiKit.INK, 20)
+	_shake_button.pressed.connect(_toggle_shake)
+	list.add_child(_shake_button)
+	_show_settings()
 	var stats := UiKit.card(UiKit.CREAM, 22, 6)
 	stats.custom_minimum_size = Vector2(380, 0)
 	row.add_child(stats)
@@ -73,6 +84,32 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_resume()
 	elif event.keycode == KEY_TAB:
 		_open_rulebook()
+	elif event.keycode == KEY_M:
+		Sfx.play("click")
+		_toggle_motion()
+	elif event.keycode == KEY_S and not _shake_button.disabled:
+		Sfx.play("click")
+		_toggle_shake()
+
+
+func _toggle_motion() -> void:
+	Settings.reduced_motion = not Settings.reduced_motion
+	Settings.save_to()
+	_show_settings()
+
+
+func _toggle_shake() -> void:
+	Settings.screen_shake = not Settings.screen_shake
+	Settings.save_to()
+	_show_settings()
+
+
+## Screen shake is greyed out while reduced motion is on, since reduced motion already stops it.
+func _show_settings() -> void:
+	_motion_button.text = "M  Reduced motion: %s" % ("On" if Settings.reduced_motion else "Off")
+	_shake_button.text = "S  Screen shake: Off (reduced motion)" if Settings.reduced_motion \
+			else "S  Screen shake: %s" % ("On" if Settings.screen_shake else "Off")
+	_shake_button.disabled = Settings.reduced_motion
 
 
 func _open_rulebook() -> void:
