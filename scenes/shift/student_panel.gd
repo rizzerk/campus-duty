@@ -110,6 +110,14 @@ func set_field_state(form_index: int, key: String, state: String) -> void:
 		row.set_state(state)
 
 
+## A small pulse on one paper field, for a flag going in. 2%, so the paper being read moves under
+## 2 px at the edges.
+func pulse_field(form_index: int, key: String) -> void:
+	var row: FieldRow = _rows.get("%d:%s" % [form_index, key])
+	if row != null:
+		Juice.punch(row, 1.02, 0.2)
+
+
 ## Forms go into three columns, each form into whichever column is shorter, so even four papers
 ## (say, a returning student with a Dean's approval) fit without scrolling.
 const PAPER_COLUMNS := 3

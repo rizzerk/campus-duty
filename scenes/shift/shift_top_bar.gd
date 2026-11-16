@@ -1,15 +1,23 @@
 class_name ShiftTopBar
 extends PanelContainer
-## The green bar across the top of the window: day, clock, served, line and patience.
+## The green bar across the top of the window: day, clock, served, line and patience. Under a
+## quarter of the starting patience, the bar beats like a heart.
+
+## Share of the starting patience under which the bar starts to beat.
+const LOW_PATIENCE := 0.25
 
 var _clock: Label
 var _served: Label
 var _line: Label
 var _patience: ProgressBar
 var _fill: StyleBoxFlat
+## True while patience is under LOW_PATIENCE of the start and the bar's heartbeat is on.
+var _beating: bool = false
+var _low_line: float = 0.0
 
 
 func _ready() -> void:
+	_low_line = float(GameData.balance("patience_start")) * LOW_PATIENCE
 	var style := UiKit.box(UiKit.GREEN, 0, UiKit.INK, 0, 0)
 	style.border_width_bottom = 4
 	style.content_margin_left = 24
@@ -45,7 +53,25 @@ func update_values(clock: String, served: int, waiting: int, patience: float) ->
 	_served.text = "Served %d" % served
 	_line.text = "Line %d" % waiting
 	_patience.value = patience
-	_fill.bg_color = UiKit.RED if patience < 30.0 else UiKit.GOLD if patience < 60.0 else Color("#6fbf73")
+	_fill.bg_color = UiKit.RED if patience < 30.0 else UiKit.GOLD if patience < 60.0 else UiKit.OK_BRIGHT
+	var low := patience < _low_line
+	if low != _beating:
+		_beating = low
+		if low:
+			Juice.heartbeat(_patience, 1.0, func() -> void: Sfx.play("heartbeat", 0.0))
+		else:
+			Juice.stop_heartbeat(_patience)
+
+
+## The patience bar, for effects that show what a mistake cost.
+func patience_bar() -> Control:
+	return _patience
+
+
+## Stops the heartbeat, say when the shift is over.
+func calm() -> void:
+	_beating = false
+	Juice.stop_heartbeat(_patience)
 
 
 func _spacer() -> Control:

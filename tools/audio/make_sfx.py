@@ -174,6 +174,35 @@ def make_alert() -> list[float]:
     return out
 
 
+def make_heartbeat() -> list[float]:
+    """Lub-dub: two soft low thumps, quiet enough to loop once a second under the shift."""
+    n = int(SAMPLE_RATE * 0.42)
+    out = []
+    for i in range(n):
+        t = i / SAMPLE_RATE
+        s = 0.0
+        for start, freq, gain in ((0.0, 62.0, 1.0), (0.17, 55.0, 0.75)):
+            if t >= start:
+                lt = t - start
+                env = min(1.0, lt / 0.006) * math.exp(-lt * 22.0)
+                s += math.sin(2.0 * math.pi * freq * lt) * env * gain
+        out.append(s * 0.55)
+    return out
+
+
+def make_pop() -> list[float]:
+    """A short bright pop for a star or a badge appearing; Sfx raises its pitch per star."""
+    n = int(SAMPLE_RATE * 0.12)
+    out = []
+    for i in range(n):
+        t = i / SAMPLE_RATE
+        freq = 520.0 + 900.0 * math.exp(-t * 40.0)
+        env = min(1.0, t / 0.002) * math.exp(-t * 30.0)
+        s = math.sin(2.0 * math.pi * freq * t) + 0.3 * math.sin(4.0 * math.pi * freq * t)
+        out.append(s * env * 0.3)
+    return out
+
+
 def _epiano(freq: float, local_t: float, duration: float) -> float:
     if freq <= 0.0 or local_t < 0.0 or local_t >= duration:
         return 0.0
@@ -275,6 +304,8 @@ def main() -> None:
         "correct": make_correct(),
         "wrong": make_wrong(),
         "alert": make_alert(),
+        "heartbeat": make_heartbeat(),
+        "pop": make_pop(),
     }
     for name, samples in sounds.items():
         write_wav(OUT_DIR, name, samples, SAMPLE_RATE)

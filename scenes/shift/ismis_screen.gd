@@ -166,6 +166,13 @@ func set_field_state(key: String, context: String, state: String) -> void:
 		row.set_state(state)
 
 
+## A small pulse on one ISMIS field, for a flag going in.
+func pulse_field(key: String, context: String) -> void:
+	var row: FieldRow = _rows.get("%s:%s" % [key, context])
+	if row != null:
+		Juice.punch(row, 1.02, 0.2)
+
+
 func show_banner(text: String, kind: String, with_ask: bool = false) -> void:
 	var colors: Array = BANNERS[kind]
 	_ask_button.visible = with_ask
