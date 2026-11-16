@@ -1,0 +1,404 @@
+{
+	"posts": [
+		{
+			"id": "any_01",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Mas dugay pa ko naghuwat sa loading sa ISMIS kaysa sa biyahe sa 13C gikan Colon paingon Talamban hehe.",
+			"en": "I waited longer for ISMIS to load than the 13C jeepney ride from Colon to Talamban hehe.",
+			"likes": [65, 180]
+		},
+		{
+			"id": "any_02",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Kinsay nakakita og green nga ballpen sa Registrar? Mao ra gyud to akong swerte sa enrollment, palihug iuli :(",
+			"en": "Who found a green pen at the Registrar? That was my lucky enrollment pen, please return it :(",
+			"likes": [20, 75]
+		},
+		{
+			"id": "any_03",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Shoutout sa akong pitaka nga igo ra gyud naka-survive sa assessment slip ug duha ka tuhog nga siomai sa canteen.",
+			"en": "Shoutout to my wallet for barely surviving the assessment slip and two sticks of canteen siomai.",
+			"likes": [80, 210]
+		},
+		{
+			"id": "any_04",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Nganong inig abot nako sa atubangan sa window, kalit man ko makalimot sa akong kaugalingong ID number?!",
+			"en": "Why do I suddenly forget my own ID number the second I reach the front of the window?!",
+			"likes": [90, 240]
+		},
+		{
+			"id": "any_05",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Init kaayo sa gawas pero inig sulod sa Registrar, ang kakulba sa akong grades ang makapapugong sa akong singot.",
+			"en": "It's blazing hot outside, but inside the Registrar my grade anxiety is what makes me sweat.",
+			"likes": [45, 130]
+		},
+		{
+			"id": "any_06",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Pro tip: pagdala og paypay, tubig, ug taas nga pasensya. Murag side quest gyud ning enrollment kada sem.",
+			"en": "Pro tip: bring a fan, water, and lots of patience. Enrollment really feels like a side quest every sem.",
+			"likes": [55, 150]
+		},
+		{
+			"id": "any_07",
+			"when": "any",
+			"author": "anon",
+			"ceb": "Kanang tingog sa stamp sa Window 3 ba, murag musika sa akong dunggan basta APPROVED ang tatak :D",
+			"en": "That stamp sound at Window 3 is like music to my ears as long as it says APPROVED :D",
+			"likes": [70, 195]
+		},
+		{
+			"id": "great_day_01",
+			"when": "great_day",
+			"author": "anon",
+			"ceb": "Window 3 karon, paspas kaayo! Wala pa ko kahuman sa akong kape, enrolled na ko.",
+			"en": "Window 3 today, so fast! I hadn't even finished my coffee and I was enrolled.",
+			"likes": [40, 120]
+		},
+		{
+			"id": "great_day_02",
+			"when": "great_day",
+			"author": "anon",
+			"ceb": "Kinsa tong SA sa Window 3 ganina? Grabe ka-sharp, usa ka tan-aw ra sa akong papeles human dayon!",
+			"en": "Who was the SA at Window 3 earlier? Super sharp, one look at my papers and it was done right away!",
+			"likes": [55, 160]
+		},
+		{
+			"id": "great_day_03",
+			"when": "great_day",
+			"author": "anon",
+			"ceb": "Abi nakog maabtan kog udto sa linya, pero murag turbo man ang Window 3 karon. Bigyan ng jacket ang SA!",
+			"en": "I thought I'd be stuck in line till noon, but Window 3 was on turbo today. Give that SA a jacket!",
+			"likes": [60, 175]
+		},
+		{
+			"id": "great_day_04",
+			"when": "great_day",
+			"author": "anon",
+			"ceb": "Hapsay kaayo ang Window 3 karon, walay saba ug paspas ang dagan sa pila. Sana all ing-ani kada enrollment :D",
+			"en": "Window 3 was so smooth today, zero drama and the line moved fast. Wish every enrollment day was like this :D",
+			"likes": [50, 140]
+		},
+		{
+			"id": "rough_day_01",
+			"when": "rough_day",
+			"author": "anon",
+			"ceb": "Murag wala pa nakakape ang SA sa Window 3 karon... kaduha na nibalik akong sinundan sa linya huhu.",
+			"en": "Looks like the SA at Window 3 hasn't had coffee yet... the person ahead of me came back twice already huhu.",
+			"likes": [35, 110]
+		},
+		{
+			"id": "rough_day_02",
+			"when": "rough_day",
+			"author": "anon",
+			"ceb": "Unsay nahitabo sa Window 3 ganina? Nagkaguliyang man ang mga papel, murag na-mental block apil ang counter :(",
+			"en": "What happened at Window 3 earlier? Papers were all over the place, even the counter had a mental block :(",
+			"likes": [40, 115]
+		},
+		{
+			"id": "rough_day_03",
+			"when": "rough_day",
+			"author": "anon",
+			"ceb": "Ginhawa lang, SA sa Window 3! Kita tanan gi-atake sa enrollment stress karon, kaya ra lagi na.",
+			"en": "Just breathe, Window 3 SA! Enrollment stress is hitting all of us today, you'll get through it.",
+			"likes": [45, 125]
+		},
+		{
+			"id": "rough_day_04",
+			"when": "rough_day",
+			"author": "anon",
+			"ceb": "Kadaghan ba sa nagbagulbol gikan sa Window 3 karon uy. Pag-double check intawon sa ISMIS sa dili pa mo-stamp!",
+			"en": "So many people grumbling on their way back from Window 3 today. Please double-check ISMIS before stamping!",
+			"likes": [30, 95]
+		},
+		{
+			"id": "line_lost_01",
+			"when": "line_lost",
+			"author": "anon",
+			"ceb": "Hala, nigawas na gyud si Ma'am Lorna sa Window 3! Sa sobra ka-dugay sa linya, siya na ang nipuli sa counter.",
+			"en": "Whoa, Ma'am Lorna actually stepped out at Window 3! The line took so long she took over the counter herself.",
+			"likes": [85, 230]
+		},
+		{
+			"id": "line_lost_02",
+			"when": "line_lost",
+			"author": "anon",
+			"ceb": "Nahurot gyud ang pasensya sa pila sa Window 3 ganina. Pag-ingon ni Ma'am Lorna og 'Ako na ani,' hilom tanan uy!",
+			"en": "The Window 3 line completely ran out of patience earlier. When Ma'am Lorna said 'I'll take it from here,' everyone went dead silent!",
+			"likes": [95, 250]
+		},
+		{
+			"id": "line_lost_03",
+			"when": "line_lost",
+			"author": "anon",
+			"ceb": "Na-pack up og sayo ang Window 3 kay nagkagubot na ang linya. RIP sa atong shift karon, balik na lang ta ugma :(",
+			"en": "Window 3 closed early because the queue lost its cool. RIP to today's shift, guess we're coming back tomorrow :(",
+			"likes": [60, 170]
+		},
+		{
+			"id": "walked_out_01",
+			"when": "walked_out",
+			"author": "anon",
+			"ceb": "Kaduha ko gipabalik-balik sa Window 3 nga walay klarong rason! Niuli na lang ko uy, bahala na to :(",
+			"en": "Window 3 sent me back and forth twice for no good reason! I just went home, forget it :(",
+			"likes": [50, 145]
+		},
+		{
+			"id": "walked_out_02",
+			"when": "walked_out",
+			"author": "anon",
+			"ceb": "Kita gyud ko nga ni-walk out tong usa ka estudyante sa Window 3 human masaypan og kaduha. Sakit tan-awon uy.",
+			"en": "I watched a student straight-up walk out of Window 3 after getting mishandled twice. Painful to watch.",
+			"likes": [55, 155]
+		},
+		{
+			"id": "walked_out_03",
+			"when": "walked_out",
+			"author": "anon",
+			"ceb": "Kapoya anang pabalikon ka unya sayop diay ang gitatak! Naa gyuy nilakaw sa kalagot ganina sa Window 3.",
+			"en": "Nothing's more exhausting than being sent away on a wrong stamp! Someone walked out in frustration at Window 3 earlier.",
+			"likes": [45, 130]
+		},
+		{
+			"id": "favor_01",
+			"when": "favor",
+			"author": "anon",
+			"ceb": "Hmm, kita ko atong gihatagan og merienda sa Window 3 ha... kalit man lang na-APPROVED bisan walay check-check?",
+			"en": "Hmm, I saw that merienda handoff at Window 3... how did they get APPROVED instantly without any checks?",
+			"likes": [75, 205]
+		},
+		{
+			"id": "favor_02",
+			"when": "favor",
+			"author": "anon",
+			"ceb": "Naa diay express lane sa Window 3 basta moingon ka nga pag-umangkon ka ni Dean? Bantay lang mo kang Ma'am Lorna!",
+			"en": "So there's an express lane at Window 3 if you claim to be the Dean's nephew? Wait till Ma'am Lorna checks the logs!",
+			"likes": [90, 240]
+		},
+		{
+			"id": "favor_03",
+			"when": "favor",
+			"author": "anon",
+			"ceb": "Naghuwat mi og tarong sa linya unya naay gipalusot sa Window 3. Nagtan-aw ra ba ang tibuok pila :(",
+			"en": "We're waiting fairly in line and someone just got waved through at Window 3. The whole queue saw that :(",
+			"likes": [65, 185]
+		},
+		{
+			"id": "false_alarms_01",
+			"when": "false_alarms",
+			"author": "anon",
+			"ceb": "Gi-flag sa Window 3 akong ID kay 'Ma.' ang nakasulat imbes nga 'Maria'! Normal ra man intawon na nga short form uy.",
+			"en": "Window 3 flagged my ID because it said 'Ma.' instead of 'Maria'! That's a completely normal abbreviation.",
+			"likes": [45, 135]
+		},
+		{
+			"id": "false_alarms_02",
+			"when": "false_alarms",
+			"author": "anon",
+			"ceb": "Kulbaa sa SA sa Window 3 karon, tanan na lang gi-flag bisan sakto ra ang akong papeles ug ISMIS record hehe.",
+			"en": "The SA at Window 3 is so jumpy today, flagging everything even when my papers and ISMIS record match hehe.",
+			"likes": [35, 105]
+		},
+		{
+			"id": "wrong_office_01",
+			"when": "wrong_office",
+			"author": "anon",
+			"ceb": "Gipaadto ko sa Consultation sa Window 3 unya nag-coffee break pa diay ang mga adviser! Sayang akong lakaw uy.",
+			"en": "Window 3 sent me to Consultation while the advisers were on coffee break! What a wasted trip.",
+			"likes": [50, 140]
+		},
+		{
+			"id": "wrong_office_02",
+			"when": "wrong_office",
+			"author": "anon",
+			"ceb": "Naka-exercise kog ahat ganina! Gipadala ko sa Window 3 sa opisina nga wala diay koy labot didto :(",
+			"en": "Got an unplanned workout earlier! Window 3 routed me to an office that had nothing to do with my form :(",
+			"likes": [45, 125]
+		},
+		{
+			"id": "wrong_office_03",
+			"when": "wrong_office",
+			"author": "anon",
+			"ceb": "Sirado na ang Dean's Office pag-abot nako didto! Tan-awa intawon ang office schedule sa dili pa mo mag-route uy.",
+			"en": "The Dean's Office was already closed when I got there! Please check the office schedule before routing us.",
+			"likes": [55, 150]
+		},
+		{
+			"id": "turned_away_01",
+			"when": "turned_away",
+			"author": "anon",
+			"ceb": "Gi-reject ko sa Window 3 kay kulang akong library clearance. Sakit, pero sige na lang, nakalimot man gyud ko hehe.",
+			"en": "Got turned away at Window 3 for a missing library clearance. Hurts, but fair enough, I really did forget it hehe.",
+			"likes": [40, 115]
+		},
+		{
+			"id": "turned_away_02",
+			"when": "turned_away",
+			"author": "anon",
+			"ceb": "Walay lusot sa Window 3 uy! Nasakpan akong 5.0 sa prereq sa Grades tab. Balik na lang ko sa sugod ani :(",
+			"en": "Nothing gets past Window 3! They caught my 5.0 prerequisite on the Grades tab. Back to square one for me :(",
+			"likes": [60, 165]
+		},
+		{
+			"id": "turned_away_03",
+			"when": "turned_away",
+			"author": "anon",
+			"ceb": "Strikto kaayo ang Window 3 sa pirma sa adviser, gi-kompara gyud sa specimen sheet! Sakto ra pud hinuon.",
+			"en": "Window 3 is super strict with adviser signatures, checked it right against the specimen sheet! Fair play though.",
+			"likes": [45, 130]
+		},
+		{
+			"id": "found_section_01",
+			"when": "found_section",
+			"author": "anon",
+			"ceb": "Puno na unta akong block section, maayo gani nakakita pa ang SA sa Window 3 og schedule nga walay conflict! Lifesaver :D",
+			"en": "My block section was full, good thing the Window 3 SA found an open schedule with zero conflict! Lifesaver :D",
+			"likes": [65, 180]
+		},
+		{
+			"id": "found_section_02",
+			"when": "found_section",
+			"author": "anon",
+			"ceb": "Abi nakog ma-underload na ko kay closed akong section, pero gi-magic sa Window 3 akong timetable. Salamat kaayo!",
+			"en": "Thought I'd be underloaded because my section closed, but Window 3 worked magic on my timetable. Thank you so much!",
+			"likes": [55, 155]
+		},
+		{
+			"id": "day_6_01",
+			"when": "day_6",
+			"author": "anon",
+			"ceb": "Open Market karon murag Hunger Games! Samtang nagpili og section, kalit lang mahurot ang slots sa imong atubangan!",
+			"en": "Open Market today is like the Hunger Games! While picking a section, the slots literally vanish right in front of you!",
+			"likes": [95, 260]
+		},
+		{
+			"id": "day_6_02",
+			"when": "day_6",
+			"author": "anon",
+			"ceb": "1st year hangtod 4th year nag-abot sa Registrar para sa Open Market! Kaway-kaway sa mga nagbarog pa sa hallway hehe.",
+			"en": "1st years to 4th years all collided at the Registrar for Open Market! Waving to everyone still standing in the hallway hehe.",
+			"likes": [80, 220]
+		},
+		{
+			"id": "day_9_01",
+			"when": "day_9",
+			"author": "anon",
+			"ceb": "Extension day na pero pilion ra diay nga department ang pwede! Sayang akong plete paingon campus, basa-basa lagi og memo :(",
+			"en": "It's extension day but only listed departments are allowed! Wasted my fare to campus, should've read the memo :(",
+			"likes": [55, 160]
+		},
+		{
+			"id": "day_9_02",
+			"when": "day_9",
+			"author": "anon",
+			"ceb": "Daghana namong nag-try og hangyo sa Window 3 bisan wala among department sa extension list uy. Walay nadala sa pahiyom hehe.",
+			"en": "So many of us tried pleading at Window 3 even though our department wasn't on the extension list. Smiles didn't work hehe.",
+			"likes": [60, 175]
+		},
+		{
+			"id": "jericho_112_good_01",
+			"when": "jericho_112_good",
+			"author": "jericho_112",
+			"ceb": "Sulit akong pag-atang sukad kadlawon! Naa na koy slot ug nabalhin pa gyud sa way conflict. Banana cue para sa Window 3! :D",
+			"en": "Camping out since dawn paid off! Got my slot and moved into a conflict-free schedule. Banana cue for Window 3! :D",
+			"likes": [75, 200]
+		},
+		{
+			"id": "jericho_112_good_02",
+			"when": "jericho_112_good",
+			"author": "jericho_112",
+			"ceb": "Salamat sa SA sa Window 3 nga wala gyud gipul-an sa akong nawong kada balik nako! Kompleto na gyud akong units.",
+			"en": "Thanks to the Window 3 SA who never got tired of seeing my face every time I came back! My units are finally complete.",
+			"likes": [65, 180]
+		},
+		{
+			"id": "jericho_112_bad_01",
+			"when": "jericho_112_bad",
+			"author": "jericho_112",
+			"ceb": "Nagmata kog alas kwatro sa kadlawon para lang masaypan akong papel sa Window 3... sakit pa sa bulag uy :(",
+			"en": "I woke up at 4 AM just for my papers to get messed up at Window 3... hurts worse than a breakup :(",
+			"likes": [50, 145]
+		},
+		{
+			"id": "jericho_112_bad_02",
+			"when": "jericho_112_bad",
+			"author": "jericho_112",
+			"ceb": "Kaila na man unta ta sa Window 3 pero nganong naglibog gihapon akong enrollment?! Hapit na lang ko mahimong suki sa pila.",
+			"en": "We already know each other at Window 3, how is my enrollment still a mess?! I'm practically a permanent resident of this line.",
+			"likes": [45, 130]
+		},
+		{
+			"id": "carlo_104_good_01",
+			"when": "carlo_104_good",
+			"author": "carlo_104",
+			"ceb": "Bisan nahulog akong ID sa 13C nga jeep, na-search ra dayon akong record sa Window 3! Nakaginhawa ra gyud ko :D",
+			"en": "Even after my ID fell out on the 13C jeepney, Window 3 pulled up my record by number right away! Huge relief :D",
+			"likes": [70, 190]
+		},
+		{
+			"id": "carlo_104_good_02",
+			"when": "carlo_104_good",
+			"author": "carlo_104",
+			"ceb": "Na-enroll na akong manghod nga freshman ug na-okay na pud akong pirma ni Engr.! Salamat kaayo sa Window 3.",
+			"en": "My freshman sibling is enrolled and Engr.'s signature is sorted out too! Huge thanks to Window 3.",
+			"likes": [60, 165]
+		},
+		{
+			"id": "carlo_104_bad_01",
+			"when": "carlo_104_bad",
+			"author": "carlo_104",
+			"ceb": "Nawala na gani akong ID sa 13C, nasayop pa gyud ang pag-handle sa akong form sa Window 3. Dimalasa adlawa uy :(",
+			"en": "First I lose my ID on the 13C, then my form gets mishandled at Window 3. What an unlucky day :(",
+			"likes": [45, 135]
+		},
+		{
+			"id": "carlo_104_bad_02",
+			"when": "carlo_104_bad",
+			"author": "carlo_104",
+			"ceb": "Nagtabang ra gani ko sa akong manghod nga 1st year, kami na nuon duha ang nagbalik-balik sa linya sa Window 3!",
+			"en": "I was just helping my 1st-year sibling, and now both of us are stuck going back and forth in the Window 3 line!",
+			"likes": [40, 120]
+		},
+		{
+			"id": "mae_118_good_01",
+			"when": "mae_118_good",
+			"author": "mae_118",
+			"ceb": "Worth it akong color-coded ug alphabetized nga slips! Paspas kaayo ko nahuman sa Window 3, abot pa ko sa OAS interview :D",
+			"en": "My color-coded and alphabetized slips paid off! Finished super fast at Window 3 and made my OAS interview on time :D",
+			"likes": [80, 215]
+		},
+		{
+			"id": "mae_118_good_02",
+			"when": "mae_118_good",
+			"author": "mae_118",
+			"ceb": "Kompleto na akong maintaining load para sa scholarship! Salamat sa Window 3 sa pag-atiman sa akong Accounting subjects.",
+			"en": "My scholarship maintaining load is complete! Thank you Window 3 for taking care of my Accounting subjects.",
+			"likes": [65, 175]
+		},
+		{
+			"id": "mae_118_bad_01",
+			"when": "mae_118_bad",
+			"author": "mae_118",
+			"ceb": "Gi-color-code ug gi-plastic envelope na nako tanan, pero nasayop gihapon ang Window 3! Ma-late na ko sa OAS interview :(",
+			"en": "I color-coded and put everything in a plastic envelope, and Window 3 still got it wrong! I'm gonna be late for my OAS interview :(",
+			"likes": [55, 150]
+		},
+		{
+			"id": "mae_118_bad_02",
+			"when": "mae_118_bad",
+			"author": "mae_118",
+			"ceb": "Nagubot akong gi-alphabetize nga slips sa sige nakog balik sa Window 3! Kulbaan na kaayo ko sa akong scholarship load.",
+			"en": "My alphabetized slips are all out of order from coming back to Window 3! I'm so anxious about my scholarship load now.",
+			"likes": [45, 130]
+		}
+	]
+}
