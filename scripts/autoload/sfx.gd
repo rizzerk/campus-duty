@@ -15,6 +15,8 @@ const SOUND_IDS := [
 	"correct",
 	"wrong",
 	"alert",
+	"heartbeat",
+	"pop",
 ]
 const BGM_IDS := [
 	"menu",
@@ -64,7 +66,9 @@ static func bgm_stream(id: String) -> AudioStreamWAV:
 	return _bgm_streams[id]
 
 
-static func play(id: String, pitch_jitter: float = 0.03) -> void:
+## pitch sets the base pitch (1.0 is as recorded), for a run of sounds that climb, like the
+## report's stars; pitch_jitter adds a little randomness on top so repeats don't sound copied.
+static func play(id: String, pitch_jitter: float = 0.03, pitch: float = 1.0) -> void:
 	if muted or not SOUND_IDS.has(id) or DisplayServer.get_name() == "headless":
 		return
 	var audio := stream(id)
@@ -77,7 +81,7 @@ static func play(id: String, pitch_jitter: float = 0.03) -> void:
 	_next = (_next + 1) % players.size()
 	player.stream = audio
 	player.volume_db = volume_db
-	player.pitch_scale = 1.0 + _rng.randf_range(-pitch_jitter, pitch_jitter) if pitch_jitter > 0.0 else 1.0
+	player.pitch_scale = clampf(pitch, 0.25, 4.0) * (1.0 + _rng.randf_range(-pitch_jitter, pitch_jitter) if pitch_jitter > 0.0 else 1.0)
 	if player.is_inside_tree():
 		player.play()
 	elif not player.ready.is_connected(player.play):

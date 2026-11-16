@@ -20,6 +20,9 @@ func _run() -> void:
 	_test_settings_reject_bad_values()
 	_test_juice_respects_settings()
 	_test_effects_never_take_input()
+	_test_slice_two_effects()
+	await _test_hit_stop_always_recovers()
+	await _test_star_reveal()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PATH))
 	# Back to the defaults, so nothing here leaks into whatever runs next.
 	Settings.reduced_motion = false
@@ -138,3 +141,75 @@ func _test_effects_never_take_input() -> void:
 	Juice.settle(stamp)
 	_check(stamp.position == Vector2(10, 20) and stamp.scale == Vector2.ONE and not stamp.has_meta("juice_home"), "settle puts a node back where and how big it was")
 	stamp.queue_free()
+
+
+func _test_slice_two_effects() -> void:
+	Settings.reduced_motion = false
+	Settings.screen_shake = true
+	var panel := _box()
+	_check(Juice.slide_in(panel, Vector2(-28, 0)) != null and panel.position == Vector2(-18, 20), "slide in starts from the offset")
+	Juice.settle(panel)
+	_check(panel.position == Vector2(10, 20), "and settles back home")
+	_check(not panel.has_meta("juice_slide"), "settle also stops the slide, so it can't move the node again")
+	var beats := [0]
+	_check(Juice.heartbeat(panel, 1.0, func() -> void: beats[0] += 1) != null, "heartbeat starts")
+	Juice.stop_heartbeat(panel)
+	_check(not panel.has_meta("juice_heartbeat") and panel.scale == Vector2.ONE, "heartbeat stops and leaves the bar at normal size")
+	var room := _box()
+	room.size = Vector2(600, 300)
+	_check(Juice.banner(room, "RUSH!  +4 in line", Color.GOLD, 84.0) != null, "banner runs")
+	Juice.banner(room, "RUSH!  +2 in line", Color.GOLD, 84.0)
+	var cards := room.get_children().filter(func(child: Node) -> bool: return child is PanelContainer and not child.is_queued_for_deletion())
+	_check(cards.size() == 1, "a new banner replaces the old one")
+	_check(cards.size() == 1 and (cards[0] as Control).mouse_filter == Control.MOUSE_FILTER_IGNORE, "the banner lets clicks through")
+	var bits := Juice.confetti(room, Vector2(100, 100), 500)
+	_check(bits != null and bits.amount == 40 and bits.one_shot, "confetti is one burst of at most 40")
+	Settings.reduced_motion = true
+	_check(Juice.slide_in(panel, Vector2(-28, 0)) == null and panel.position == Vector2(10, 20), "reduced motion: no slide, it just appears")
+	_check(Juice.confetti(room, Vector2(100, 100)) == null, "reduced motion: no confetti")
+	_check(Juice.heartbeat(panel, 1.0, func() -> void: pass) != null, "reduced motion keeps the heartbeat (a brightness beat, no swelling)")
+	Juice.stop_heartbeat(panel)
+	_check(panel.modulate == Color.WHITE, "stopping a reduced-motion heartbeat restores the color")
+	Juice.banner(room, "RUSH!", Color.GOLD, 84.0)
+	var still := room.get_children().filter(func(child: Node) -> bool: return child is PanelContainer and not child.is_queued_for_deletion())
+	_check(still.size() == 1 and is_equal_approx((still[0] as Control).position.y, 84.0), "reduced motion: the banner appears in place")
+	Settings.reduced_motion = false
+	_check(Sfx.SOUND_IDS.has("heartbeat") and Sfx.SOUND_IDS.has("pop"), "the new sounds are registered")
+	_check(FileAccess.file_exists("res://audio/sfx/heartbeat.wav") and FileAccess.file_exists("res://audio/sfx/pop.wav"), "the new sound files exist")
+	panel.queue_free()
+	room.queue_free()
+
+
+func _test_hit_stop_always_recovers() -> void:
+	Settings.reduced_motion = true
+	var box := _box()
+	_check(not Juice.hit_stop(box), "reduced motion: no hit stop")
+	_check(Engine.time_scale == 1.0, "and the game keeps full speed")
+	Settings.reduced_motion = false
+	_check(Juice.hit_stop(box, 5.0), "hit stop runs")
+	_check(Engine.time_scale < 1.0, "it slows the game")
+	_check(not Juice.hit_stop(box), "a second one can't overlap the first")
+	# Real time, ignoring the slowed clock: the cap is 0.06 s, so 0.2 s is plenty.
+	await create_timer(0.2, true, false, true).timeout
+	_check(Engine.time_scale == 1.0, "full speed comes back, even when asked for 5 s")
+	_check(Juice.hit_stop(box), "and the next hit stop can run")
+	await create_timer(0.2, true, false, true).timeout
+	box.queue_free()
+
+
+func _test_star_reveal() -> void:
+	var stars := StarRow.new()
+	root.add_child(stars)
+	stars.reveal(7, 0.01)
+	await stars.revealed
+	_check(stars.filled == stars.total, "a reveal never fills more stars than the row has")
+	stars.reveal(0, 0.01)
+	await stars.revealed
+	_check(stars.filled == 0, "no stars, nothing filled")
+	var shown := [0]
+	stars.revealed.connect(func() -> void: shown[0] += 1)
+	stars.reveal(3, 0.01)
+	stars.reveal(1, 0.01)
+	await create_timer(0.6).timeout
+	_check(shown[0] == 1 and stars.filled == 1, "a second reveal replaces the first instead of running alongside it")
+	stars.queue_free()

@@ -67,7 +67,13 @@ func _ready() -> void:
 	shift.shift_ended.connect(_on_shift_ended)
 	shift.rush_arrived.connect(func(count: int) -> void:
 		Sfx.play("alert")
-		_line_strip.flash("RUSH! %d more students just joined the line" % count))
+		_line_strip.flash("RUSH! %d more students just joined the line" % count)
+		# A banner drops onto the top bar (over the clock, never over the line's new faces) and
+		# the line hops as they pile in. Not over an open menu or the rulebook: the line strip's
+		# red hint says it then.
+		if _menu == null:
+			Juice.banner(self, "RUSH!  +%d in line" % count, UiKit.GOLD, 4.0)
+		Juice.shake(_line_strip, 4.0, 0.3, Vector2(0.0, 1.0)))
 	shift.event_triggered.connect(_on_event_triggered)
 	shift.spot_inspected.connect(_on_spot_inspected)
 	_refresh_line()
@@ -252,7 +258,11 @@ func _call_next() -> void:
 		_student_panel.say(_reaction("returned"))
 	_refresh_line()
 	_update_buttons()
-	_fix_sizes.call_deferred()
+	# The next student steps up. The slide has to start after _fix_sizes puts the panel in place,
+	# or _fix_sizes snaps it straight back, so both go in one deferred call, in that order.
+	(func() -> void:
+		_fix_sizes()
+		Juice.slide_in(_student_panel, Vector2(-28.0, 0.0), 0.35)).call_deferred()
 
 
 func _on_face_clicked(index: int) -> void:
@@ -442,12 +452,17 @@ func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 	await get_tree().process_frame
 	if _stamp == null or not is_instance_valid(_stamp):
 		return
+	# Measure where the papers will be, not where a student still sliding in happens to be.
+	Juice.settle(_student_panel)
 	var area := _student_panel.stamp_rect()
 	_stamp.pivot_offset = _stamp.size / 2.0
 	_stamp.position = area.get_center() - _stamp.size / 2.0
-	# The stamp lands: it slams in a little big and jolts. Only the stamp moves, never the paper.
-	Juice.punch(_stamp, 1.15, 0.12)
-	Juice.shake(_stamp, 4.0, 0.12)
+	# The stamp lands: it slams in a little big, jolts and the game holds for a blink. Only the
+	# stamp moves, never the paper. Skipped if the papers are already on their way back.
+	if not _handing:
+		Juice.punch(_stamp, 1.15, 0.12)
+		Juice.shake(_stamp, 4.0, 0.12)
+		Juice.hit_stop(self, 0.05)
 	_ismis.show_banner("Stamped %s. Hand the papers back (Space), or click the stamp to lift it off." % text, "")
 	_update_buttons()
 
@@ -544,14 +559,14 @@ func _commit(decision: Dictionary) -> void:
 
 ## How a call lands: a wash of its color over the window and its word popping up where the stamp
 ## was, which is where the player is looking (and clear of the student's name).
-## A wrong call also shakes the top bar, where the patience it cost is shown (the papers stay put).
+## A wrong call also shakes the patience bar, which shows what it cost (the papers stay put).
 func _verdict_juice(word: String, color: Color, wrong: bool) -> void:
 	Juice.screen_flash(self, Color(color, 0.22 if wrong else 0.16), 0.3 if wrong else 0.25)
 	var spot := _student_panel.stamp_rect().get_center()
 	Juice.pop_text(self, word, UiKit.RED_BRIGHT if wrong else color, spot, 38)
 	if wrong:
-		# Up and down only: the bar spans the screen, so a sideways jolt would show the wall.
-		Juice.shake(_top_bar, 6.0, 0.3, Vector2(0.0, 1.0))
+		# Only the patience bar, which is what the mistake cost; the rest of the top bar holds still.
+		Juice.shake(_top_bar.patience_bar(), 6.0, 0.3, Vector2(1.0, 0.5))
 
 
 ## With parent: any routing gets an argument from the parent, which costs the window a few minutes.
@@ -667,6 +682,9 @@ func _select(picked: Dictionary) -> void:
 	_flags.append(flag)
 	_set_mark(paper, "claimed")
 	_set_mark(record, "claimed")
+	# Both flagged fields give a small pulse, like a pin going in (2%, so the paper barely moves).
+	_student_panel.pulse_field(paper["form"], paper["key"])
+	_ismis.pulse_field(record["key"], record.get("context", ""))
 	var onboarding_flag := ShiftEvents.onboarding_banner(shift.current, "flagged")
 	_ismis.show_banner(onboarding_flag if onboarding_flag != "" else "Flagged · %s. It gets checked when you decide." % caption, "flag", true)
 
@@ -773,6 +791,7 @@ func _refresh_offices() -> void:
 
 ## Leaves the last verdict on screen for a moment, then the report, or S18 if the line gave up.
 func _on_shift_ended(reason: String) -> void:
+	_top_bar.calm()
 	_update_buttons()
 	if _menu != null and is_instance_valid(_menu):
 		_menu.queue_free()

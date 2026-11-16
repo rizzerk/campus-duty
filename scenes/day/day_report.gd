@@ -30,9 +30,14 @@ func _ready() -> void:
 	layout.add_child(head)
 	head.add_child(UiKit.label("SHIFT FAILED" if failed else "END OF SHIFT", 60, UiKit.GOLD))
 	var stars := StarRow.new()
-	stars.filled = summary["stars"]
 	stars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(stars)
+	# The stars pop in one by one; a full three bursts into confetti.
+	var earned: int = summary["stars"]
+	stars.reveal(earned)
+	if earned >= stars.total:
+		stars.revealed.connect(func() -> void:
+			Juice.confetti(self, get_global_transform().affine_inverse() * stars.get_global_rect().get_center()), CONNECT_ONE_SHOT)
 	var season := UiKit.label("Season so far: %d stars" % GameState.season_stars(), 22, Color("#cfe0d6"))
 	season.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(season)
