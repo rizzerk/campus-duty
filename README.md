@@ -25,7 +25,8 @@ Each day:
    - **Inspect.** Compare the student's papers with their ISMIS record and flag any mismatch.
    - **Decide.** Fix it at the window, route them (Cashier, Consultation, Dean's office), put them on the Hold bench, or reject them.
 4. **Day report.** Stars, mistakes, a "Because of you" list of consequences, and the supervisor's spot check.
-5. **Desk upgrades.** Spend stars, then go on to the next day.
+5. **Freedom Wall.** Three to six anonymous student posts about Window 3, picked by what actually happened today. Regulars post about their own visit.
+6. **Desk upgrades.** Spend stars, then go on to the next day.
 
 If the line's patience hits zero, Ma'am Lorna takes over and the shift ends early.
 
@@ -106,7 +107,7 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 ## Screens
 
 - **Menus:** splash, title, save slots, SA creator, settings, pause, credits
-- **Daily loop:** season calendar, morning memo, the window (the shift), day report, desk upgrades
+- **Daily loop:** season calendar, morning memo, the window (the shift), day report, Freedom Wall, desk upgrades
 - **Inside a shift:** section picker, route menu, ISMIS reset, change drawer, rulebook, Hold bench, shift failed
 - **Story and endings:** thank-you notes, regulars logbook, the end-of-season evaluation
 - **Achievements:** the unlock toast, and the achievements list on the title screen and the day report
@@ -121,7 +122,7 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 
 ## Status
 
-**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, achievements, and Ma'am Lorna's end-of-season evaluation with its three endings (kept the post, on probation, not renewed) and what happened to each regular.
+**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report and the Freedom Wall. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, rule bending, both live mid-shift and end-of-day spot checks, achievements, the Freedom Wall's posts after each day, and Ma'am Lorna's end-of-season evaluation with its three endings (kept the post, on probation, not renewed) and what happened to each regular.
 
 **Still to come:** title screen, saves and settings; desk upgrades; audio and final art.
 

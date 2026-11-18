@@ -8,11 +8,12 @@ const SCENES := {
 	"window": "res://scenes/day/window.tscn",
 	"report": "res://scenes/day/day_report.tscn",
 	"evaluation": "res://scenes/day/evaluation.tscn",
+	"freedom_wall": "res://scenes/day/freedom_wall.tscn",
 	"title": "res://scenes/main/title.tscn",
 }
 ## Screens a debug launch may jump to. The report needs a finished shift, so it isn't one. The
-## evaluation gets a made-up season (see DebugSeason).
-const DEBUG_SCENES := ["calendar", "memo", "window", "evaluation"]
+## evaluation and the Freedom Wall get a made-up season (see DebugSeason).
+const DEBUG_SCENES := ["calendar", "memo", "window", "evaluation", "freedom_wall"]
 
 var day: int = 1
 var base_seed: int = 1
@@ -62,8 +63,8 @@ func season_stars() -> int:
 	return total
 
 
-## After the last day the report opens the evaluation instead, and a new season goes through
-## start_new_game, so this never runs past the last day.
+## After the last day the Freedom Wall opens the evaluation instead, and a new season goes
+## through start_new_game, so this never runs past the last day.
 func next_day() -> void:
 	day = mini(day + 1, int(GameData.json("days")["last_day"]))
 	go_to("calendar")
@@ -114,6 +115,11 @@ func debug_jump() -> bool:
 	if scene == "evaluation":
 		day = int(days["last_day"])
 		results = DebugSeason.make(args)
+	elif scene == "freedom_wall":
+		# Today's made-up summary; no calls, so only the day's outcome posts and filler show.
+		results = DebugSeason.make(args)
+		last_summary = results.get(day, {})
+		last_history = []
 	# tests/smoke.sh looks for this line to know the jump really happened.
 	print("debug_jump: day %d seed %d -> %s" % [day, base_seed, scene])
 	go_to(scene)

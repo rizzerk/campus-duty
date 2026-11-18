@@ -1,4 +1,13 @@
 {
+	"_note": "The Freedom Wall after each day's report (scripts/rules/freedom_wall.gd). Each post's \"when\" says when it may show up: line_lost, great_day (3 stars), rough_day (1 star or less), walked_out, favor or favor:<favors.json id>, wrong_office (sent to the wrong open office), closed_office:<office>, false_alarms, turned_away or turned_away:<reject_reasons.json id>, found_section, day_N, <regular id>_good or _bad (that regular came today; bad if any call on them went wrong), or any (filler). An optional \"days\" list limits a post to those days, for posts about one visit or a check that starts on a later day. One post per thing that happened, 3 to 6 a day. author is anon or a regular's events.json id. likes is a [min, max] range. screen holds the page's own text; reactions can use {likes}, subtitle {day}.",
+	"screen": {
+		"title": "FREEDOM WALL",
+		"subtitle": "Day {day} · what Carolinians posted about Window 3 today",
+		"anonymous": "Anonymous Carolinian",
+		"reactions": "{likes} reactions",
+		"next_day": "Enter  Next day",
+		"evaluation": "Enter  See your evaluation"
+	},
 	"posts": [
 		{
 			"id": "any_01",
@@ -12,7 +21,7 @@
 			"id": "any_02",
 			"when": "any",
 			"author": "anon",
-			"ceb": "Kinsay nakakita og green nga ballpen sa Registrar? Mao ra gyud to akong swerte sa enrollment, palihug iuli :(",
+			"ceb": "Kinsay nakakita og green nga ballpen sa Registrar? Mao to akong swerte nga ballpen sa enrollment, palihug iuli :(",
 			"en": "Who found a green pen at the Registrar? That was my lucky enrollment pen, please return it :(",
 			"likes": [20, 75]
 		},
@@ -20,8 +29,8 @@
 			"id": "any_03",
 			"when": "any",
 			"author": "anon",
-			"ceb": "Shoutout sa akong pitaka nga igo ra gyud naka-survive sa assessment slip ug duha ka tuhog nga siomai sa canteen.",
-			"en": "Shoutout to my wallet for barely surviving the assessment slip and two sticks of canteen siomai.",
+			"ceb": "Shoutout sa akong pitaka nga igo ra gyud naka-survive sa assessment slip ug tulo ka buok siomai sa canteen.",
+			"en": "Shoutout to my wallet for barely surviving the assessment slip and three pieces of canteen siomai.",
 			"likes": [80, 210]
 		},
 		{
@@ -36,7 +45,7 @@
 			"id": "any_05",
 			"when": "any",
 			"author": "anon",
-			"ceb": "Init kaayo sa gawas pero inig sulod sa Registrar, ang kakulba sa akong grades ang makapapugong sa akong singot.",
+			"ceb": "Init kaayo sa gawas, pero sa sulod sa Registrar, ang kakulba sa akong grades ang makapasingot nako.",
 			"en": "It's blazing hot outside, but inside the Registrar my grade anxiety is what makes me sweat.",
 			"likes": [45, 130]
 		},
@@ -60,8 +69,8 @@
 			"id": "great_day_01",
 			"when": "great_day",
 			"author": "anon",
-			"ceb": "Window 3 karon, paspas kaayo! Wala pa ko kahuman sa akong kape, enrolled na ko.",
-			"en": "Window 3 today, so fast! I hadn't even finished my coffee and I was enrolled.",
+			"ceb": "Window 3 karon, paspas kaayo! Wala pa ko kahuman sa akong kape, human na ko.",
+			"en": "Window 3 today, so fast! I hadn't even finished my coffee and I was done.",
 			"likes": [40, 120]
 		},
 		{
@@ -76,8 +85,8 @@
 			"id": "great_day_03",
 			"when": "great_day",
 			"author": "anon",
-			"ceb": "Abi nakog maabtan kog udto sa linya, pero murag turbo man ang Window 3 karon. Bigyan ng jacket ang SA!",
-			"en": "I thought I'd be stuck in line till noon, but Window 3 was on turbo today. Give that SA a jacket!",
+			"ceb": "Abi nakog maabtan kog udto sa linya, pero murag turbo man ang Window 3 karon. Librehi na og kape ang SA!",
+			"en": "I thought I'd be stuck in line till noon, but Window 3 was on turbo today. Somebody buy that SA a coffee!",
 			"likes": [60, 175]
 		},
 		{
@@ -92,7 +101,7 @@
 			"id": "rough_day_01",
 			"when": "rough_day",
 			"author": "anon",
-			"ceb": "Murag wala pa nakakape ang SA sa Window 3 karon... kaduha na nibalik akong sinundan sa linya huhu.",
+			"ceb": "Murag wala pa nakakape ang SA sa Window 3 karon... kaduha na nibalik akong gisundan sa linya huhu.",
 			"en": "Looks like the SA at Window 3 hasn't had coffee yet... the person ahead of me came back twice already huhu.",
 			"likes": [35, 110]
 		},
@@ -100,7 +109,7 @@
 			"id": "rough_day_02",
 			"when": "rough_day",
 			"author": "anon",
-			"ceb": "Unsay nahitabo sa Window 3 ganina? Nagkaguliyang man ang mga papel, murag na-mental block apil ang counter :(",
+			"ceb": "Unsay nahitabo sa Window 3 ganina? Nagkagubot man ang mga papel, murag na-mental block apil ang counter :(",
 			"en": "What happened at Window 3 earlier? Papers were all over the place, even the counter had a mental block :(",
 			"likes": [40, 115]
 		},
@@ -125,7 +134,7 @@
 			"when": "line_lost",
 			"author": "anon",
 			"ceb": "Hala, nigawas na gyud si Ma'am Lorna sa Window 3! Sa sobra ka-dugay sa linya, siya na ang nipuli sa counter.",
-			"en": "Whoa, Ma'am Lorna actually stepped out at Window 3! The line took so long she took over the counter herself.",
+			"en": "Whoa, Ma'am Lorna actually came out to Window 3! The line took so long she took over the counter herself.",
 			"likes": [85, 230]
 		},
 		{
@@ -140,8 +149,8 @@
 			"id": "line_lost_03",
 			"when": "line_lost",
 			"author": "anon",
-			"ceb": "Na-pack up og sayo ang Window 3 kay nagkagubot na ang linya. RIP sa atong shift karon, balik na lang ta ugma :(",
-			"en": "Window 3 closed early because the queue lost its cool. RIP to today's shift, guess we're coming back tomorrow :(",
+			"ceb": "Pahuway sa, SA sa Window 3! Si Ma'am Lorna na ang nipuli nimo ganina, pero makabawi ra ka :)",
+			"en": "Take a breather, Window 3 SA! Ma'am Lorna took over for you earlier, but you'll bounce back :)",
 			"likes": [60, 170]
 		},
 		{
@@ -170,7 +179,7 @@
 		},
 		{
 			"id": "favor_01",
-			"when": "favor",
+			"when": "favor:merienda",
 			"author": "anon",
 			"ceb": "Hmm, kita ko atong gihatagan og merienda sa Window 3 ha... kalit man lang na-APPROVED bisan walay check-check?",
 			"en": "Hmm, I saw that merienda handoff at Window 3... how did they get APPROVED instantly without any checks?",
@@ -178,10 +187,10 @@
 		},
 		{
 			"id": "favor_02",
-			"when": "favor",
+			"when": "favor:connections",
 			"author": "anon",
 			"ceb": "Naa diay express lane sa Window 3 basta moingon ka nga pag-umangkon ka ni Dean? Bantay lang mo kang Ma'am Lorna!",
-			"en": "So there's an express lane at Window 3 if you claim to be the Dean's nephew? Wait till Ma'am Lorna checks the logs!",
+			"en": "So there's an express lane at Window 3 if you claim to be the Dean's nephew? Watch out for Ma'am Lorna!",
 			"likes": [90, 240]
 		},
 		{
@@ -210,7 +219,7 @@
 		},
 		{
 			"id": "wrong_office_01",
-			"when": "wrong_office",
+			"when": "closed_office:consultation",
 			"author": "anon",
 			"ceb": "Gipaadto ko sa Consultation sa Window 3 unya nag-coffee break pa diay ang mga adviser! Sayang akong lakaw uy.",
 			"en": "Window 3 sent me to Consultation while the advisers were on coffee break! What a wasted trip.",
@@ -226,7 +235,7 @@
 		},
 		{
 			"id": "wrong_office_03",
-			"when": "wrong_office",
+			"when": "closed_office:dean",
 			"author": "anon",
 			"ceb": "Sirado na ang Dean's Office pag-abot nako didto! Tan-awa intawon ang office schedule sa dili pa mo mag-route uy.",
 			"en": "The Dean's Office was already closed when I got there! Please check the office schedule before routing us.",
@@ -234,15 +243,15 @@
 		},
 		{
 			"id": "turned_away_01",
-			"when": "turned_away",
+			"when": "turned_away:missing_requirement",
 			"author": "anon",
-			"ceb": "Gi-reject ko sa Window 3 kay kulang akong library clearance. Sakit, pero sige na lang, nakalimot man gyud ko hehe.",
-			"en": "Got turned away at Window 3 for a missing library clearance. Hurts, but fair enough, I really did forget it hehe.",
+			"ceb": "Gi-reject ko sa Window 3 kay naa pa koy kulang sa clearance checklist. Sakit, pero nakalimot man gyud ko hehe.",
+			"en": "Got turned away at Window 3 for a missing item on my clearance checklist. Hurts, but I really did forget it hehe.",
 			"likes": [40, 115]
 		},
 		{
 			"id": "turned_away_02",
-			"when": "turned_away",
+			"when": "turned_away:failed_prereq",
 			"author": "anon",
 			"ceb": "Walay lusot sa Window 3 uy! Nasakpan akong 5.0 sa prereq sa Grades tab. Balik na lang ko sa sugod ani :(",
 			"en": "Nothing gets past Window 3! They caught my 5.0 prerequisite on the Grades tab. Back to square one for me :(",
@@ -250,7 +259,7 @@
 		},
 		{
 			"id": "turned_away_03",
-			"when": "turned_away",
+			"when": "turned_away:fake_signature",
 			"author": "anon",
 			"ceb": "Strikto kaayo ang Window 3 sa pirma sa adviser, gi-kompara gyud sa specimen sheet! Sakto ra pud hinuon.",
 			"en": "Window 3 is super strict with adviser signatures, checked it right against the specimen sheet! Fair play though.",
@@ -292,7 +301,7 @@
 			"id": "day_9_01",
 			"when": "day_9",
 			"author": "anon",
-			"ceb": "Extension day na pero pilion ra diay nga department ang pwede! Sayang akong plete paingon campus, basa-basa lagi og memo :(",
+			"ceb": "Extension day na pero pinili ra diay nga department ang pwede! Sayang akong plete paingon campus, basa-basa lagi og memo :(",
 			"en": "It's extension day but only listed departments are allowed! Wasted my fare to campus, should've read the memo :(",
 			"likes": [55, 160]
 		},
@@ -307,6 +316,7 @@
 		{
 			"id": "jericho_112_good_01",
 			"when": "jericho_112_good",
+			"days": [3],
 			"author": "jericho_112",
 			"ceb": "Sulit akong pag-atang sukad kadlawon! Naa na koy slot ug nabalhin pa gyud sa way conflict. Banana cue para sa Window 3! :D",
 			"en": "Camping out since dawn paid off! Got my slot and moved into a conflict-free schedule. Banana cue for Window 3! :D",
@@ -315,30 +325,34 @@
 		{
 			"id": "jericho_112_good_02",
 			"when": "jericho_112_good",
+			"days": [4, 6, 8],
 			"author": "jericho_112",
-			"ceb": "Salamat sa SA sa Window 3 nga wala gyud gipul-an sa akong nawong kada balik nako! Kompleto na gyud akong units.",
-			"en": "Thanks to the Window 3 SA who never got tired of seeing my face every time I came back! My units are finally complete.",
+			"ceb": "Salamat sa SA sa Window 3 nga wala gyud gipul-an sa akong nawong kada balik nako! Na-atiman ra gyud akong papeles karon.",
+			"en": "Thanks to the Window 3 SA who never got tired of seeing my face every time I came back! My papers got sorted out today.",
 			"likes": [65, 180]
 		},
 		{
 			"id": "jericho_112_bad_01",
 			"when": "jericho_112_bad",
+			"days": [3],
 			"author": "jericho_112",
-			"ceb": "Nagmata kog alas kwatro sa kadlawon para lang masaypan akong papel sa Window 3... sakit pa sa bulag uy :(",
+			"ceb": "Nagmata kog alas kwatro sa kadlawon para lang masaypan akong papel sa Window 3... sakit pa sa buwag uy :(",
 			"en": "I woke up at 4 AM just for my papers to get messed up at Window 3... hurts worse than a breakup :(",
 			"likes": [50, 145]
 		},
 		{
 			"id": "jericho_112_bad_02",
 			"when": "jericho_112_bad",
+			"days": [4, 6, 8, 9],
 			"author": "jericho_112",
-			"ceb": "Kaila na man unta ta sa Window 3 pero nganong naglibog gihapon akong enrollment?! Hapit na lang ko mahimong suki sa pila.",
-			"en": "We already know each other at Window 3, how is my enrollment still a mess?! I'm practically a permanent resident of this line.",
+			"ceb": "Kaila na man unta ta sa Window 3 pero nganong nasayop man gihapon akong papel karon?! Naglibog na nuon akong record :(",
+			"en": "We already know each other at Window 3, how did my papers still get mishandled today?! Now my record's a mess :(",
 			"likes": [45, 130]
 		},
 		{
 			"id": "carlo_104_good_01",
 			"when": "carlo_104_good",
+			"days": [3],
 			"author": "carlo_104",
 			"ceb": "Bisan nahulog akong ID sa 13C nga jeep, na-search ra dayon akong record sa Window 3! Nakaginhawa ra gyud ko :D",
 			"en": "Even after my ID fell out on the 13C jeepney, Window 3 pulled up my record by number right away! Huge relief :D",
@@ -347,14 +361,16 @@
 		{
 			"id": "carlo_104_good_02",
 			"when": "carlo_104_good",
+			"days": [7],
 			"author": "carlo_104",
-			"ceb": "Na-enroll na akong manghod nga freshman ug na-okay na pud akong pirma ni Engr.! Salamat kaayo sa Window 3.",
-			"en": "My freshman sibling is enrolled and Engr.'s signature is sorted out too! Huge thanks to Window 3.",
+			"ceb": "Dala na nako akong ID karon, ug na-okay na pud ang pirma ni Engr.! Salamat kaayo sa Window 3.",
+			"en": "I actually brought my ID today, and Engr.'s signature got sorted out too! Huge thanks to Window 3.",
 			"likes": [60, 165]
 		},
 		{
 			"id": "carlo_104_bad_01",
 			"when": "carlo_104_bad",
+			"days": [3],
 			"author": "carlo_104",
 			"ceb": "Nawala na gani akong ID sa 13C, nasayop pa gyud ang pag-handle sa akong form sa Window 3. Dimalasa adlawa uy :(",
 			"en": "First I lose my ID on the 13C, then my form gets mishandled at Window 3. What an unlucky day :(",
@@ -363,14 +379,16 @@
 		{
 			"id": "carlo_104_bad_02",
 			"when": "carlo_104_bad",
+			"days": [5],
 			"author": "carlo_104",
-			"ceb": "Nagtabang ra gani ko sa akong manghod nga 1st year, kami na nuon duha ang nagbalik-balik sa linya sa Window 3!",
-			"en": "I was just helping my 1st-year sibling, and now both of us are stuck going back and forth in the Window 3 line!",
+			"ceb": "Nagtabang ra gani ko sa akong manghod nga 1st year, nasayop pa gyud ang pag-atiman sa iyang papel sa Window 3!",
+			"en": "I was just helping my 1st-year sibling, and Window 3 still messed up their enrollment papers!",
 			"likes": [40, 120]
 		},
 		{
 			"id": "mae_118_good_01",
 			"when": "mae_118_good",
+			"days": [4],
 			"author": "mae_118",
 			"ceb": "Worth it akong color-coded ug alphabetized nga slips! Paspas kaayo ko nahuman sa Window 3, abot pa ko sa OAS interview :D",
 			"en": "My color-coded and alphabetized slips paid off! Finished super fast at Window 3 and made my OAS interview on time :D",
@@ -379,6 +397,7 @@
 		{
 			"id": "mae_118_good_02",
 			"when": "mae_118_good",
+			"days": [7],
 			"author": "mae_118",
 			"ceb": "Kompleto na akong maintaining load para sa scholarship! Salamat sa Window 3 sa pag-atiman sa akong Accounting subjects.",
 			"en": "My scholarship maintaining load is complete! Thank you Window 3 for taking care of my Accounting subjects.",
@@ -387,6 +406,7 @@
 		{
 			"id": "mae_118_bad_01",
 			"when": "mae_118_bad",
+			"days": [4],
 			"author": "mae_118",
 			"ceb": "Gi-color-code ug gi-plastic envelope na nako tanan, pero nasayop gihapon ang Window 3! Ma-late na ko sa OAS interview :(",
 			"en": "I color-coded and put everything in a plastic envelope, and Window 3 still got it wrong! I'm gonna be late for my OAS interview :(",
@@ -395,10 +415,55 @@
 		{
 			"id": "mae_118_bad_02",
 			"when": "mae_118_bad",
+			"days": [6, 7],
 			"author": "mae_118",
-			"ceb": "Nagubot akong gi-alphabetize nga slips sa sige nakog balik sa Window 3! Kulbaan na kaayo ko sa akong scholarship load.",
-			"en": "My alphabetized slips are all out of order from coming back to Window 3! I'm so anxious about my scholarship load now.",
+			"ceb": "Bisan gi-alphabetize na nako akong slips, nasayop gihapon ang pag-handle sa Window 3! Kulbaan na ko sa akong scholarship load.",
+			"en": "Even after I alphabetized my slips, Window 3 still mishandled them! I'm so anxious about my scholarship load now.",
 			"likes": [45, 130]
+		},
+		{
+			"id": "turned_away_04",
+			"when": "turned_away",
+			"author": "anon",
+			"ceb": "Gi-turn away ko sa Window 3, pero gi-explain gyud unsay problema ug unsay buhaton. Sakit, pero klaro hehe.",
+			"en": "Got turned away at Window 3, but they explained exactly what was wrong and what to do. Hurts, but it's clear hehe.",
+			"likes": [40, 120]
+		},
+		{
+			"id": "jericho_112_good_03",
+			"when": "jericho_112_good",
+			"days": [9],
+			"author": "jericho_112",
+			"ceb": "Wala diay sa extension list akong department, gi-turn away ko. Sakit, pero patas ang Window 3. Last na gyud, promise!",
+			"en": "My department wasn't on the extension list, so I got turned away. Hurts, but Window 3 was fair about it. Last one, promise!",
+			"likes": [70, 190]
+		},
+		{
+			"id": "carlo_104_good_03",
+			"when": "carlo_104_good",
+			"days": [5],
+			"author": "carlo_104",
+			"ceb": "Na-enroll na akong manghod nga freshman! Salamat sa Window 3, mas organized pa mo kaysa nako hehe.",
+			"en": "My freshman sibling is enrolled! Thanks Window 3, you're way more organized than me hehe.",
+			"likes": [55, 150]
+		},
+		{
+			"id": "carlo_104_bad_03",
+			"when": "carlo_104_bad",
+			"days": [7],
+			"author": "carlo_104",
+			"ceb": "Dala na gani nako akong ID karon, ang pirma ni Engr. na pud ang nagkaproblema sa Window 3. Dili gyud ko swertehon uy :(",
+			"en": "I finally brought my ID today, and now Engr.'s signature is the problem at Window 3. Luck just isn't on my side :(",
+			"likes": [45, 130]
+		},
+		{
+			"id": "mae_118_good_03",
+			"when": "mae_118_good",
+			"days": [6],
+			"author": "mae_118",
+			"ceb": "Gi-double check na nako akong prereqs, gi-double check pud sa Window 3. Teamwork! Na-survive nako ang Open Market :D",
+			"en": "I double-checked my prereqs, and Window 3 double-checked them too. Teamwork! I survived Open Market :D",
+			"likes": [60, 170]
 		}
 	]
 }
