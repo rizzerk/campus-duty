@@ -29,8 +29,8 @@
 			"id": "any_03",
 			"when": "any",
 			"author": "anon",
-			"ceb": "Shoutout sa akong pitaka nga igo ra gyud naka-survive sa assessment slip ug duha ka tuhog nga siomai sa canteen.",
-			"en": "Shoutout to my wallet for barely surviving the assessment slip and two sticks of canteen siomai.",
+			"ceb": "Shoutout sa akong pitaka nga igo ra gyud naka-survive sa assessment slip ug tulo ka buok siomai sa canteen.",
+			"en": "Shoutout to my wallet for barely surviving the assessment slip and three pieces of canteen siomai.",
 			"likes": [80, 210]
 		},
 		{
@@ -85,8 +85,8 @@
 			"id": "great_day_03",
 			"when": "great_day",
 			"author": "anon",
-			"ceb": "Abi nakog maabtan kog udto sa linya, pero murag turbo man ang Window 3 karon. Bigyan ng jacket ang SA!",
-			"en": "I thought I'd be stuck in line till noon, but Window 3 was on turbo today. Give that SA a jacket!",
+			"ceb": "Abi nakog maabtan kog udto sa linya, pero murag turbo man ang Window 3 karon. Librehi na og kape ang SA!",
+			"en": "I thought I'd be stuck in line till noon, but Window 3 was on turbo today. Somebody buy that SA a coffee!",
 			"likes": [60, 175]
 		},
 		{
@@ -101,7 +101,7 @@
 			"id": "rough_day_01",
 			"when": "rough_day",
 			"author": "anon",
-			"ceb": "Murag wala pa nakakape ang SA sa Window 3 karon... kaduha na nibalik akong sinundan sa linya huhu.",
+			"ceb": "Murag wala pa nakakape ang SA sa Window 3 karon... kaduha na nibalik akong gisundan sa linya huhu.",
 			"en": "Looks like the SA at Window 3 hasn't had coffee yet... the person ahead of me came back twice already huhu.",
 			"likes": [35, 110]
 		},
@@ -109,7 +109,7 @@
 			"id": "rough_day_02",
 			"when": "rough_day",
 			"author": "anon",
-			"ceb": "Unsay nahitabo sa Window 3 ganina? Nagkaguliyang man ang mga papel, murag na-mental block apil ang counter :(",
+			"ceb": "Unsay nahitabo sa Window 3 ganina? Nagkagubot man ang mga papel, murag na-mental block apil ang counter :(",
 			"en": "What happened at Window 3 earlier? Papers were all over the place, even the counter had a mental block :(",
 			"likes": [40, 115]
 		},
@@ -245,8 +245,8 @@
 			"id": "turned_away_01",
 			"when": "turned_away:missing_requirement",
 			"author": "anon",
-			"ceb": "Gi-reject ko sa Window 3 kay kulang akong library clearance. Sakit, pero sige na lang, nakalimot man gyud ko hehe.",
-			"en": "Got turned away at Window 3 for a missing library clearance. Hurts, but fair enough, I really did forget it hehe.",
+			"ceb": "Gi-reject ko sa Window 3 kay naa pa koy kulang sa clearance checklist. Sakit, pero nakalimot man gyud ko hehe.",
+			"en": "Got turned away at Window 3 for a missing item on my clearance checklist. Hurts, but I really did forget it hehe.",
 			"likes": [40, 115]
 		},
 		{
@@ -301,7 +301,7 @@
 			"id": "day_9_01",
 			"when": "day_9",
 			"author": "anon",
-			"ceb": "Extension day na pero pilion ra diay nga department ang pwede! Sayang akong plete paingon campus, basa-basa lagi og memo :(",
+			"ceb": "Extension day na pero pinili ra diay nga department ang pwede! Sayang akong plete paingon campus, basa-basa lagi og memo :(",
 			"en": "It's extension day but only listed departments are allowed! Wasted my fare to campus, should've read the memo :(",
 			"likes": [55, 160]
 		},
@@ -327,8 +327,8 @@
 			"when": "jericho_112_good",
 			"days": [4, 6, 8],
 			"author": "jericho_112",
-			"ceb": "Salamat sa SA sa Window 3 nga wala gyud gipul-an sa akong nawong kada balik nako! Kompleto na gyud akong units.",
-			"en": "Thanks to the Window 3 SA who never got tired of seeing my face every time I came back! My units are finally complete.",
+			"ceb": "Salamat sa SA sa Window 3 nga wala gyud gipul-an sa akong nawong kada balik nako! Na-atiman ra gyud akong papeles karon.",
+			"en": "Thanks to the Window 3 SA who never got tired of seeing my face every time I came back! My papers got sorted out today.",
 			"likes": [65, 180]
 		},
 		{
@@ -336,7 +336,7 @@
 			"when": "jericho_112_bad",
 			"days": [3],
 			"author": "jericho_112",
-			"ceb": "Nagmata kog alas kwatro sa kadlawon para lang masaypan akong papel sa Window 3... sakit pa sa bulag uy :(",
+			"ceb": "Nagmata kog alas kwatro sa kadlawon para lang masaypan akong papel sa Window 3... sakit pa sa buwag uy :(",
 			"en": "I woke up at 4 AM just for my papers to get messed up at Window 3... hurts worse than a breakup :(",
 			"likes": [50, 145]
 		},
@@ -345,8 +345,8 @@
 			"when": "jericho_112_bad",
 			"days": [4, 6, 8, 9],
 			"author": "jericho_112",
-			"ceb": "Kaila na man unta ta sa Window 3 pero nganong naglibog gihapon akong enrollment?! Hapit na lang ko mahimong suki sa pila.",
-			"en": "We already know each other at Window 3, how is my enrollment still a mess?! I'm practically a permanent resident of this line.",
+			"ceb": "Kaila na man unta ta sa Window 3 pero nganong nasayop man gihapon akong papel karon?! Naglibog na nuon akong record :(",
+			"en": "We already know each other at Window 3, how did my papers still get mishandled today?! Now my record's a mess :(",
 			"likes": [45, 130]
 		},
 		{
@@ -381,8 +381,8 @@
 			"when": "carlo_104_bad",
 			"days": [5],
 			"author": "carlo_104",
-			"ceb": "Nagtabang ra gani ko sa akong manghod nga 1st year, kami na nuon duha ang nagbalik-balik sa linya sa Window 3!",
-			"en": "I was just helping my 1st-year sibling, and now both of us are stuck going back and forth in the Window 3 line!",
+			"ceb": "Nagtabang ra gani ko sa akong manghod nga 1st year, nasayop pa gyud ang pag-atiman sa iyang papel sa Window 3!",
+			"en": "I was just helping my 1st-year sibling, and Window 3 still messed up their enrollment papers!",
 			"likes": [40, 120]
 		},
 		{
@@ -417,8 +417,8 @@
 			"when": "mae_118_bad",
 			"days": [6, 7],
 			"author": "mae_118",
-			"ceb": "Nagubot akong gi-alphabetize nga slips sa sige nakog balik sa Window 3! Kulbaan na kaayo ko sa akong scholarship load.",
-			"en": "My alphabetized slips are all out of order from coming back to Window 3! I'm so anxious about my scholarship load now.",
+			"ceb": "Bisan gi-alphabetize na nako akong slips, nasayop gihapon ang pag-handle sa Window 3! Kulbaan na ko sa akong scholarship load.",
+			"en": "Even after I alphabetized my slips, Window 3 still mishandled them! I'm so anxious about my scholarship load now.",
 			"likes": [45, 130]
 		},
 		{
