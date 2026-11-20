@@ -17,6 +17,7 @@ const SOUND_IDS := [
 	"alert",
 	"heartbeat",
 	"pop",
+	"murmur",
 ]
 const BGM_IDS := [
 	"menu",

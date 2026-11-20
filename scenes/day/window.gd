@@ -22,6 +22,8 @@ const REACT_SECONDS := 1.6
 const CALL_DELAY := 0.5
 const NUMBER_KEYS := [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
 const KEYPAD_KEYS := [KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4, KEY_KP_5]
+## How often (real seconds) the waiting faces update what they're doing.
+const MOOD_SECONDS := 1.0
 
 var shift: ShiftState
 
@@ -51,6 +53,14 @@ var _hand_back_button: Button
 ## Only shown when the student at the window asks for a favor (rule bending).
 var _favor_button: Button
 var _spot_note: String = ""
+## The living line: who's on their phone, who's sighing, and the barks over their heads.
+var _chatter: LineChatter
+var _bubble: LineBubble
+## Real seconds since the shift began, for spacing out barks.
+var _shift_seconds: float = 0.0
+var _mood_left: float = MOOD_SECONDS
+## Under this patience the line looks annoyed (balance.json line_life.sigh_patience).
+var _sigh_patience: float = 40.0
 
 
 func _ready() -> void:
@@ -60,8 +70,10 @@ func _ready() -> void:
 	# The day report only flags what this shift unlocked.
 	Achievements.fresh.clear()
 	shift = ShiftState.new(GameState.day, GameState.base_seed)
+	_chatter = LineChatter.new(GameState.base_seed, GameState.day)
+	_sigh_patience = LineChatter.setting("sigh_patience")
 	_build()
-	shift.student_joined_line.connect(func(_s: Dictionary) -> void: _refresh_line())
+	shift.student_joined_line.connect(_on_joined_line)
 	shift.bench_changed.connect(_refresh_offices)
 	shift.office_changed.connect(func(_o: String, _status: String) -> void: _refresh_offices())
 	shift.shift_ended.connect(_on_shift_ended)
@@ -73,7 +85,8 @@ func _ready() -> void:
 		# red hint says it then.
 		if _menu == null:
 			Juice.banner(self, "RUSH!  +%d in line" % count, UiKit.GOLD, 4.0)
-		Juice.shake(_line_strip, 4.0, 0.3, Vector2(0.0, 1.0)))
+		Juice.shake(_line_strip, 4.0, 0.3, Vector2(0.0, 1.0))
+		_bark("rush", _speakers()))
 	shift.event_triggered.connect(_on_event_triggered)
 	shift.spot_inspected.connect(_on_spot_inspected)
 	_refresh_line()
@@ -87,8 +100,15 @@ func _process(delta: float) -> void:
 	shift.tick(delta)
 	if shift.ended:
 		return
+	_shift_seconds += delta
+	_mood_left -= delta
+	if _mood_left <= 0.0:
+		_mood_left = MOOD_SECONDS
+		_line_strip.update_moods(shift.patience, shift.minute)
+	if not shift.current.is_empty() and _react_left <= 0.0 and _chatter.slow_due(shift.minute):
+		_bark("slow_service", _speakers(true))
 	_top_bar.update_values(shift.clock_text(), shift.served, shift.line.size(), shift.patience)
-	var band := 0 if shift.patience < 40.0 else 1 if shift.patience < 70.0 else 2
+	var band := 0 if shift.patience < _sigh_patience else 1 if shift.patience < 70.0 else 2
 	if band != _patience_band:
 		_patience_band = band
 		_refresh_line()
@@ -149,6 +169,9 @@ func _build() -> void:
 	_line_strip = LineStrip.new()
 	_place(_line_strip, Rect2(24, 72, 1232, 96))
 	_line_strip.face_clicked.connect(_on_face_clicked)
+	# Over the top bar and the line, under everything placed after it (menus, the rulebook).
+	_bubble = LineBubble.new()
+	add_child(_bubble)
 	_student_panel = StudentPanel.new()
 	_place(_student_panel, Rect2(24, 176, 494, 440))
 	_student_panel.paper_field_clicked.connect(_on_paper_field)
@@ -240,6 +263,7 @@ func _call_next() -> void:
 	_clear_stamp()
 	_student_panel.show_student(student)
 	_ismis.show_student(student)
+	_chatter.note_called(shift.minute)
 	var onboarding := ShiftEvents.onboarding_banner(student, "called")
 	if onboarding != "":
 		_ismis.show_banner(onboarding, "")
@@ -271,6 +295,12 @@ func _on_face_clicked(index: int) -> void:
 		Sfx.play("bell")
 		_refresh_line()
 		_ismis.show_banner("Called a priority student to the front of the line.", "")
+		# Someone they just skipped (now right behind them) has something to say about it.
+		var skipped: Array = []
+		for i in range(1, mini(index + 1, _visible_faces())):
+			if shift.line[i]["priority"] == "":
+				skipped.append(i)
+		_bark("priority_cut", skipped)
 
 
 func _on_id_scanned() -> void:
@@ -555,6 +585,12 @@ func _commit(decision: Dictionary) -> void:
 	_refresh_line()
 	_refresh_offices()
 	_update_buttons()
+	# Quick right calls in a row get the line cheering. A student who stays for another problem
+	# is still the same visit, so only their last decision counts. A favor never earns a cheer.
+	if outcome != "stays" and _chatter.note_decision(result["correct"] and action != "favor", shift.minute) and not shift.ended:
+		_line_strip.cheer(LineChatter.setting("cheer_seconds"))
+		Sfx.play("pop")
+		_bark("fast_streak", _speakers())
 
 
 ## How a call lands: a wash of its color over the window and its word popping up where the stamp
@@ -779,7 +815,61 @@ func _clear_selection_highlight() -> void:
 
 
 func _refresh_line() -> void:
-	_line_strip.refresh(shift.line, shift.patience)
+	_line_strip.refresh(shift.line, shift.patience, shift.minute)
+
+
+func _on_joined_line(student: Dictionary) -> void:
+	_refresh_line()
+	# Back from a wrong call, and they let the whole line know. (Back from an office that helped
+	# them, they have nothing to complain about, even if they were angry earlier.)
+	if student.get("trip", {}).get("sent_back", false):
+		var index := shift.line.size() - 1
+		_bark("angry_return", [index] if index < _visible_faces() else [])
+
+
+## Faces on screen that could speak. Impatient students get the first word when the window is slow.
+func _speakers(impatient_first: bool = false) -> Array:
+	var all: Array = []
+	var impatient: Array = []
+	for i in _visible_faces():
+		all.append(i)
+		if shift.line[i].get("trait", "") == "impatient":
+			impatient.append(i)
+	return impatient if impatient_first and not impatient.is_empty() else all
+
+
+## Someone in line says something, if LineChatter allows it right now. The bubble follows them as
+## the line moves and goes away if they're called up.
+func _bark(situation: String, speakers: Array) -> void:
+	if shift.ended:
+		return
+	var bark := _chatter.bark(situation, _shift_seconds, _clear_of_tags(speakers))
+	if bark.is_empty() or int(bark["index"]) >= shift.line.size():
+		return
+	var student: Dictionary = shift.line[bark["index"]]
+	_bubble.say(bark["line"], func() -> Vector2: return _line_strip.anchor_of(student), LineChatter.setting("bark_seconds"))
+	_line_strip.speak(bark["index"])
+	Sfx.play("murmur", 0.08)
+
+
+## Faces both on screen and still in line (the same unless the strip hasn't caught up yet).
+func _visible_faces() -> int:
+	return mini(_line_strip.shown_count(), shift.line.size())
+
+
+## A bubble covers the tags of the faces around its speaker, so speakers whose neighbors have no
+## GRAD, PWD or BACK tag go first; the player is often scanning for those tags right then.
+func _clear_of_tags(speakers: Array) -> Array:
+	var clear: Array = []
+	for i: int in speakers:
+		var tagged := false
+		for j in range(maxi(0, i - 2), mini(i + 3, _visible_faces())):
+			var other: Dictionary = shift.line[j]
+			if other["priority"] != "" or other.get("mood", "") == "angry":
+				tagged = true
+		if not tagged:
+			clear.append(i)
+	return clear if not clear.is_empty() else speakers
 
 
 func _refresh_offices() -> void:
@@ -792,6 +882,7 @@ func _refresh_offices() -> void:
 ## Leaves the last verdict on screen for a moment, then the report, or S18 if the line gave up.
 func _on_shift_ended(reason: String) -> void:
 	_top_bar.calm()
+	_bubble.dismiss()
 	_update_buttons()
 	if _menu != null and is_instance_valid(_menu):
 		_menu.queue_free()
