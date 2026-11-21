@@ -12,6 +12,9 @@ signal event_triggered(event: Dictionary)
 signal spot_inspected(inspection: Dictionary)
 signal slots_changed
 signal shift_ended(reason: String)
+## After every decision: right calls in a row, the in-the-zone tier that gives (0 to the number of
+## tiers in balance.json "zone"), and whether this call broke a run.
+signal streak_changed(streak: int, tier: int, broken: bool)
 
 const BENCH_SEATS := 3
 
@@ -34,6 +37,12 @@ var ended: bool = false
 ## True while the player has the section picker open. Open market seats only drain then.
 var choosing_section: bool = false
 var end_reason: String = ""
+## Right calls in a row this shift (one per decision, so each fix for a student with two problems
+## counts, as in Evaluation.best_streak). A wrong call or a favor that bent the rules ends the run.
+var streak: int = 0:
+	set(value):
+		streak = value
+		_calm = clampf(1.0 - _ease_per_tier * streak_tier(value), 0.0, 1.0)
 
 var _arrivals: Array = []
 var _away: Array = []
@@ -41,6 +50,10 @@ var _office_status: Dictionary = {}
 var _drain_rng := RandomNumberGenerator.new()
 var _drain_clock: float = 0.0
 var _base_seed: int = 1
+## The share of the usual patience drain while in the zone, worked out when the streak changes
+## (not every frame).
+var _calm: float = 1.0
+var _ease_per_tier: float = 0.0
 var _scheduled_events: Array = []
 
 
@@ -48,6 +61,7 @@ func _init(day_number: int, base_seed: int) -> void:
 	day = day_number
 	_base_seed = base_seed
 	patience = GameData.balance("patience_start")
+	_ease_per_tier = float(_zone_settings().get("drain_ease_per_tier", 0.0))
 	var info := GameData.day(day)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = base_seed * 100 + day
@@ -131,7 +145,7 @@ func tick(delta_seconds: float) -> void:
 			_join_line(student)
 	_release_bench()
 	_emit_office_changes()
-	patience -= delta_seconds * (GameData.balance("patience_drain_base") + GameData.balance("patience_drain_per_waiting") * waiting_weight())
+	patience -= delta_seconds * (GameData.balance("patience_drain_base") + GameData.balance("patience_drain_per_waiting") * waiting_weight()) * _calm
 	_check_end()
 
 
@@ -151,6 +165,26 @@ static func trait_weight(student: Dictionary) -> float:
 	if id == "":
 		return 1.0
 	return float(GameData.json("traits")[id].get("drain_weight", 1.0))
+
+
+## The in-the-zone tier a run of right calls reaches: one per threshold in balance.json
+## "zone.tiers" that it meets (0 below the first).
+static func streak_tier(run: int) -> int:
+	var tier := 0
+	for need: float in _zone_settings().get("tiers", []):
+		if run >= int(need):
+			tier += 1
+	return tier
+
+
+## The share of the usual patience drain the line has while the player is in the zone: the line
+## calms a little per tier (balance.json "zone.drain_ease_per_tier").
+func zone_calm() -> float:
+	return _calm
+
+
+static func _zone_settings() -> Dictionary:
+	return GameData.json("balance").get("zone", {})
 
 
 ## A parent arguing about a routing slows the window down.
@@ -291,6 +325,9 @@ func act(action: String, details: Dictionary = {}) -> Dictionary:
 	})
 	if outcome != "stays":
 		current = {}
+	var was := streak
+	streak = streak + 1 if history[-1]["correct"] else 0
+	streak_changed.emit(streak, streak_tier(streak), streak == 0 and was > 0)
 	if SpotCheck.should_inspect_mid_shift(history, _base_seed, day):
 		spot_inspected.emit(SpotCheck.inspect_latest(history, _base_seed, day))
 	_check_end()

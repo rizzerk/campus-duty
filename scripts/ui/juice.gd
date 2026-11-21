@@ -257,6 +257,37 @@ static func confetti(parent: Control, at: Vector2, amount: int = 36) -> CPUParti
 	return bits
 
 
+## Lets a node fall a little and fade out, for something lost (a broken streak's badge). With
+## reduced motion it only fades. It ends invisible (modulate.a 0) back where it started, so
+## showing it again is just modulate.a = 1 (after cancel_drop, if it might still be falling).
+static func drop_out(node: Control, distance: float = 18.0, duration: float = 0.4) -> Tween:
+	if not _ready_for(node):
+		return null
+	cancel_drop(node)
+	var home := node.position
+	node.set_meta("juice_drop_home", home)
+	var tween := node.create_tween().set_parallel()
+	if Settings.motion_allowed():
+		tween.tween_property(node, "position:y", home.y + distance, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(node, "modulate:a", 0.0, duration)
+	tween.chain().tween_callback(func() -> void:
+		if is_instance_valid(node):
+			node.position = home
+			node.remove_meta("juice_drop_home"))
+	node.set_meta("juice_drop", tween)
+	return tween
+
+
+## Stops a drop_out still running and puts the node back where it started (still faded).
+static func cancel_drop(node: Control) -> void:
+	if node == null or not is_instance_valid(node):
+		return
+	_stop(node, "juice_drop")
+	if node.has_meta("juice_drop_home"):
+		node.position = node.get_meta("juice_drop_home")
+		node.remove_meta("juice_drop_home")
+
+
 ## Ends any shake, punch or slide on node at once and puts it back where and how big it was, so another
 ## tween (say, the papers sliding away) can move it without a fight.
 static func settle(node: Control) -> void:
