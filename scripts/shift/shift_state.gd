@@ -82,6 +82,10 @@ func _init(day_number: int, base_seed: int) -> void:
 	else:
 		ShiftEvents.apply_daily_flavor(_arrivals, day, base_seed)
 		_scheduled_events = ShiftEvents.events_for_day(day)
+	# Last, once regulars are in place: no two students share an ID number, and no one else gets a
+	# regular's number, even on a day that regular doesn't come.
+	var everyone: Array = _arrivals.map(func(arrival: Dictionary) -> Dictionary: return arrival["student"])
+	StudentGen.make_ids_unique(everyone, base_seed * 89 + day * 17, ShiftEvents.regular_id_numbers())
 	_drain_rng.seed = base_seed * 7 + day
 	_office_status = _statuses()
 	tick(0.0)

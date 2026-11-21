@@ -32,6 +32,7 @@ func _init() -> void:
 	_test_day_one_onboarding_and_events()
 	_test_day_one_mistakes_are_gentler()
 	_test_speed_doesnt_rescue_wrong_calls()
+	_test_ids_unique_in_a_shift()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -576,3 +577,28 @@ func _test_speed_doesnt_rescue_wrong_calls() -> void:
 
 func _last_day() -> int:
 	return int(GameData.json("days")["last_day"])
+
+
+## No two students in one shift share an ID number, regulars included, no one else carries a
+## regular's number, and every paper shows the student's own number. Days 2-8 over 30 seeds (day 4
+## seed 30, day 7 seed 5 and day 8 seed 22 used to collide), plus a few seeds on the other days.
+func _test_ids_unique_in_a_shift() -> void:
+	var regular_ids := ShiftEvents.regular_id_numbers()
+	for day in range(1, 11):
+		var seeds := 30 if day >= 2 and day <= 8 else 5
+		for seed_value in range(1, seeds + 1):
+			var shift := ShiftState.new(day, seed_value)
+			var students: Array = shift.line.duplicate()
+			for arrival: Dictionary in shift._arrivals:
+				students.append(arrival["student"])
+			_check(students.size() == shift.total_students, "day %d seed %d: every student counted" % [day, seed_value])
+			var seen := {}
+			for student: Dictionary in students:
+				var id: String = student["record"]["id_number"]
+				_check(not seen.has(id), "day %d seed %d: ID %s is used twice" % [day, seed_value, id])
+				seen[id] = true
+				if not student.has("regular_id"):
+					_check(not regular_ids.has(id), "day %d seed %d: %s carries a regular's ID" % [day, seed_value, id])
+				for paper: Dictionary in student["papers"]:
+					if paper["fields"].has("id_number"):
+						_check(paper["fields"]["id_number"] == id, "day %d seed %d: the %s shows the student's ID" % [day, seed_value, paper["form"]])

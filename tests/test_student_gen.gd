@@ -23,6 +23,7 @@ func _init() -> void:
 	_test_favors()
 	_test_personalities()
 	_test_department_list()
+	_test_unique_ids()
 	print("student_gen: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -241,3 +242,39 @@ func _test_personalities() -> void:
 
 func _last_day() -> int:
 	return int(GameData.json("days")["last_day"])
+
+
+## Two students with the same number: the first keeps it, the second gets a new one everywhere
+## (record, papers, line) with the same entry year. A regular always keeps theirs.
+func _test_unique_ids() -> void:
+	var first := StudentGen.make(1, 7)
+	var second := StudentGen.make(1, 7)
+	var old: String = first["record"]["id_number"]
+	second["line"] = { "ceb": "Ang akong ID kay %s." % old, "en": "My ID is %s." % old }
+	StudentGen.make_ids_unique([first, second], 3)
+	var id: String = second["record"]["id_number"]
+	_check(first["record"]["id_number"] == old, "the first student keeps their ID")
+	_check(id != old and id.left(4) == old.left(4) and id.length() == old.length(), "the second gets a new ID with the same entry year")
+	var id_papers := 0
+	for paper: Dictionary in second["papers"]:
+		if paper["fields"].has("id_number"):
+			id_papers += 1
+			_check(paper["fields"]["id_number"] == id, "the %s shows the new ID" % paper["form"])
+	_check(id_papers >= 2, "the test student carries at least two papers with an ID")
+	_check(second["line"]["en"] == "My ID is %s." % id and second["line"]["ceb"].contains(id), "the line says the new ID")
+	var again := [StudentGen.make(1, 7), StudentGen.make(1, 7)]
+	StudentGen.make_ids_unique(again, 3)
+	_check(again[1]["record"]["id_number"] == id, "same seed gives the same new ID")
+	var student := StudentGen.make(1, 7)
+	var regular := StudentGen.make(1, 7)
+	regular["regular_id"] = "carlo"
+	StudentGen.make_ids_unique([student, regular], 3)
+	_check(regular["record"]["id_number"] == old and student["record"]["id_number"] != old, "a regular keeps their ID; the other student moves")
+	var stranger := StudentGen.make(1, 7)
+	StudentGen.make_ids_unique([stranger], 3, [old])
+	_check(stranger["record"]["id_number"] != old, "a reserved ID (an absent regular's) is never given to anyone else")
+	var regular_ids := ShiftEvents.regular_id_numbers()
+	var seen := {}
+	for regular_id: String in regular_ids:
+		_check(not seen.has(regular_id), "regulars' ID %s is used by two regulars" % regular_id)
+		seen[regular_id] = true

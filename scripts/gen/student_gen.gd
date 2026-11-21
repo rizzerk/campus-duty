@@ -10,6 +10,8 @@ const WORRIED_CHANCE := 0.2
 const RANDOM_FAVORS := ["sob_story", "merienda"]
 ## Decided by the student's program, not by a roll among the other problems (see _pick_program).
 const WRONG_DEPARTMENT := "wrong_department"
+## Tries at a free ID number for a student whose number is taken (see make_ids_unique).
+const MAX_ID_ROLLS := 100
 
 
 ## forced, when given, replaces the problem roll with exactly these problems (the line director
@@ -375,6 +377,46 @@ static func resolve(student: Dictionary, problem: String) -> void:
 				"title": "Dean's approval",
 				"fields": { "approved_units": _paper(student, "add_drop")["fields"]["units_after"], "note": "Overload approved" },
 			})
+
+
+## Gives every student in a shift their own ID number, so a player comparing IDs never sees the
+## same number on two people. Regulars keep theirs (it is part of who they are), and reserved
+## numbers (every regular's, all season) are never handed to anyone else. Anyone else whose
+## number is taken keeps their entry year and gets new last four digits, rolled from seed_value,
+## on the record, every paper and in their line. Same seed, same IDs.
+static func make_ids_unique(students: Array, seed_value: int, reserved: Array = []) -> void:
+	var taken := {}
+	for id: String in reserved:
+		taken[id] = true
+	for student: Dictionary in students:
+		if student.has("regular_id"):
+			taken[student["record"]["id_number"]] = true
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	for student: Dictionary in students:
+		if student.has("regular_id"):
+			continue
+		var old: String = student["record"]["id_number"]
+		var id := old
+		# 9000 endings per entry year against a line of about 25, so a free one comes at once; the
+		# cap only keeps the loop bounded.
+		for _attempt in MAX_ID_ROLLS:
+			if not taken.has(id):
+				break
+			id = "%s%04d" % [old.left(4), rng.randi_range(1000, 9999)]
+		taken[id] = true
+		if id != old:
+			_set_id(student, old, id)
+
+
+static func _set_id(student: Dictionary, old: String, id: String) -> void:
+	student["record"]["id_number"] = id
+	for paper: Dictionary in student["papers"]:
+		if paper["fields"].get("id_number", "") == old:
+			paper["fields"]["id_number"] = id
+	var line: Dictionary = student.get("line", {})
+	for lang: String in line:
+		line[lang] = str(line[lang]).replace(old, id)
 
 
 ## A difference that doesn't matter: a shortened first name or another way of writing the
