@@ -203,6 +203,24 @@ def make_pop() -> list[float]:
     return out
 
 
+def make_murmur() -> list[float]:
+    """A soft two-syllable "mm-hm" from the line, under a bark's speech bubble."""
+    n = int(SAMPLE_RATE * 0.26)
+    rng = random.Random(211)
+    out = []
+    smooth = 0.0
+    for i in range(n):
+        t = i / SAMPLE_RATE
+        # Two humps, the second a little higher, like a voice going "mm-HM".
+        first = math.sin(math.pi * min(1.0, t / 0.11)) if t < 0.11 else 0.0
+        second = math.sin(math.pi * min(1.0, (t - 0.13) / 0.12)) if 0.13 <= t < 0.25 else 0.0
+        freq = 190.0 if t < 0.12 else 240.0
+        voice = math.sin(2.0 * math.pi * freq * t) + 0.5 * math.sin(4.0 * math.pi * freq * t) + 0.25 * math.sin(6.0 * math.pi * freq * t)
+        smooth += ((rng.random() * 2.0 - 1.0) - smooth) * 0.08
+        out.append((voice * 0.8 + smooth * 0.6) * max(first, second) * 0.16)
+    return out
+
+
 def _epiano(freq: float, local_t: float, duration: float) -> float:
     if freq <= 0.0 or local_t < 0.0 or local_t >= duration:
         return 0.0
@@ -306,6 +324,7 @@ def main() -> None:
         "alert": make_alert(),
         "heartbeat": make_heartbeat(),
         "pop": make_pop(),
+        "murmur": make_murmur(),
     }
     for name, samples in sounds.items():
         write_wav(OUT_DIR, name, samples, SAMPLE_RATE)

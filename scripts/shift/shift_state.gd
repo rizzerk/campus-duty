@@ -122,7 +122,8 @@ func tick(delta_seconds: float) -> void:
 				StudentGen.resolve(student, trip["resolve"])
 			student["returning"] = true
 			# Where they went, so the window can say how it went.
-			student["trip"] = { "office": trip.get("office", ""), "wrong": trip.get("wrong", false), "closed": trip.get("closed", false) }
+			# sent_back: they're back because of a wrong call, not from an office that helped them.
+			student["trip"] = { "office": trip.get("office", ""), "wrong": trip.get("wrong", false), "closed": trip.get("closed", false), "sent_back": trip["resolve"] == "" }
 			_join_line(student)
 	_release_bench()
 	_emit_office_changes()
@@ -369,6 +370,8 @@ func _finish(outcome: String) -> String:
 
 
 func _join_line(student: Dictionary) -> void:
+	# When they (re)joined, so the living line can show how long they've been waiting.
+	student["joined_at"] = minute
 	line.append(student)
 	student_joined_line.emit(student)
 

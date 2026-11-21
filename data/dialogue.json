@@ -662,5 +662,105 @@
 				"en": "Look, they're the same."
 			}
 		]
+	},
+	"line_barks": {
+		"slow_service": [
+			{
+				"ceb": "Dugay ra kaayo oy.",
+				"en": "This is taking forever."
+			},
+			{
+				"ceb": "Paspasi gamay, palihug.",
+				"en": "A little faster, please."
+			},
+			{
+				"ceb": "Unsa may dugay sa unahan?",
+				"en": "What's taking so long up front?"
+			},
+			{
+				"ceb": "Basin mabiyaan ko sa 13C.",
+				"en": "I might miss my 13C jeep."
+			},
+			{
+				"ceb": "Gigutom na ko diri.",
+				"en": "I'm getting hungry here."
+			}
+		],
+		"fast_streak": [
+			{
+				"ceb": "Kusog man diay ning Window 3!",
+				"en": "Window 3 is fast after all!"
+			},
+			{
+				"ceb": "Uy, padayon! Hapit na ko.",
+				"en": "Ooh, keep going! I'm almost up."
+			},
+			{
+				"ceb": "Grabe, paspas kaayo!",
+				"en": "Wow, that's fast!"
+			},
+			{
+				"ceb": "Mao na, mao na!",
+				"en": "That's it, that's it!"
+			},
+			{
+				"ceb": "Salamat, Window 3!",
+				"en": "Thank you, Window 3!"
+			}
+		],
+		"priority_cut": [
+			{
+				"ceb": "Sige, una lang siya. Sakto ra.",
+				"en": "Sure, let them go first. Fair enough."
+			},
+			{
+				"ceb": "Ah, priority diay. Sige lang.",
+				"en": "Oh, they're priority. That's fine."
+			},
+			{
+				"ceb": "Okay ra, priority man siya.",
+				"en": "It's okay, they're priority."
+			},
+			{
+				"ceb": "Paunaha lang siya, okay ra.",
+				"en": "Let them go first, it's fine."
+			}
+		],
+		"angry_return": [
+			{
+				"ceb": "Mibalik na pud ko, ha.",
+				"en": "I'm back again, you know."
+			},
+			{
+				"ceb": "Sayop man tong imong giingon!",
+				"en": "What you told me was wrong!"
+			},
+			{
+				"ceb": "Nausik ra akong lakaw.",
+				"en": "That trip was for nothing."
+			},
+			{
+				"ceb": "Kapoy na magbalik-balik.",
+				"en": "I'm tired of going back and forth."
+			}
+		],
+		"rush": [
+			{
+				"ceb": "Hala, kadaghan sa nisulod!",
+				"en": "Whoa, so many just came in!"
+			},
+			{
+				"ceb": "Nadugangan na ang pila.",
+				"en": "The line just got longer."
+			},
+			{
+				"ceb": "Hala, naa pa gyuy nag-abot.",
+				"en": "Oh no, more keep coming."
+			},
+			{
+				"ceb": "Basin dili na ta ma-serve ani.",
+				"en": "We might not get served at this rate."
+			}
+		]
 	}
 }
