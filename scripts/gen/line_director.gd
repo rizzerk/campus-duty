@@ -13,7 +13,10 @@ extends RefCounted
 ## its own range, so two searches never make the same student. Far from the shift's own seeds
 ## (base * 100000 + day * 1000 + i, with i under 100): 500 + k * 30 stays under 1000 while a day
 ## introduces at most 10 new problems (the season has at most 2 per day). Ranges from
-## REGULAR_RANGE up are for regulars whose problem is missing from the line (one per regular).
+## REGULAR_RANGE up are for regulars whose problem is missing from the line (one per regular),
+## then one more per regular for the student built from their own program (ShiftEvents). The
+## 16 blocks under 1000 are all used by 3 regulars: a fourth needs a smaller SEARCH_LIMIT or a new
+## layout (test_line_director checks this).
 const SEARCH_OFFSET := 500
 const SEARCH_LIMIT := 30
 const REGULAR_RANGE := 10
@@ -146,7 +149,7 @@ static func _plain(student: Dictionary) -> bool:
 ## seeds are tried. range_index picks this problem's own block of seeds.
 static func search_student(problem: String, day: int, seed_value: int, range_index: int = 0) -> Dictionary:
 	var forced: Array = [problem] + GameData.problem(problem).get("requires", [])
-	var first := seed_value * 100000 + day * 1000 + SEARCH_OFFSET + range_index * SEARCH_LIMIT
+	var first := search_start(day, seed_value, range_index)
 	var fallback := {}
 	for j in SEARCH_LIMIT:
 		var student := StudentGen.make(first + j, day, forced)
@@ -156,6 +159,12 @@ static func search_student(problem: String, day: int, seed_value: int, range_ind
 			if fallback.is_empty():
 				fallback = student
 	return fallback
+
+
+## The first seed of a block of SEARCH_LIMIT search seeds. Blocks never overlap the shift's own
+## students (seeds under SEARCH_OFFSET within the day).
+static func search_start(day: int, seed_value: int, range_index: int) -> int:
+	return seed_value * 100000 + day * 1000 + SEARCH_OFFSET + range_index * SEARCH_LIMIT
 
 
 ## The student to give up for a missing teacher: a clean one if possible, else one from the most

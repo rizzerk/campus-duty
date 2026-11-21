@@ -20,6 +20,7 @@ func _init() -> void:
 	_test_no_student_twice()
 	_test_regulars_get_their_problem()
 	_test_regular_brings_their_department()
+	_test_regulars_fit_their_program()
 	_test_shift_line_keeps_streak_cap()
 	print("line_director: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
@@ -267,7 +268,7 @@ func _test_regulars_get_their_problem() -> void:
 			if appearance.has("problem_chance"):
 				_check(outcomes.size() == 2, "%s's day %d line goes both ways across seeds" % [regular["name"], day])
 	var regulars: Array = GameData.json("events")["regulars"]
-	_check(LineDirector.REGULAR_RANGE + regulars.size() <= (1000 - LineDirector.SEARCH_OFFSET) / LineDirector.SEARCH_LIMIT, "every regular has its own block of search seeds under 1000")
+	_check(LineDirector.REGULAR_RANGE + 2 * regulars.size() <= (1000 - LineDirector.SEARCH_OFFSET) / LineDirector.SEARCH_LIMIT, "every regular has its own two blocks of search seeds under 1000")
 	var days: Dictionary = GameData.json("days")
 	for day in range(int(days["first_day"]), int(days["last_day"]) + 1):
 		_check(LineDirector.new_problems(day).size() <= LineDirector.REGULAR_RANGE, "day %d's new-problem searches stay clear of the regulars' seeds" % day)
@@ -314,6 +315,72 @@ func _test_regular_brings_their_department() -> void:
 	_check(not insider["problems"].has("wrong_department"), "the insider starts without the turn-away")
 	ShiftEvents._apply_regular(insider, unlisted, appearance)
 	_check(insider["problems"].has("wrong_department"), "%s off the list brings the turn-away" % unlisted["name"])
+
+
+## A regular's record, advisers, slip, course, schedule and grades all come from their own program
+## and year, not the student whose slot they took, and they carry no priority flag (issues #30, #31).
+func _test_regulars_fit_their_program() -> void:
+	var total := 0
+	var fitting := 0
+	for regular: Dictionary in GameData.json("events")["regulars"]:
+		var program := StudentGen.program_info(regular["program"])
+		var year := int(regular["year"])
+		var advisers: Array = program["advisers"].map(func(a: Dictionary) -> String: return a["name"])
+		var this_year: Array = program["courses"][str(year)].map(func(c: Dictionary) -> String: return c["code"])
+		var earlier: Array = []
+		for past in range(1, year):
+			earlier += program["courses"][str(past)].map(func(c: Dictionary) -> String: return c["code"])
+		for day_key: String in regular["appearances"]:
+			var day := int(day_key)
+			for seed_value in range(1, SEEDS + 1):
+				var s := _regular_in_shift(day, seed_value, regular["id"])
+				if s.is_empty():
+					continue
+				total += 1
+				var where := "%s day %d seed %d" % [regular["name"], day, seed_value]
+				var record: Dictionary = s["record"]
+				var ok := true
+				ok = _fits(record["department"] == program["department"], where + " department") and ok
+				ok = _fits(record["advisers"].map(func(a: Dictionary) -> String: return a["name"]) == advisers, where + " ISMIS advisers") and ok
+				ok = _fits(record["grades"].keys().all(func(code: String) -> bool: return earlier.has(code)), where + " grades from earlier years") and ok
+				ok = _fits(record["schedule"].all(func(c: Dictionary) -> bool: return this_year.has(c["course"])), where + " schedule") and ok
+				if s["request"].has("course"):
+					ok = _fits(this_year.has(s["request"]["course"]), where + " requested course") and ok
+				for paper: Dictionary in s["papers"]:
+					if paper["form"] == "consultation_slip":
+						ok = _fits(advisers.has(paper["fields"]["adviser"]), where + " consultation slip adviser") and ok
+				ok = _fits(s["priority"] == "", where + " carries no priority") and ok
+				if ok:
+					fitting += 1
+	_check(total > 0 and fitting == total, "regulars fit their own program (%d of %d)" % [fitting, total])
+	# A slot whose student was flagged GRAD still gives the regular no flag.
+	var student := StudentGen.make(21, 7)
+	student["priority"] = "grad"
+	var regular: Dictionary = GameData.json("events")["regulars"][0]
+	ShiftEvents._apply_regular(student, regular, { "slot": 3, "ceb": "x", "en": "x" })
+	_check(student["priority"] == "", "a regular never inherits GRAD from the slot")
+	# A regular whose data sets a priority keeps it.
+	var pwd_regular := regular.duplicate()
+	pwd_regular["priority"] = "pwd"
+	ShiftEvents._apply_regular(student, pwd_regular, { "slot": 3, "ceb": "x", "en": "x" })
+	_check(student["priority"] == "pwd", "a regular's own priority from data is kept")
+
+
+func _fits(ok: bool, what: String) -> bool:
+	_check(ok, what)
+	return ok
+
+
+## The regular's student in a shift's line, or {} if they are not in it.
+func _regular_in_shift(day: int, seed_value: int, regular_id: String) -> Dictionary:
+	var shift := ShiftState.new(day, seed_value)
+	var everyone: Array = shift.line.duplicate()
+	for arrival: Dictionary in shift._arrivals:
+		everyone.append(arrival["student"])
+	for student: Dictionary in everyone:
+		if student.get("regular_id", "") == regular_id:
+			return student
+	return {}
 
 
 ## The line the player meets (after regulars are placed) still keeps runs at two whenever the mix
