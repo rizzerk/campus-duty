@@ -15,13 +15,25 @@ const WRONG_DEPARTMENT := "wrong_department"
 ## forced, when given, replaces the problem roll with exactly these problems (the line director
 ## uses it to find a student who shows a new problem on its own). The visit is picked among the
 ## day's visits those problems allow. Without it, nothing changes from the plain roll.
-static func make(seed_value: int, day_number: int, forced: Array = []) -> Dictionary:
+## pin fixes parts of the student instead of rolling them, so a regular can get a student built
+## from their own program: "program" (code), "year", "visit" and "problems" (exactly these, even
+## none; wrong_department still follows the program). A pinned year wins over the usual
+## "first_year means year 1" rule. Without it, nothing changes.
+static func make(seed_value: int, day_number: int, forced: Array = [], pin: Dictionary = {}) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var day := GameData.day(day_number)
-	var visit: String = _pick_weighted(rng, day["visits"] if forced.is_empty() else _visits_for(day["visits"], forced))
-	var year: int = 1 if visit == "first_year" else int(_pick(rng, day["years"]))
-	var program := _pick_program(rng, day, visit, forced)
+	var visit: String
+	if pin.has("visit"):
+		visit = str(pin["visit"])
+	else:
+		visit = _pick_weighted(rng, day["visits"] if forced.is_empty() else _visits_for(day["visits"], forced))
+	var year: int
+	if pin.has("year"):
+		year = int(pin["year"])
+	else:
+		year = 1 if visit == "first_year" else int(_pick(rng, day["years"]))
+	var program := program_info(str(pin["program"])) if pin.has("program") else _pick_program(rng, day, visit, forced)
 	var portrait := PortraitGen.roll(seed_value, false, year)
 	var student := {
 		"seed": seed_value,
@@ -46,7 +58,10 @@ static func make(seed_value: int, day_number: int, forced: Array = []) -> Dictio
 	if visit in ["enroll_subject", "add_subject"]:
 		_add_course_request(rng, student, program)
 	student["papers"] = _make_papers(rng, student, program)
-	if forced.is_empty():
+	if pin.has("problems"):
+		_force_problems(rng, student, pin["problems"].filter(func(id: String) -> bool: return id != WRONG_DEPARTMENT))
+		sync_department(student)
+	elif forced.is_empty():
 		_roll_problems(rng, student, day)
 	else:
 		_force_problems(rng, student, forced)
@@ -119,6 +134,14 @@ static func _pick_program(rng: RandomNumberGenerator, day: Dictionary, visit: St
 		outside = rng.randf() < float(day.get("problems", {}).get(WRONG_DEPARTMENT, 0.0))
 	var pool := programs.filter(func(program: Dictionary) -> bool: return allowed.has(program["department"]) != outside)
 	return _pick(rng, pool if not pool.is_empty() else programs)
+
+
+## The program with this code from students.json, or {} if there is none.
+static func program_info(code: String) -> Dictionary:
+	for program: Dictionary in GameData.json("students")["programs"]:
+		if program["code"] == code:
+			return program
+	return {}
 
 
 ## Is this student's department missing from today's list? Always false on days without one.

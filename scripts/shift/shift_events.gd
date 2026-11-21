@@ -88,7 +88,8 @@ static func onboarding_banner(student: Dictionary, stage: String) -> String:
 
 ## Weaves recurring regulars (#112 Jericho, #104 Carlo, #118 Mae) and special customer moments
 ## into the Day 2+ queue. A regular whose beat names a problem gets a student who has it (moved
-## or generated); otherwise problems and paper validity are left as they are.
+## or generated); otherwise problems and paper validity are left as they are. The slot's student
+## is then rebuilt from the regular's own program and year, keeping the same visit and problems.
 static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> void:
 	if day <= 1 or arrivals.is_empty():
 		return
@@ -105,6 +106,11 @@ static func apply_daily_flavor(arrivals: Array, day: int, base_seed: int) -> voi
 		var problems := regular_problems(appearance, day, base_seed, int(regular["number"]))
 		var search := { "seed": base_seed, "range": LineDirector.REGULAR_RANGE + r }
 		_bring_problem_to(arrivals, slot, problems, day, used_slots, search)
+		var own_range := LineDirector.REGULAR_RANGE + regulars.size() + r
+		var opening := 1 + LineDirector.new_problems(day).size()
+		var own := {} if slot < opening else _student_for_regular(arrivals[slot]["student"], regular, day, base_seed, own_range)
+		if not own.is_empty():
+			arrivals[slot]["student"] = own
 		var student: Dictionary = arrivals[slot]["student"]
 		used_slots[slot] = true
 		_apply_regular(student, regular, appearance)
@@ -213,6 +219,32 @@ static func _run_through(arrivals: Array, slot: int) -> int:
 	return run
 
 
+## The student a regular should be in this slot: the same visit and problems as the student there
+## now, built from the regular's own program and year, so their grades, courses, schedule,
+## advisers and consultation slip all fit them. {} when the student there already has the
+## regular's program and year, or (very rarely) no seed in the block gives the same problems; the
+## regular then takes the slot's student as is. wrong_department follows the regular's program.
+static func _student_for_regular(current: Dictionary, regular: Dictionary, day: int, base_seed: int, range_index: int) -> Dictionary:
+	var program := str(regular["program"])
+	var year := int(regular["year"])
+	if StudentGen.program_info(program).is_empty() or (current["program"] == program and int(current["year"]) == year):
+		return {}
+	var wanted := _problems_besides_department(current)
+	var pin := { "program": program, "year": year, "visit": current["visit"], "problems": wanted }
+	var first := LineDirector.search_start(day, base_seed, range_index)
+	for j in LineDirector.SEARCH_LIMIT:
+		var student := StudentGen.make(first + j, day, [], pin)
+		if _problems_besides_department(student) == wanted:
+			return student
+	return {}
+
+
+static func _problems_besides_department(student: Dictionary) -> Array:
+	var problems: Array = student["problems"].filter(func(id: String) -> bool: return id != StudentGen.WRONG_DEPARTMENT)
+	problems.sort()
+	return problems
+
+
 static func _apply_regular(student: Dictionary, regular: Dictionary, appearance: Dictionary) -> void:
 	var name_str := str(regular["name"])
 	var gender := str(regular["gender"])
@@ -228,6 +260,8 @@ static func _apply_regular(student: Dictionary, regular: Dictionary, appearance:
 	student["year"] = year
 	student["favor"] = ""
 	student["trait"] = ""
+	# A regular is called out of turn only if their data says so (none of them is graduating).
+	student["priority"] = str(regular.get("priority", ""))
 	student["record"]["id_number"] = id_number
 	student["record"]["name"] = name_str
 	student["record"]["program"] = program_code
@@ -272,10 +306,7 @@ static func _apply_regular(student: Dictionary, regular: Dictionary, appearance:
 
 
 static func _program_info(code: String) -> Dictionary:
-	for program: Dictionary in GameData.json("students")["programs"]:
-		if program["code"] == code:
-			return program
-	return {}
+	return StudentGen.program_info(code)
 
 
 static func _format_student_line(line: Dictionary, student: Dictionary) -> void:
