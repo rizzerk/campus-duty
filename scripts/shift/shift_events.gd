@@ -245,12 +245,26 @@ static func _problems_besides_department(student: Dictionary) -> Array:
 	return problems
 
 
+## A regular's ID number: their own from data, or one built from their year and line number.
+static func regular_id_number(regular: Dictionary) -> String:
+	var year := int(regular["year"])
+	return str(regular.get("id_number", "%d%04d" % [StudentGen.SEASON_YEAR - (year - 1), 1000 + int(regular["number"])]))
+
+
+## Every regular's ID number, all season, so no other student is ever given one.
+static func regular_id_numbers() -> Array:
+	var ids: Array = []
+	for regular: Dictionary in GameData.json("events")["regulars"]:
+		ids.append(regular_id_number(regular))
+	return ids
+
+
 static func _apply_regular(student: Dictionary, regular: Dictionary, appearance: Dictionary) -> void:
 	var name_str := str(regular["name"])
 	var gender := str(regular["gender"])
 	var program_code := str(regular["program"])
 	var year := int(regular["year"])
-	var id_number := str(regular.get("id_number", "%d%04d" % [StudentGen.SEASON_YEAR - (year - 1), 1000 + int(regular["number"])]))
+	var id_number := regular_id_number(regular)
 	var program_info := _program_info(program_code)
 	student["regular_id"] = regular["id"]
 	student["number"] = int(regular["number"])
