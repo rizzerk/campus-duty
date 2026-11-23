@@ -35,6 +35,8 @@ func _init() -> void:
 	_test_ids_unique_in_a_shift()
 	_test_call_next()
 	_test_call_next_waits_for_returns_and_bench()
+	_test_streak()
+	_test_streak_calms_the_line()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
 
@@ -628,6 +630,13 @@ func _test_call_next() -> void:
 	_check(shift.patience < 60.0 and absf(shift.patience - expected) < 0.001, "skipping costs the base drain for the time, as waiting would (%.3f vs %.3f)" % [shift.patience, expected])
 	_check(shift.line.size() >= 1 and shift._arrivals.size() == waiting_before - shift.line.size(), "the student is in line")
 	_check(not shift.can_skip(), "and the skip is gone until the window is idle again")
+	var zoned := ShiftState.new(2, 1)
+	zoned.line.clear()
+	zoned.streak = 100
+	zoned.patience = 60.0
+	zoned.skip_wait()
+	var zoned_expected := 60.0 - waited_seconds * GameData.balance("patience_drain_base") * zoned.zone_calm()
+	_check(zoned.zone_calm() < 1.0 and absf(zoned.patience - zoned_expected) < 0.001, "in the zone, a skip drains at the eased rate, as waiting would (%.3f vs %.3f)" % [zoned.patience, zoned_expected])
 	var a := ShiftState.new(3, 7)
 	var b := ShiftState.new(3, 7)
 	for shift_copy: ShiftState in [a, b]:
@@ -685,3 +694,54 @@ func _closed_office() -> Dictionary:
 					return { "day": day, "minute": float(minute), "office": office, "student": student }
 				break
 	return {}
+
+
+## Right calls in a row build the streak and its tiers (balance.json "zone.tiers"); a wrong call
+## or a bent favor ends it, and only a run that existed counts as broken.
+func _test_streak() -> void:
+	var tiers: Array = GameData.json("balance")["zone"]["tiers"]
+	_check(ShiftState.streak_tier(0) == 0 and ShiftState.streak_tier(int(tiers[0]) - 1) == 0, "no tier below the first threshold")
+	for i in tiers.size():
+		_check(ShiftState.streak_tier(int(tiers[i])) == i + 1, "tier %d at %d right calls" % [i + 1, int(tiers[i])])
+	_check(ShiftState.streak_tier(100) == tiers.size(), "the top tier is the last")
+	var shift := ShiftState.new(4, 5)
+	var events: Array = []
+	shift.streak_changed.connect(func(run: int, tier: int, broken: bool) -> void: events.append([run, tier, broken]))
+	for i in int(tiers[0]):
+		shift.current = _student(4, [])
+		shift.act("approve")
+	_check(shift.streak == int(tiers[0]), "each right call adds one (%d)" % shift.streak)
+	_check(events.size() == int(tiers[0]) and events[-1] == [int(tiers[0]), 1, false], "the signal reports the run and its tier (%s)" % [events[-1]])
+	shift.current = _student(4, ["unpaid_balance"])
+	shift.act("approve")
+	_check(shift.streak == 0 and events[-1] == [0, 0, true], "a wrong call breaks the run (%s)" % [events[-1]])
+	shift.current = _student(4, ["unpaid_balance"])
+	shift.act("approve")
+	_check(events[-1] == [0, 0, false], "a wrong call with no run going breaks nothing")
+	shift.current = _student(4, [])
+	shift.act("approve")
+	shift.current = _student(4, ["unpaid_balance"])
+	shift.act("favor")
+	_check(shift.streak == 0 and events[-1][2], "a favor that bends the rules breaks the run")
+	shift.current = _student(4, [])
+	shift.act("favor")
+	_check(shift.streak == 1, "a favor for a clean student is a right call and counts")
+
+
+## In the zone the line's patience drains a little slower: drain_ease_per_tier per tier.
+func _test_streak_calms_the_line() -> void:
+	var per_tier := float(GameData.json("balance")["zone"]["drain_ease_per_tier"])
+	_check(per_tier > 0.0 and per_tier <= 0.1, "the calm per tier stays small (%.2f)" % per_tier)
+	var plain := ShiftState.new(5, 3)
+	var zoned := ShiftState.new(5, 3)
+	zoned.streak = 100
+	var top := ShiftState.streak_tier(100)
+	_check(is_equal_approx(plain.zone_calm(), 1.0), "no calm without a streak")
+	_check(is_equal_approx(zoned.zone_calm(), 1.0 - per_tier * top), "full calm at the top tier (%.2f)" % zoned.zone_calm())
+	plain.patience = 80.0
+	zoned.patience = 80.0
+	plain.tick(2.0)
+	zoned.tick(2.0)
+	var plain_drop := 80.0 - plain.patience
+	var zoned_drop := 80.0 - zoned.patience
+	_check(plain_drop > 0.0 and is_equal_approx(zoned_drop, plain_drop * zoned.zone_calm()), "the zone eases the drain (%.3f vs %.3f)" % [zoned_drop, plain_drop])

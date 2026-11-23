@@ -27,6 +27,8 @@ const MOOD_SECONDS := 1.0
 ## Where Call next sits: on the empty desk, under "Waiting for the next student…".
 const CALL_NEXT_RECT := Rect2(141, 432, 260, 56)
 const CALL_NEXT_TIP := "Nobody is waiting. Skip ahead to the next student instead of waiting for them."
+## How long after a wrong call's buzz a broken run's record scratch plays.
+const SCRATCH_DELAY := 0.13
 
 var shift: ShiftState
 
@@ -66,10 +68,20 @@ var _shift_seconds: float = 0.0
 var _mood_left: float = MOOD_SECONDS
 ## Under this patience the line looks annoyed (balance.json line_life.sigh_patience).
 var _sigh_patience: float = 40.0
+## The in-the-zone tier shown now (badge and music stems), from ShiftState.streak_changed.
+var _zone_tier: int = 0
+## Set by the decision being judged: it lost a run that had reached a tier, or reached a new tier.
+var _zone_lost: bool = false
+var _zone_rose: bool = false
 
 
 func _ready() -> void:
 	Sfx.play_bgm("shift")
+	# A retried day keeps the shift music playing: start it plain again.
+	Sfx.set_bgm_layers(0, true)
+	# Loaded now so the first one doesn't hitch at the moment it plays.
+	Sfx.stream("pop")
+	Sfx.stream("record_scratch")
 	_rng.seed = GameState.base_seed + GameState.day
 	_unlocked = GameState.unlocked_actions()
 	# The day report only flags what this shift unlocked.
@@ -94,6 +106,7 @@ func _ready() -> void:
 		_bark("rush", _speakers()))
 	shift.event_triggered.connect(_on_event_triggered)
 	shift.spot_inspected.connect(_on_spot_inspected)
+	shift.streak_changed.connect(_on_streak_changed)
 	_refresh_line()
 	_refresh_offices()
 	_call_left = CALL_DELAY
@@ -523,7 +536,9 @@ func _set_reject(reason: String, items: Array) -> void:
 ## Presses the stamp onto the papers. A new stamp replaces the old one.
 func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 	_clear_stamp()
-	Sfx.play("stamp")
+	# In the zone the stamp lands heavier: a deeper thump and a bigger slam per tier.
+	var zone := ShiftState.streak_tier(shift.streak)
+	Sfx.play("stamp", 0.03, 1.0 - 0.05 * zone)
 	_pending = decision
 	_stamp = StampMark.make(text, color)
 	add_child(_stamp)
@@ -540,9 +555,9 @@ func _set_pending(decision: Dictionary, text: String, color: Color) -> void:
 	# The stamp lands: it slams in a little big, jolts and the game holds for a blink. Only the
 	# stamp moves, never the paper. Skipped if the papers are already on their way back.
 	if not _handing:
-		Juice.punch(_stamp, 1.15, 0.12)
-		Juice.shake(_stamp, 4.0, 0.12)
-		Juice.hit_stop(self, 0.05)
+		Juice.punch(_stamp, 1.15 + 0.05 * zone, 0.12)
+		Juice.shake(_stamp, 4.0 + 1.5 * zone, 0.12)
+		Juice.hit_stop(self, 0.05 + 0.003 * zone)
 	_ismis.show_banner("Stamped %s. Hand the papers back (Space), or click the stamp to lift it off." % text, "")
 	_update_buttons()
 
@@ -593,6 +608,8 @@ func _commit(decision: Dictionary) -> void:
 	var action: String = decision["action"]
 	var student := shift.current
 	_spot_note = ""
+	_zone_lost = false
+	_zone_rose = false
 	var result := shift.act(action, {
 		"flags": _flags_for_decision(),
 		"reason": decision["reason"],
@@ -609,6 +626,8 @@ func _commit(decision: Dictionary) -> void:
 	Achievements.record_decision(shift, student)
 	var outcome: String = result["outcome"]
 	var flag_note := _flag_note(_flags_for_decision().size(), shift.history[-1]) + _spot_note
+	if _zone_lost:
+		flag_note += " Your run is over."
 	if result["bent"]:
 		Sfx.play("alert")
 		_ismis.show_banner("FAVOR DONE · %s The line saw it.%s" % [shift.history[-1]["reason"], flag_note], "flag")
@@ -639,8 +658,36 @@ func _commit(decision: Dictionary) -> void:
 	# is still the same visit, so only their last decision counts. A favor never earns a cheer.
 	if outcome != "stays" and _chatter.note_decision(result["correct"] and action != "favor", shift.minute) and not shift.ended:
 		_line_strip.cheer(LineChatter.setting("cheer_seconds"))
-		Sfx.play("pop")
+		# A new zone tier already popped on this call: one pop, not two.
+		if not _zone_rose:
+			Sfx.play("pop")
 		_bark("fast_streak", _speakers())
+
+
+## In the zone: each tier a run of right calls reaches pops the badge and brings in a music stem.
+## Breaking a run that had reached a tier scratches the record, drops the badge and the stems.
+func _on_streak_changed(streak: int, tier: int, broken: bool) -> void:
+	if broken:
+		if _zone_tier > 0:
+			_zone_lost = true
+			# Just after the wrong buzz, so the scratch is heard on its own.
+			get_tree().create_timer(SCRATCH_DELAY).timeout.connect(func() -> void: Sfx.play("record_scratch", 0.0))
+			_top_bar.drop_streak()
+			Sfx.set_bgm_layers(0)
+		_zone_tier = 0
+		return
+	_top_bar.set_streak(streak, tier)
+	var badge := _top_bar.zone_badge()
+	if tier > _zone_tier:
+		_zone_rose = true
+		Sfx.play("pop", 0.0, 1.0 + 0.12 * tier)
+		Sfx.set_bgm_layers(tier)
+		if Juice.punch(badge, 1.3, 0.3) == null:
+			Juice.flash(badge, Color(1.6, 1.6, 1.6), 0.3)
+	elif tier > 0:
+		# One more on the count: a small nudge, the right-call sound already says it.
+		Juice.punch(badge, 1.08, 0.12)
+	_zone_tier = tier
 
 
 ## How a call lands: a wash of its color over the window and its word popping up where the stamp
