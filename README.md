@@ -30,6 +30,8 @@ Each day:
 
 If the line's patience hits zero, Ma'am Lorna takes over and the shift ends early.
 
+Students arrive through the day, so a fast player can clear the line and find the window empty. **Call next** (the button on the empty desk, or N) skips ahead to the next student, a routed student coming back, or an office reopening for someone on the Hold bench. Skipping costs the same patience as waiting would have, so it only saves real time: a quick player simply finishes the day sooner.
+
 ## Key mechanics
 
 **Papers vs record.** Students hand over forms (add/drop form, consultation slip, receipt, assessment slip, cash in the tray, ID). You click a field on the paper and the matching field on screen to flag a mismatch: a fake signature, a failed prerequisite, a wrong amount, a mismatched ID number.
