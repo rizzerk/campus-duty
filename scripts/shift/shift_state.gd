@@ -204,6 +204,67 @@ func call_next() -> Dictionary:
 	return current
 
 
+## The game minute the player is waiting for when nobody is in line or at the window: the next
+## student arriving, a routed one coming back, or an office reopening for someone on the Hold
+## bench, whichever comes first (never past closing). -1 if someone is already waiting or nothing
+## is coming.
+func next_wait_end() -> float:
+	if ended or not current.is_empty() or not line.is_empty():
+		return -1.0
+	var best := -1.0
+	if not _arrivals.is_empty():
+		best = float(_arrivals[0]["at"])
+	for trip: Dictionary in _away:
+		best = _earlier(best, float(trip["back_at"]))
+	# Any office a held student could be sent to (as _release_bench tries them all).
+	for student: Dictionary in bench:
+		for problem: String in RulesCheck.by_priority(student):
+			var action: String = GameData.problem(problem)["action"]
+			if action.begins_with("route:"):
+				best = _earlier(best, _next_open(action.trim_prefix("route:")))
+	if best < 0.0:
+		return -1.0
+	return minf(best, GameData.balance("shift_minutes"))
+
+
+## True when Call next would move the clock: the window is idle and someone is still to come.
+func can_skip() -> bool:
+	return next_wait_end() > minute
+
+
+## Call next: jumps the clock to next_wait_end(), so a fast player never sits through an empty
+## window. The skipped time costs exactly the patience waiting it out would have (the base drain;
+## nobody is in line), so the shortcut saves real time and never changes the score. Arrivals,
+## returns, office changes and events in between happen as usual. Returns the minutes skipped.
+func skip_wait() -> float:
+	var target := next_wait_end()
+	if target <= minute:
+		return 0.0
+	var skipped := target - minute
+	var seconds := skipped * GameData.balance("shift_seconds") / GameData.balance("shift_minutes")
+	# As tick() would have drained it: the base rate, eased while the player is in the zone.
+	patience -= seconds * GameData.balance("patience_drain_base") * _calm
+	minute = target
+	tick(0.0)
+	return skipped
+
+
+## The next minute today the office is open, or -1.
+func _next_open(office: String) -> float:
+	var at := minute
+	for i in 8:
+		at = OfficeSchedule.next_change(day, office, at)
+		if at < 0.0 or OfficeSchedule.is_open(day, office, at):
+			return at
+	return -1.0
+
+
+static func _earlier(best: float, candidate: float) -> float:
+	if candidate < 0.0:
+		return best
+	return candidate if best < 0.0 or candidate < best else best
+
+
 ## Calls a priority student (graduating or PWD) to the front of the line.
 func call_out_of_turn(index: int) -> bool:
 	if index < 0 or index >= line.size() or line[index]["priority"] == "":

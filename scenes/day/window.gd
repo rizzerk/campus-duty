@@ -24,6 +24,9 @@ const NUMBER_KEYS := [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
 const KEYPAD_KEYS := [KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4, KEY_KP_5]
 ## How often (real seconds) the waiting faces update what they're doing.
 const MOOD_SECONDS := 1.0
+## Where Call next sits: on the empty desk, under "Waiting for the next student…".
+const CALL_NEXT_RECT := Rect2(141, 432, 260, 56)
+const CALL_NEXT_TIP := "Nobody is waiting. Skip ahead to the next student instead of waiting for them."
 ## How long after a wrong call's buzz a broken run's record scratch plays.
 const SCRATCH_DELAY := 0.13
 
@@ -54,6 +57,8 @@ var _handing: bool = false
 var _hand_back_button: Button
 ## Only shown when the student at the window asks for a favor (rule bending).
 var _favor_button: Button
+## Shown while nobody is in line or at the window: skips the wait for the next student.
+var _call_next_button: Button
 var _spot_note: String = ""
 ## The living line: who's on their phone, who's sighing, and the barks over their heads.
 var _chatter: LineChatter
@@ -114,6 +119,7 @@ func _process(delta: float) -> void:
 	if shift.ended:
 		return
 	_shift_seconds += delta
+	_refresh_call_next()
 	_mood_left -= delta
 	if _mood_left <= 0.0:
 		_mood_left = MOOD_SECONDS
@@ -160,6 +166,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if event.keycode == KEY_A:
 		_ask()
+		return
+	if event.keycode == KEY_N:
+		# Through the button, so the key sounds just like a click (UiKit buttons click on press).
+		if _call_next_button.visible:
+			_call_next_button.pressed.emit()
 		return
 	var index := NUMBER_KEYS.find(event.keycode)
 	if index == -1:
@@ -214,6 +225,11 @@ func _build() -> void:
 	_hand_back_button.size_flags_stretch_ratio = 1.3
 	_hand_back_button.pressed.connect(_hand_back)
 	bar.add_child(_hand_back_button)
+	_call_next_button = UiKit.button("N  Call next student", UiKit.GOLD, UiKit.INK, 22)
+	_call_next_button.tooltip_text = CALL_NEXT_TIP
+	_call_next_button.pressed.connect(_skip_wait)
+	_call_next_button.visible = false
+	_place(_call_next_button, CALL_NEXT_RECT)
 	var hints := UiKit.label(_hint_text(), 15, UiKit.INK)
 	hints.modulate.a = 0.75
 	_place(hints, Rect2(24, 698, 1232, 20))
@@ -229,6 +245,7 @@ func _hint_text() -> String:
 		if int(GameData.day(number)["max_problems"]) > 1:
 			parts.append("Two problems? Turn away  ›  Send out  ›  Fix at the window")
 			break
+	parts.append("N  Call next")
 	parts.append("Tab  Rulebook")
 	parts.append("Esc  Pause")
 	return "     ·     ".join(parts)
@@ -262,6 +279,39 @@ func _update_buttons() -> void:
 		if unlocked and id == "hold" and shift.bench_full():
 			button.disabled = true
 			button.tooltip_text = "The bench is full."
+
+
+## Call next shows only while the window is idle and someone is still to come.
+func _refresh_call_next() -> void:
+	# One look ahead per frame serves both checks.
+	var wait_end := shift.next_wait_end()
+	var wanted := not shift.ended and _react_left <= 0.0 and _menu == null and not _handing and wait_end > shift.minute
+	if wanted != _call_next_button.visible:
+		_call_next_button.visible = wanted
+	if wanted:
+		# Nothing comes before closing: pressing ends the day, so say so.
+		var closing := wait_end >= GameData.balance("shift_minutes")
+		var text := "N  Close the window" if closing else "N  Call next student"
+		if _call_next_button.text != text:
+			_call_next_button.text = text
+			_call_next_button.tooltip_text = "Nobody else is coming today. End the shift now." if closing else CALL_NEXT_TIP
+
+
+## The player doesn't want to wait: the clock jumps to the next student (or a return, or an office
+## reopening), shown as "+N min" over the line, and they step up right away. The button itself
+## makes the click.
+func _skip_wait() -> void:
+	if not _call_next_button.visible:
+		return
+	var skipped := shift.skip_wait()
+	if skipped <= 0.0:
+		return
+	# Over the empty line strip, clear of the clock the player is reading. If the wait ended with
+	# an office reopening for a held student (nobody steps up yet), say that instead.
+	var note := "" if not shift.line.is_empty() or shift.ended else " · an office reopened"
+	Juice.pop_text(self, "+%d min%s" % [maxi(1, ceili(skipped)), note], UiKit.GOLD_DARK, Vector2(640, 150), 26)
+	_call_left = minf(_call_left, 0.15)
+	_refresh_call_next()
 
 
 func _call_next() -> void:

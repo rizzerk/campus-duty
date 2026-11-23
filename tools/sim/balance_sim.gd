@@ -9,6 +9,7 @@ extends SceneTree
 ##   --seeds=20                 shifts per day and bot
 ##   --seed-base=1              first seed, so a second run can use fresh seeds
 ##   --bots=careful,average     which bots play (see BOTS)
+##   --call-next                bots press Call next whenever the window is idle (skip the wait)
 ##   --set=key=value            override a balance.json key, or dayN.key[.sub] in days.json.
 ##                              Repeat for several. Nothing is written to disk. A day's own
 ##                              value wins over balance.json: day 1 sets its own
@@ -43,10 +44,13 @@ const BOTS := {
 const ROUTES := ["route:cashier", "route:consultation", "route:dean"]
 
 var _failures: Array[String] = []
+## --call-next: bots skip the wait whenever the window is idle, like a player pressing Call next.
+var _call_next: bool = false
 
 
 func _init() -> void:
 	var options := _parse(OS.get_cmdline_user_args())
+	_call_next = options["call_next"]
 	if not _failures.is_empty():
 		for message in _failures:
 			printerr(message)
@@ -127,6 +131,8 @@ func _play_shift(day: int, seed_value: int, bot_name: String) -> Dictionary:
 				_call_priority(shift)
 			shift.call_next()
 		if shift.current.is_empty():
+			if _call_next and shift.can_skip():
+				shift.skip_wait()
 			continue
 		var student: Dictionary = shift.current
 		var key := "%d:%d" % [int(student["number"]), shift.history.size()]
@@ -368,6 +374,7 @@ func _parse(args: PackedStringArray) -> Dictionary:
 		"set": [],
 		"json": false,
 		"bench": false,
+		"call_next": false,
 	}
 	for arg: String in args:
 		var pair := arg.trim_prefix("--").split("=", true, 1)
@@ -400,6 +407,8 @@ func _parse(args: PackedStringArray) -> Dictionary:
 				options["json"] = true
 			"bench":
 				options["bench"] = true
+			"call-next":
+				options["call_next"] = true
 			_:
 				_failures.append("unknown option --%s" % key)
 	return options

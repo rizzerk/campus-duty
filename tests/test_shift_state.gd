@@ -33,6 +33,8 @@ func _init() -> void:
 	_test_day_one_mistakes_are_gentler()
 	_test_speed_doesnt_rescue_wrong_calls()
 	_test_ids_unique_in_a_shift()
+	_test_call_next()
+	_test_call_next_waits_for_returns_and_bench()
 	_test_streak()
 	_test_streak_calms_the_line()
 	print("shift_state: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
@@ -604,6 +606,94 @@ func _test_ids_unique_in_a_shift() -> void:
 				for paper: Dictionary in student["papers"]:
 					if paper["fields"].has("id_number"):
 						_check(paper["fields"]["id_number"] == id, "day %d seed %d: the %s shows the student's ID" % [day, seed_value, paper["form"]])
+
+
+## Call next: with nobody in line or at the window, the clock jumps to the next arrival and the
+## student joins the line. The skipped time costs what waiting it out would have (the base drain,
+## nobody being in line), no more and no less. Never while someone is waiting.
+func _test_call_next() -> void:
+	var shift := ShiftState.new(2, 1)
+	_check(not shift.line.is_empty() and not shift.can_skip(), "no skipping while students wait in line")
+	_check(shift.skip_wait() == 0.0 and shift.minute == 0.0, "a refused skip leaves the clock alone")
+	shift.line.clear()
+	shift.current = _student(2, [])
+	_check(not shift.can_skip(), "no skipping with a student at the window")
+	shift.current = {}
+	var next_at: float = shift._arrivals[0]["at"]
+	var waiting_before := shift._arrivals.size()
+	shift.patience = 60.0
+	_check(shift.can_skip() and is_equal_approx(shift.next_wait_end(), next_at), "the wait ends at the next arrival (%.1f)" % shift.next_wait_end())
+	var skipped := shift.skip_wait()
+	_check(is_equal_approx(skipped, next_at) and is_equal_approx(shift.minute, next_at), "the clock jumps to them (%.1f)" % shift.minute)
+	var waited_seconds := next_at * GameData.balance("shift_seconds") / GameData.balance("shift_minutes")
+	var expected := 60.0 - waited_seconds * GameData.balance("patience_drain_base")
+	_check(shift.patience < 60.0 and absf(shift.patience - expected) < 0.001, "skipping costs the base drain for the time, as waiting would (%.3f vs %.3f)" % [shift.patience, expected])
+	_check(shift.line.size() >= 1 and shift._arrivals.size() == waiting_before - shift.line.size(), "the student is in line")
+	_check(not shift.can_skip(), "and the skip is gone until the window is idle again")
+	var zoned := ShiftState.new(2, 1)
+	zoned.line.clear()
+	zoned.streak = 100
+	zoned.patience = 60.0
+	zoned.skip_wait()
+	var zoned_expected := 60.0 - waited_seconds * GameData.balance("patience_drain_base") * zoned.zone_calm()
+	_check(zoned.zone_calm() < 1.0 and absf(zoned.patience - zoned_expected) < 0.001, "in the zone, a skip drains at the eased rate, as waiting would (%.3f vs %.3f)" % [zoned.patience, zoned_expected])
+	var a := ShiftState.new(3, 7)
+	var b := ShiftState.new(3, 7)
+	for shift_copy: ShiftState in [a, b]:
+		shift_copy.line.clear()
+		shift_copy.skip_wait()
+	_check(a.minute == b.minute and a.line.size() == b.line.size() and a.line[0]["number"] == b.line[0]["number"], "same seed, same skip")
+
+
+## With nobody left to arrive, Call next waits for a routed student coming back, or for the office
+## a held student needs to reopen, and never runs past closing time.
+func _test_call_next_waits_for_returns_and_bench() -> void:
+	var shift := ShiftState.new(4, 3)
+	shift.line.clear()
+	shift._arrivals.clear()
+	_check(not shift.can_skip(), "nobody to come: nothing to skip to")
+	var student := _student(4, ["unpaid_balance"])
+	shift._away.append({ "student": student, "back_at": shift.minute + 25.0, "resolve": "unpaid_balance", "office": "cashier" })
+	shift.skip_wait()
+	_check(is_equal_approx(shift.minute, 25.0) and shift.line.size() == 1 and shift.line[0] == student, "skips to a routed student coming back (%.1f)" % shift.minute)
+	var closed := _closed_office()
+	_check(not closed.is_empty(), "found an office that closes and reopens with a student who needs it")
+	if not closed.is_empty():
+		var held := ShiftState.new(closed["day"], 3)
+		held.line.clear()
+		held._arrivals.clear()
+		held.minute = closed["minute"]
+		held.bench.append(closed["student"])
+		var opens := OfficeSchedule.next_change(closed["day"], closed["office"], closed["minute"])
+		_check(is_equal_approx(held.next_wait_end(), opens), "a held student: the wait ends when %s reopens (%.1f vs %.1f)" % [closed["office"], held.next_wait_end(), opens])
+		held.skip_wait()
+		_check(held.bench.is_empty() and held._away.size() == 1, "skipping there sends them off the bench")
+	var late := ShiftState.new(4, 3)
+	late.line.clear()
+	late._arrivals.clear()
+	late.minute = 230.0
+	late._away.append({ "student": _student(4, ["unpaid_balance"]), "back_at": 260.0, "resolve": "unpaid_balance", "office": "cashier" })
+	late.skip_wait()
+	_check(late.ended and late.end_reason == "time" and is_equal_approx(late.minute, GameData.balance("shift_minutes")), "never past closing: the shift ends on time")
+
+
+## An office that is closed at some minute and opens again that day, with a student who needs it:
+## { day, minute, office, student }, or {} if the schedule has none.
+func _closed_office() -> Dictionary:
+	var needs := { "cashier": "unpaid_balance", "consultation": "missing_signature", "dean": "overload" }
+	for day in range(2, 11):
+		for office: String in needs:
+			for minute in range(1, int(GameData.balance("shift_minutes"))):
+				if OfficeSchedule.is_open(day, office, minute):
+					continue
+				var opens := OfficeSchedule.next_change(day, office, minute)
+				if opens <= 0.0 or not OfficeSchedule.is_open(day, office, opens):
+					continue
+				var student := _student(day, [needs[office]])
+				if not student.is_empty():
+					return { "day": day, "minute": float(minute), "office": office, "student": student }
+				break
+	return {}
 
 
 ## Right calls in a row build the streak and its tiers (balance.json "zone.tiers"); a wrong call
