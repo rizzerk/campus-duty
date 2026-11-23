@@ -310,6 +310,101 @@ def make_shift_bgm() -> list[float]:
     return out
 
 
+# The shift loop's chords, shared by its in-the-zone stems so every layer fits the same bars.
+SHIFT_CHORDS = [
+    (130.81, [261.63, 329.63, 392.00, 493.88]),  # Cmaj7
+    (110.00, [261.63, 329.63, 392.00, 440.00]),  # Am7
+    (146.83, [261.63, 293.66, 349.23, 440.00]),  # Dm7
+    (98.00,  [246.94, 293.66, 349.23, 392.00]),  # G7
+]
+
+
+def make_record_scratch() -> list[float]:
+    # A short vinyl scratch: a buzzy tone dragged down and back, with grit, for a broken streak.
+    n = int(SAMPLE_RATE * 0.4)
+    rng = random.Random(907)
+    out = []
+    phase = 0.0
+    for i in range(n):
+        t = i / SAMPLE_RATE
+        x = i / n
+        # Fast drag down, a little pull back up, then the needle slows to a stop.
+        freq = 520.0 - 430.0 * x + 140.0 * math.sin(math.pi * min(1.0, x * 2.2)) * (1.0 - x)
+        phase += 2.0 * math.pi * freq / SAMPLE_RATE
+        saw = (phase / math.pi) % 2.0 - 1.0
+        grit = (rng.random() * 2.0 - 1.0) * 0.45
+        env = min(1.0, t / 0.008) * (1.0 - x) ** 1.4
+        out.append((saw * 0.55 + grit) * env * 0.42)
+    return out
+
+
+def _shift_loop(voice) -> list[float]:
+    # Renders an 8.0 s, 120 BPM stem the same length as the shift loop, so the stems loop in sync.
+    total_sec = 8.0
+    n = int(BGM_RATE * total_sec)
+    return [voice(i / BGM_RATE) * 0.65 for i in range(n)]
+
+
+def make_shift_zone1() -> list[float]:
+    # Tier 1: a soft kick on every beat and a hi-hat on the off-beats.
+    rng = random.Random(311)
+    noise = [rng.random() * 2.0 - 1.0 for _ in range(int(BGM_RATE * 0.06))]
+
+    def voice(t: float) -> float:
+        beat_t = t % 0.5
+        kick = math.sin(2.0 * math.pi * (55.0 + 70.0 * math.exp(-beat_t * 30.0)) * beat_t) * math.exp(-beat_t * 14.0)
+        off_t = (t - 0.25) % 0.5
+        hat = 0.0
+        k = int(off_t * BGM_RATE)
+        if k < len(noise) - 1:
+            hat = (noise[k + 1] - noise[k]) * math.exp(-off_t * 70.0)
+        return kick * 0.34 + hat * 0.10
+
+    return _shift_loop(voice)
+
+
+def make_shift_zone2() -> list[float]:
+    # Tier 2: a bright plucked sixteenth-note arpeggio an octave above the chords.
+    pattern = [0, 2, 1, 3, 2, 0, 3, 1]
+
+    def voice(t: float) -> float:
+        bar_idx = min(3, int(t / 2.0))
+        bar_t = t - bar_idx * 2.0
+        step = int(bar_t / 0.125)
+        step_t = bar_t - step * 0.125
+        notes = SHIFT_CHORDS[bar_idx][1]
+        freq = notes[pattern[step % 8]] * 2.0
+        pluck = math.sin(2.0 * math.pi * freq * step_t) * math.exp(-step_t * 22.0)
+        accent = 1.0 if step % 4 == 0 else 0.7
+        return pluck * 0.17 * accent * min(1.0, step_t / 0.002)
+
+    return _shift_loop(voice)
+
+
+def make_shift_zone3() -> list[float]:
+    # Tier 3: a bell-like lead melody on top, the "in the zone" hook.
+    melody = [
+        # (start_sec, duration_sec, freq)
+        (0.0, 0.5, 659.25), (0.5, 0.25, 783.99), (0.75, 0.75, 987.77), (1.5, 0.5, 783.99),
+        (2.0, 0.5, 659.25), (2.5, 0.25, 587.33), (2.75, 0.75, 523.25), (3.5, 0.5, 659.25),
+        (4.0, 0.5, 698.46), (4.5, 0.25, 659.25), (4.75, 0.75, 587.33), (5.5, 0.5, 523.25),
+        (6.0, 0.75, 587.33), (6.75, 0.25, 659.25), (7.0, 1.0, 783.99),
+    ]
+
+    def voice(t: float) -> float:
+        sample = 0.0
+        for start, dur, freq in melody:
+            if start <= t < start + dur:
+                local = t - start
+                attack = min(1.0, local / 0.005)
+                release = min(1.0, (dur - local) / 0.03)
+                body = math.sin(2.0 * math.pi * freq * local) + 0.3 * math.sin(2.0 * math.pi * freq * 2.0 * local) * math.exp(-local * 6.0)
+                sample += body * attack * release * math.exp(-local * 3.0)
+        return sample * 0.21
+
+    return _shift_loop(voice)
+
+
 def main() -> None:
     sounds = {
         "click": make_click(),
@@ -325,12 +420,16 @@ def main() -> None:
         "heartbeat": make_heartbeat(),
         "pop": make_pop(),
         "murmur": make_murmur(),
+        "record_scratch": make_record_scratch(),
     }
     for name, samples in sounds.items():
         write_wav(OUT_DIR, name, samples, SAMPLE_RATE)
     bgm_tracks = {
         "menu": make_menu_bgm(),
         "shift": make_shift_bgm(),
+        "shift_zone1": make_shift_zone1(),
+        "shift_zone2": make_shift_zone2(),
+        "shift_zone3": make_shift_zone3(),
     }
     for name, samples in bgm_tracks.items():
         write_wav(BGM_DIR, name, samples, BGM_RATE)

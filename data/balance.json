@@ -23,6 +23,7 @@
 		"streak_every": 5, "streak_bonus": 0.01, "streak_cap": 0.03,
 		"integrity": { "start": 100, "per_favor": 20, "per_caught_favor": 10, "per_false_alarm": 4, "per_flag": 2 }
 	},
+	"zone": { "tiers": [3, 6, 10], "drain_ease_per_tier": 0.05 },
 	"director": { "enabled": true, "max_streak": 2, "peak_at": 0.7, "jitter": 0.35, "rush_boost": 0.5 },
 	"line_life": {
 		"bark_seconds": 3.0, "bark_gap_seconds": 8.0, "bark_repeat_seconds": 30.0,

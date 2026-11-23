@@ -21,6 +21,8 @@ func _run() -> void:
 	_test_juice_respects_settings()
 	_test_effects_never_take_input()
 	_test_slice_two_effects()
+	_test_music_layers()
+	await _test_drop_out()
 	await _test_hit_stop_always_recovers()
 	await _test_star_reveal()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(TEST_PATH))
@@ -213,3 +215,57 @@ func _test_star_reveal() -> void:
 	await create_timer(0.6).timeout
 	_check(shown[0] == 1 and stars.filled == 1, "a second reveal replaces the first instead of running alongside it")
 	stars.queue_free()
+
+
+## The shift's stems loop in sync with it: same rate, same length, one synchronized stream, and
+## set_bgm_layers turns on exactly the first n.
+func _test_music_layers() -> void:
+	for track: String in Sfx.BGM_LAYERS:
+		var base := Sfx.bgm_stream(track)
+		for stem: String in Sfx.BGM_LAYERS[track]:
+			var part := Sfx.bgm_stream(stem)
+			_check(part != null and part.mix_rate == base.mix_rate and part.stereo == base.stereo and part.data.size() == base.data.size(),
+					"%s is the same rate and length as %s, so they loop together" % [stem, track])
+		var synced := Sfx.layered_stream(track)
+		_check(synced != null and synced.stream_count == Sfx.BGM_LAYERS[track].size() + 1, "%s plays as one stream with its stems" % track)
+	var before := Sfx._current_bgm
+	Sfx._current_bgm = "shift"
+	var shift := Sfx.layered_stream("shift")
+	Sfx.set_bgm_layers(2, true)
+	_check(Sfx.layers_on() == 2, "two stems on")
+	_check(shift.get_sync_stream_volume(0) == 0.0 and shift.get_sync_stream_volume(1) == 0.0 and shift.get_sync_stream_volume(2) == 0.0, "the track and the first two stems play")
+	_check(shift.get_sync_stream_volume(3) == Sfx.LAYER_SILENT_DB, "the third stem stays silent")
+	Sfx.set_bgm_layers(99, true)
+	_check(Sfx.layers_on() == Sfx.BGM_LAYERS["shift"].size(), "more tiers than stems: all stems on")
+	Sfx.set_bgm_layers(0, true)
+	_check(Sfx.layers_on() == 0 and shift.get_sync_stream_volume(1) == Sfx.LAYER_SILENT_DB, "a broken streak silences every stem")
+	Sfx._current_bgm = "menu"
+	Sfx.set_bgm_layers(2, true)
+	_check(Sfx.layers_on() == 0, "a track without stems ignores layers")
+	Sfx._current_bgm = before
+
+
+## A lost badge falls and fades, or only fades with reduced motion, and ends where it started.
+func _test_drop_out() -> void:
+	for reduced: bool in [false, true]:
+		Settings.reduced_motion = reduced
+		var box := _box()
+		var home := box.position
+		var tween := Juice.drop_out(box, 18.0, 0.05)
+		_check(tween != null, "drop out runs (reduced motion %s)" % reduced)
+		await process_frame
+		_check(box.position.y == home.y or not reduced, "reduced motion: the badge never moves")
+		# Wait it out by frames, capped: the tween may already be done, so never await its signal.
+		for i in 300:
+			if not tween.is_valid() or not tween.is_running():
+				break
+			await process_frame
+		await process_frame
+		_check(box.position == home and is_equal_approx(box.modulate.a, 0.0), "it ends faded, back where it was (reduced motion %s)" % reduced)
+		box.modulate.a = 1.0
+		Juice.drop_out(box, 18.0, 1.0)
+		await process_frame
+		Juice.cancel_drop(box)
+		_check(box.position == home, "cancelling puts it back (reduced motion %s)" % reduced)
+		box.queue_free()
+	Settings.reduced_motion = false
