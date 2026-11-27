@@ -19,6 +19,22 @@ static func stars(summary: Dictionary) -> int:
 	return maxi(earned - int(summary.get("caught_bends", 0)), 0)
 
 
+## The end of a shift: Ma'am Lorna's spot check (none when the line gave up), the stars, integrity
+## and the regulars' visits, added to summary (from ShiftState.summary) and returned. The game, the
+## simulator and the save tests all finish a shift through here, so they score it the same way.
+static func finish(summary: Dictionary, history: Array, base_seed: int, day: int) -> Dictionary:
+	summary["spot_check"] = []
+	summary["caught_bends"] = 0
+	if summary["reason"] != "patience":
+		var check: Dictionary = SpotCheck.run(history, base_seed * 1000 + day, day)
+		summary["spot_check"] = check["rows"]
+		summary["caught_bends"] = check["caught_bends"]
+	summary["stars"] = stars(summary)
+	summary["integrity"] = Evaluation.integrity(summary)
+	summary["regulars"] = Evaluation.regular_calls(history)
+	return summary
+
+
 ## Mid-shift: the stars the calls so far are heading for. Students still to come aren't counted
 ## as unserved, since the day isn't over.
 static func projected(summary: Dictionary) -> int:

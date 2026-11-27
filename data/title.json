@@ -2,7 +2,16 @@
 	"title": "CAMPUS DUTY",
 	"tagline": "Registrar's Office · Window 3 · Enrollment season",
 	"footer": "A Game Development final project · University of San Carlos",
-	"continue_soon": "Coming soon: saves aren't built yet.",
+	"continue": "Continue · Day {day}",
+	"continue_done": "Continue · Evaluation",
+	"continue_empty": "Continue",
+	"continue_none": "No season to continue yet. Start one with New season.",
+	"continue_failed": "That save can't be read anymore",
+	"new_season": "N  New season",
+	"settings_label": "Settings",
+	"achievements_label": "Achievements",
+	"credits_label": "Credits",
+	"quit_label": "Quit",
 	"settings_soon": "Coming soon: settings aren't built yet.",
 	"credits": {
 		"team": [

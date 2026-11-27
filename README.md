@@ -126,13 +126,13 @@ After day 10, the supervisor's evaluation gives one of three endings based on we
 
 ## Status
 
-**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report and the Freedom Wall. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, a living line (waiting students check phones, fan themselves, sigh, cheer a fast run, and bark short Bisaya lines in speech bubbles), in-the-zone streaks with layered music, rule bending, both live mid-shift and end-of-day spot checks, achievements, the Freedom Wall's posts after each day, and Ma'am Lorna's end-of-season evaluation with its three endings (kept the post, on probation, not renewed) and what happened to each regular.
+**Playable now:** the whole season, days 1–10, from the season calendar and morning memo through the shift to the day report and the Freedom Wall. This covers full Day 1 onboarding with Ma'am Lorna, Day 2+ office bulletins (no repeated tutorial), inspection, all five actions, the section picker, ISMIS resets, live offices and the Hold bench, the extension-day department check, the day 10 payment window with its change drawer, student traits and personalities, recurring regulars (`#112`, `#104`, `#118`), mid-shift special events, a living line (waiting students check phones, fan themselves, sigh, cheer a fast run, and bark short Bisaya lines in speech bubbles), in-the-zone streaks with layered music, rule bending, both live mid-shift and end-of-day spot checks, achievements, the Freedom Wall's posts after each day, and Ma'am Lorna's end-of-season evaluation with its three endings (kept the post, on probation, not renewed) and what happened to each regular. The title screen has three save slots: the season saves when it starts, after every shift and at the start of each day, and Continue picks up the season played last. A shift in progress isn't saved (that day starts over), a finished day picks up at the next day's calendar, and a finished season reopens the evaluation.
 
-**Still to come:** title screen, saves and settings; desk upgrades; audio and final art.
+**Still to come:** the SA creator and settings screen; desk upgrades; audio and final art.
 
 ## Running it
 
-Open `project.godot` in Godot 4 and press F5. The rules, generator and achievement tests run headless with `tests/run_tests.sh`. It looks for Godot at the default macOS path. Elsewhere, set `GODOT` to your Godot executable first, for example in Git Bash on Windows:
+Open `project.godot` in Godot 4 and press F5. The rules, generator, save and achievement tests run headless with `tests/run_tests.sh`. It looks for Godot at the default macOS path. Elsewhere, set `GODOT` to your Godot executable first, for example in Git Bash on Windows:
 
 ```sh
 GODOT="/path/to/Godot_v4.7.1-stable_win64.exe" sh tests/run_tests.sh

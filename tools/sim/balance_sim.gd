@@ -168,15 +168,7 @@ func _play_shift(day: int, seed_value: int, bot_name: String) -> Dictionary:
 		# A parent argues every routing, which costs the window minutes (window.gd _parent_argues).
 		if String(decision["action"]).begins_with("route:") and student.get("trait", "") == "with_parent" and result.get("outcome", "") != "walked_out":
 			shift.argue()
-	var summary := shift.summary()
-	summary["spot_check"] = []
-	summary["caught_bends"] = 0
-	if summary["reason"] != "patience":
-		var check := SpotCheck.run(shift.history, seed_value * 1000 + day, day)
-		summary["caught_bends"] = check["caught_bends"]
-	summary["stars"] = Scoring.stars(summary)
-	summary["integrity"] = Evaluation.integrity(summary)
-	summary["regulars"] = Evaluation.regular_calls(shift.history)
+	var summary := Scoring.finish(shift.summary(), shift.history, seed_value, day)
 	summary["patience_left"] = maxf(shift.patience, 0.0)
 	summary["minute"] = shift.minute
 	summary["mistakes_by_problem"] = mistakes_by_problem

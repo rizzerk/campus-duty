@@ -77,10 +77,12 @@ func _main_menu() -> void:
 		GameState.go_to("title")
 
 
+## To the save slots, so the next season never replaces this finished one without the player
+## choosing its slot.
 func _new_season() -> void:
 	if not _leaving:
 		_leaving = true
-		GameState.start_new_game()
+		GameState.choose_new_season()
 
 
 ## The evaluation form: heading, the numbers against the bars, the reasons, Lorna's verdict, the
