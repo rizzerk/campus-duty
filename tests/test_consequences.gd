@@ -8,6 +8,7 @@ func _init() -> void:
 	_test_wrong_calls_come_first()
 	_test_every_template_fills()
 	_test_limit_and_false_alarms()
+	_test_variety_and_natural_clauses()
 	_test_real_shift_history()
 	print("consequences: %s" % ("PASS" if _failures == 0 else "%d FAILED" % _failures))
 	quit(1 if _failures > 0 else 0)
@@ -86,6 +87,25 @@ func _test_limit_and_false_alarms() -> void:
 	var trip: String = Consequences.build([_entry("route:consultation", "approve", false, "", { "reason": "There was nothing wrong with the papers. Approve it." })])[0]["text"]
 	_check(trip.contains("to Consultation, but there was nothing wrong"), "needless trip reads naturally: %s" % trip)
 	_check(not trip.contains("route:"), "no raw action names")
+
+
+func _test_variety_and_natural_clauses() -> void:
+	var repeated := [
+		_entry("route:cashier", "route:cashier", true, "unpaid_balance", { "number": 101, "name": "Ana Lim" }),
+		_entry("route:cashier", "route:cashier", true, "unpaid_balance", { "number": 102, "name": "Ben Tan" }),
+		_entry("route:cashier", "route:cashier", true, "unpaid_balance", { "number": 103, "name": "Bea Sy" }),
+	]
+	var items := Consequences.build(repeated)
+	_check(items[0]["text"].replace("#101 Ana Lim", "") != items[1]["text"].replace("#102 Ben Tan", ""),
+		"repeated good calls vary their phrasing")
+	var bad_fix: String = Consequences.build([
+		_entry("fix", "approve", false, "", { "outcome": "wrong_fix", "reason": "There was nothing wrong with the papers. Approve it." }),
+	])[0]["text"]
+	_check(not bad_fix.contains("Approve it"), "imperative rulebook tail stripped from stories: %s" % bad_fix)
+	var bad_hold: String = Consequences.build([
+		_entry("hold", "approve", false, "", { "reason": "There was nothing wrong with the papers. Approve it." }),
+	])[0]["text"]
+	_check(not bad_hold.contains("chose to"), "wrong_call uses active natural phrasing: %s" % bad_hold)
 
 
 func _test_real_shift_history() -> void:
