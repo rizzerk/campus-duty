@@ -29,6 +29,7 @@ func _init() -> void:
 	_test_trait_weights()
 	_test_own_section_never_drains()
 	_test_caught_favors_cost_stars()
+	_test_finish_scores_a_shift()
 	_test_day_one_onboarding_and_events()
 	_test_day_one_mistakes_are_gentler()
 	_test_speed_doesnt_rescue_wrong_calls()
@@ -463,6 +464,42 @@ func _test_caught_favors_cost_stars() -> void:
 	_check(Scoring.stars(summary) == 0, "stars never go below zero")
 	summary["reason"] = ""
 	_check(Scoring.projected(summary) == 3, "the pause projection ignores the spot check")
+
+
+## Scoring.finish is how the game, the simulator and the saves all close a shift.
+func _test_finish_scores_a_shift() -> void:
+	var day: int = int(GameData.json("balance")["spot_check"]["from_day"])
+	var perfect := ShiftState.new(day, 42)
+	_play(perfect, _perfect)
+	var gave_up := perfect.summary()
+	gave_up["reason"] = "patience"
+	Scoring.finish(gave_up, perfect.history, 42, day)
+	_check(gave_up["spot_check"] == [] and gave_up["caught_bends"] == 0, "no spot check when the line gave up")
+	_check(gave_up["stars"] == 0, "and no stars")
+	# A favor at index 3 and a regular among the calls; find a seed where Lorna's check catches it.
+	var history: Array = []
+	for i in 6:
+		var bent := i == 3
+		history.append({ "number": 100 + i, "name": "Student %d" % i, "action": "favor" if bent else "approve", "correct": not bent,
+			"bent": bent, "reason": "ISMIS shows an unpaid balance.", "expected": "route:cashier" if bent else "approve",
+			"outcome": "bent" if bent else "served", "problem": "unpaid_balance" if bent else "", "false_alarms": 0,
+			"regular_id": "r112" if i == 1 else "" })
+	# From 1: with base seed 0 the spot-check seed is just the day, which would hide a lost seed.
+	var found := -1
+	for seed_value in range(1, 200):
+		if SpotCheck.run(history.duplicate(true), seed_value * 1000 + day, day)["caught_bends"] == 1:
+			found = seed_value
+			break
+	_check(found >= 0, "some seed's spot check catches the favor")
+	var clean := perfect.summary()
+	clean["caught_bends"] = 0
+	var finished := Scoring.finish(perfect.summary(), history.duplicate(true), found, day)
+	_check(finished["spot_check"] == SpotCheck.run(history.duplicate(true), found * 1000 + day, day)["rows"], "the spot check runs on the shift's own seed")
+	_check(finished["caught_bends"] == 1, "a caught favor is counted")
+	_check(finished["stars"] == maxi(Scoring.stars(clean) - 1, 0) and finished["stars"] < Scoring.stars(clean), "and costs a star")
+	_check(finished["integrity"] == Evaluation.integrity(finished), "integrity is worked out from the finished summary")
+	_check(finished["regulars"] == Evaluation.regular_calls(history), "the regulars' visits are recorded")
+	_check(finished["regulars"].has("r112"), "including the regular who came")
 
 
 func _test_day_one_onboarding_and_events() -> void:

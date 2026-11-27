@@ -56,8 +56,18 @@ for day in $days; do
 done
 
 # The end-of-season evaluation, once per ending, and the Freedom Wall, from a made-up season
-# (DebugSeason). Skipped when only some days were asked for.
+# (DebugSeason), and the title with its save slots. Skipped when only some days were asked for.
 if [ "$#" -eq 0 ]; then
+	# The title reads the save slots to label Continue (it never writes them), and compiles the
+	# save slots screen with it.
+	output=$("$GODOT" --headless --path . --quit-after 120 res://scenes/main/title.tscn 2>&1)
+	if [ $? -ne 0 ] || echo "$output" | grep -Eq "$ERRORS"; then
+		echo "smoke title: FAIL"
+		echo "$output" | grep -E -A3 "$ERRORS" | head -40
+		status=1
+	else
+		echo "smoke title: PASS"
+	fi
 	output=$("$GODOT" --headless --path . --quit-after 120 -- --day=6 --seed=42 --scene=freedom_wall 2>&1)
 	# The wall says how many of its notes landed inside the board; all of them must have.
 	if [ $? -ne 0 ] || echo "$output" | grep -Eq "$ERRORS" || ! echo "$output" | grep -q -- "-> freedom_wall" \
