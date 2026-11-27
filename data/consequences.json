@@ -1,40 +1,147 @@
 {
 	"good": {
-		"fake_signature": "You caught #{number} {name}'s fake signature. They'll have to come back with their real adviser.",
-		"identity_mismatch": "You stopped someone from resetting #{number}'s account. It wasn't theirs to reset.",
-		"failed_prereq": "You caught the 5.0 in #{number} {name}'s prerequisite before it became a bigger mess.",
-		"short_payment": "You counted #{number} {name}'s cash and sent them back to complete the payment.",
-		"overpayment": "You gave #{number} {name} the exact change. Not a peso lost.",
-		"wrong_department": "You turned #{number} {name} away. Their department wasn't on today's list.",
-		"missing_requirement": "You sent #{number} {name} home with the exact list of what to bring.",
-		"unpaid_balance": "You sent #{number} {name} to the Cashier first. They came back with a receipt.",
-		"missing_signature": "You sent #{number} {name} to get their adviser's signature.",
-		"inc_prereq": "You sent #{number} {name} to sort out their INC with their adviser.",
-		"overload": "You sent #{number} {name}'s overload to the Dean's office.",
-		"ismis_login": "You got #{number} {name} back into ISMIS.",
-		"closed_section": "You found #{number} {name} a seat in {section}.",
-		"held": "You kept #{number} {name} on the bench until the office reopened.",
-		"office_closed": "You told #{number} {name} to come back tomorrow instead of sending them to a closed office."
+		"fake_signature": [
+			"You spotted the forged signature on #{number} {name}'s slip before it got into ISMIS.",
+			"#{number} {name}'s fake adviser signature didn't get past you—they'll have to come back with the real one.",
+			"Caught #{number} {name} trying to pass off a fake signature on their consultation slip."
+		],
+		"identity_mismatch": [
+			"You stopped someone from resetting #{number}'s account—the birthday on the slip didn't match.",
+			"Protected #{number}'s ISMIS account after catching a mismatched birthday on the admission slip.",
+			"Someone tried to claim #{number}'s login, and you caught the birthday mismatch in time."
+		],
+		"failed_prereq": [
+			"You caught the 5.0 in #{number} {name}'s prerequisite before it turned into a bigger headache.",
+			"Stopped #{number} {name} from enrolling in a subject while still carrying a 5.0 in its prerequisite.",
+			"Checked the Grades tab and caught #{number} {name}'s failed prerequisite right away."
+		],
+		"short_payment": [
+			"You counted #{number} {name}'s cash carefully and sent them back to complete the amount due.",
+			"Caught #{number} {name}'s short tuition payment before the drawer came up short.",
+			"#{number} {name}'s cash didn't cover the assessment—you caught it at the tray."
+		],
+		"overpayment": [
+			"You counted #{number} {name}'s bills and handed back the exact change, down to the peso.",
+			"#{number} {name} paid with big bills and walked away with the exact change.",
+			"Balanced the tray on #{number} {name}'s overpayment without a single peso off."
+		],
+		"wrong_department": [
+			"You turned #{number} {name} away politely—their department wasn't on today's extension list.",
+			"Kept the extension line fair by turning #{number} {name} away when their department wasn't listed.",
+			"Checked ISMIS first and caught that #{number} {name}'s department wasn't scheduled today."
+		],
+		"missing_requirement": [
+			"#{number} {name} left with the exact checklist of clearance items they still needed to bring.",
+			"You checked #{number} {name}'s graduation clearance and ticked every missing attachment for them.",
+			"Saved #{number} {name} a second wasted trip by marking the exact clearance items they forgot."
+		],
+		"unpaid_balance": [
+			"#{number} {name} settled their balance at the Cashier and came back with an official receipt.",
+			"You routed #{number} {name} to the Cashier first so their enrollment could clear properly.",
+			"Caught #{number} {name}'s unpaid balance in ISMIS—one Cashier trip later, they were good to go."
+		],
+		"missing_signature": [
+			"#{number} {name} got their consultation slip signed by their adviser and made it back.",
+			"You sent #{number} {name} to Consultation for the missing adviser signature before adding their subject.",
+			"Spotted the blank signature line on #{number} {name}'s slip and sent them to their adviser."
+		],
+		"inc_prereq": [
+			"#{number} {name} sorted out their INC prerequisite at Consultation and came back with an adviser's note.",
+			"You caught the INC in #{number} {name}'s prerequisite and sent them to get their adviser's go-ahead.",
+			"Sent #{number} {name} to Consultation so their adviser could clear their INC first."
+		],
+		"overload": [
+			"You routed #{number} {name}'s overload request to the Dean's office for proper sign-off.",
+			"#{number} {name} went over 24 units, so you sent them to get the Dean's approval first.",
+			"Caught #{number} {name}'s unit overload and sent them up to the Dean's office."
+		],
+		"ismis_login": [
+			"#{number} {name} walked away with a fresh temporary password and a working ISMIS account.",
+			"You verified #{number} {name}'s admission slip and got them logged into ISMIS for the first time.",
+			"Unlocked #{number} {name}'s freshman ISMIS account right at the window."
+		],
+		"closed_section": [
+			"You found #{number} {name} an open, conflict-free seat in {section}.",
+			"#{number} {name}'s section was full, so you moved them smoothly into {section}.",
+			"Saved #{number} {name}'s timetable by slotting them into {section} without a clash."
+		],
+		"held": [
+			"#{number} {name} waited on the bench instead of walking to a closed door, then went as soon as it reopened.",
+			"You parked #{number} {name} on the Hold bench during break so they didn't waste a trip.",
+			"Kept #{number} {name} on the bench until the office reopened."
+		],
+		"office_closed": [
+			"You spared #{number} {name} a trip to a shut office and told them to come back tomorrow.",
+			"#{number} {name} needed an office that had already closed for the day, so you saved them the walk.",
+			"Watched the clock and told #{number} {name} to return tomorrow instead of sending them to a closed door."
+		]
 	},
 	"bad": {
-		"bent_caught": "You did #{number} {name} a favor and waved them through, but {reason} Ma'am Lorna found it in the spot check.",
-		"bent": "You did #{number} {name} a favor and waved them through, but {reason} Nobody noticed… this time.",
+		"bent_caught": [
+			"You did #{number} {name} a favor and waved them through while {clause}—and Ma'am Lorna caught it in the spot check.",
+			"You let #{number} {name} slide on a favor even though {clause}. Ma'am Lorna spotted it in the spot check."
+		],
+		"bent": [
+			"You did #{number} {name} a favor and waved them through while {clause}. Nobody noticed… this time.",
+			"You let #{number} {name} through on a favor even though {clause}. It slipped past the audit… today."
+		],
 		"wrong_order": "#{number} {name}: {reason}",
-		"wrong_fix": "You changed things for #{number} {name} at the window, but {reason}",
-		"walked_out": "#{number} {name} walked out after two wrong calls. The whole line saw it.",
-		"closed_office": "You sent #{number} {name} to {office} while it was closed. They stood there for nothing.",
-		"wrong_office": "You sent #{number} {name} to {office}, but they needed {expected}. They came back angry.",
-		"needless_trip": "You sent #{number} {name} to {office}, but {reason}",
-		"let_through": "You approved #{number} {name}, but {reason}",
-		"right_call_wrong_detail": "#{number} {name}: right call, wrong details. {reason}",
-		"wrong_call": "You chose {action} for #{number} {name}. {reason}",
+		"wrong_fix": [
+			"You changed things for #{number} {name} at the window even though {clause}.",
+			"You edited #{number} {name}'s request at the window, but {clause}."
+		],
+		"walked_out": [
+			"#{number} {name} walked out after two wrong calls. The whole line saw it.",
+			"After getting mishandled twice, #{number} {name} gave up and walked out in front of the queue."
+		],
+		"closed_office": [
+			"You sent #{number} {name} to {office} while it was closed. They stood outside a shut door for nothing.",
+			"#{number} {name} walked all the way to {office} while it was closed and came back fuming."
+		],
+		"wrong_office": [
+			"You sent #{number} {name} to {office} when they actually needed {expected}. They came back angry.",
+			"#{number} {name} wasted a trip to {office}—they needed {expected} instead."
+		],
+		"needless_trip": [
+			"You sent #{number} {name} to {office}, but {clause}.",
+			"#{number} {name} walked all the way to {office}, even though {clause}."
+		],
+		"let_through": [
+			"You stamped #{number} {name} approved even though {clause}.",
+			"#{number} {name} slipped past the window approved while {clause}.",
+			"You waved #{number} {name} through, missing that {clause}."
+		],
+		"right_call_wrong_detail": [
+			"#{number} {name}: {reason}",
+			"Almost had #{number} {name}'s call right—{reason_lower}"
+		],
+		"wrong_call": [
+			"You {action}, even though {clause}.",
+			"You {action}—but {clause}."
+		],
 		"more": "…and {count} more wrong call{plural}.",
-		"false_alarms": "You flagged {count} thing{plural} that turned out to be fine. Each false alarm cost the line some patience."
+		"false_alarms": "You flagged {count} thing{plural} that turned out to be fine, draining the line's patience."
 	},
-	"action_names": {
-		"approve": "to approve",
-		"reject": "to turn them away",
-		"fix": "to fix it at the window",
-		"hold": "to hold them on the bench"
+	"problem_clauses": {
+		"clean": "there was nothing wrong with their papers",
+		"fake_signature": "the adviser's signature on their slip was forged",
+		"identity_mismatch": "the birthday on their admission slip didn't match ISMIS",
+		"failed_prereq": "they had a 5.0 in the prerequisite",
+		"wrong_department": "their department wasn't on today's extension list",
+		"short_payment": "their cash was short of the amount due",
+		"missing_requirement": "they were still missing a clearance requirement",
+		"unpaid_balance": "they still had an unpaid balance in ISMIS",
+		"missing_signature": "their consultation slip wasn't signed yet",
+		"inc_prereq": "they needed their adviser's note for an INC prerequisite",
+		"overload": "their load went over 24 units without the Dean's approval",
+		"ismis_login": "their ISMIS account was still locked",
+		"overpayment": "they overpaid and needed exact change back",
+		"closed_section": "their requested section was already full"
+	},
+	"action_verbs": {
+		"approve": "approved #{number} {name}",
+		"reject": "turned #{number} {name} away",
+		"fix": "edited #{number} {name}'s enrollment at the window",
+		"hold": "put #{number} {name} on the Hold bench"
 	}
 }
